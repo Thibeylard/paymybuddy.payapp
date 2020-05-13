@@ -1,4 +1,4 @@
-package com.paymybuddy.payapp;
+package com.paymybuddy.payapp.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;

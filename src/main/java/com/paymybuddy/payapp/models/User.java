@@ -1,22 +1,19 @@
 package com.paymybuddy.payapp.models;
 
-import com.paymybuddy.payapp.enums.Role;
-
-import java.util.ArrayList;
-
 public class User {
     private String username;
     private String email;
     private String password;
-    private ArrayList<Role> roles;
+    private final Role[] roles;
 
-    public User(String username, String email, String password, ArrayList<Role> roles) {
+    public User(String username, String email, String password, Role[] roles) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.roles = roles;
     }
 
+    // ----------------------------------- GETTERS AND SETTERS
     public String getUsername() {
         return username;
     }
@@ -29,7 +26,19 @@ public class User {
         return password;
     }
 
-    public ArrayList<Role> getRoles() {
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public Role[] getRoles() {
         return roles;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

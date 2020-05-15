@@ -1,12 +1,16 @@
 package com.paymybuddy.payapp.models;
 
+import com.paymybuddy.payapp.enums.Role;
+
 public class User {
+    private final int id;
+    private final Role[] roles;
     private String username;
     private String email;
     private String password;
-    private final Role[] roles;
 
-    public User(String username, String email, String password, Role[] roles) {
+    public User(int id, String username, String email, String password, Role[] roles) {
+        this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
@@ -14,6 +18,11 @@ public class User {
     }
 
     // ----------------------------------- GETTERS AND SETTERS
+
+    public int getId() {
+        return id;
+    }
+
     public String getUsername() {
         return username;
     }

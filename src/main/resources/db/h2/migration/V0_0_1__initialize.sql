@@ -4,13 +4,6 @@
     Description : Initialize database for first deliverable
  */
 
-CREATE TABLE Role
-(
-    id          IDENTITY    NOT NULL,
-    description VARCHAR(15) NOT NULL,
-    CONSTRAINT Role_pk PRIMARY KEY (id)
-);
-
 CREATE TABLE USER
 (
     id       IDENTITY    NOT NULL,
@@ -34,13 +27,6 @@ CREATE TABLE User_Role
     role_id INTEGER NOT NULL,
     CONSTRAINT User_Role_pk PRIMARY KEY (user_id, role_id)
 );
-
-ALTER TABLE User_Role
-    ADD CONSTRAINT ROLE_User_Role_fk
-        FOREIGN KEY (role_id)
-            REFERENCES Role (id)
-            ON DELETE NO ACTION
-            ON UPDATE NO ACTION;
 
 ALTER TABLE User_Role
     ADD CONSTRAINT USER_User_Role_fk

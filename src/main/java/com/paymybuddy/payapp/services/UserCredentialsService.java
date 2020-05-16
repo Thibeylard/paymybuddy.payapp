@@ -2,6 +2,7 @@ package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.UserDAO;
 import com.paymybuddy.payapp.models.User;
+import com.paymybuddy.payapp.models.UserCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,12 +12,12 @@ import org.springframework.stereotype.Service;
 import java.sql.SQLException;
 
 @Service
-public class AppUserDetailsService implements UserDetailsService {
+public class UserCredentialsService implements UserDetailsService {
 
     private final UserDAO userDAO;
 
     @Autowired
-    public AppUserDetailsService(UserDAO userDAO) {
+    public UserCredentialsService(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
 
@@ -32,6 +33,6 @@ public class AppUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException(mail);
         }
 
-        return user;
+        return new UserCredentials(user);
     }
 }

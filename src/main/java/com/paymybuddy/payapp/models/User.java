@@ -1,23 +1,73 @@
 package com.paymybuddy.payapp.models;
 
 import com.paymybuddy.payapp.enums.Role;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-public class User {
-    private final int id;
-    private final Role[] roles;
-    private String username;
-    private String email;
-    private String password;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import java.util.Collection;
 
-    public User(int id, String username, String email, String password, Role[] roles) {
+public class User implements UserDetails {
+
+    private @NotNull int id;
+    private @NotNull String username;
+    private @NotNull @Email String mail;
+    private @NotNull String password;
+    private Role[] roles;
+
+    public User(int id) {
         this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.roles = roles;
     }
 
-    // ----------------------------------- GETTERS AND SETTERS
+    public User withUsername(String username) {
+        this.username = username;
+        return this;
+    }
+
+    public User withMail(String mail) {
+        this.mail = mail;
+        return this;
+    }
+
+    public User withPassword(String password) {
+        this.password = password;
+        return this;
+    }
+
+    public User withRoles(Role[] roles) {
+        this.roles = roles;
+        return this;
+    }
+
+    // ----------------------------------- FROM UserDetails Interface
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    // ----------------------------------- Attribute Getters and Setters
 
     public int getId() {
         return id;
@@ -27,27 +77,11 @@ public class User {
         return username;
     }
 
-    public String getEmail() {
-        return email;
+    public String getMail() {
+        return mail;
     }
 
     public String getPassword() {
         return password;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public Role[] getRoles() {
-        return roles;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

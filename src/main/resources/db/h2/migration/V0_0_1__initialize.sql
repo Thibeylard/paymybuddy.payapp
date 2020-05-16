@@ -4,21 +4,21 @@
     Description : Initialize database for first deliverable
  */
 
-CREATE TABLE USER
+CREATE TABLE User
 (
     id       IDENTITY    NOT NULL,
     username VARCHAR(30) NOT NULL,
     mail     VARCHAR(50) NOT NULL,
-    password VARCHAR(30) NOT NULL,
+    password VARCHAR(80) NOT NULL,
     CONSTRAINT user_id PRIMARY KEY (id)
 );
 
-CREATE UNIQUE INDEX mail_indx
-    ON USER
+CREATE UNIQUE INDEX mail_idx
+    ON User
         (mail ASC);
 
 CREATE UNIQUE INDEX username_idx
-    ON USER
+    ON User
         (username ASC);
 
 CREATE TABLE User_Role
@@ -31,6 +31,6 @@ CREATE TABLE User_Role
 ALTER TABLE User_Role
     ADD CONSTRAINT USER_User_Role_fk
         FOREIGN KEY (user_id)
-            REFERENCES USER (id)
+            REFERENCES User (id)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION;

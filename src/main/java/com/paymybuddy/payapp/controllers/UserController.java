@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = "application/json")
 public class UserController {
 
-    @GetMapping("/")
+    @GetMapping("/home")
     public User home() {
         return null;
     }

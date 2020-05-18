@@ -7,7 +7,7 @@ import java.util.Collection;
 
 public class UserCredentials implements UserDetails {
 
-    private User user;
+    private final User user;
 
     public UserCredentials(User user) {
         this.user = user;

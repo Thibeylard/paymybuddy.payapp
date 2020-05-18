@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(produces = "application/json")
 public class UserController {
 
-    @GetMapping("/home")
+    @GetMapping("/user/home")
     public User home() {
         return null;
     }
 
-    @GetMapping("/settings")
+    @GetMapping("/user/settings")
     public User settings() {
         return null;
     }

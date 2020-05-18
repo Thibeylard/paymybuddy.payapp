@@ -30,14 +30,17 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public User findByMail(@Email String mail) throws SQLException {
         //TODO ajouter la validation de l'email
+        User user = null;
         Connection con = datasource.getConnection();
         PreparedStatement ps = con.prepareStatement(DBStatements.GET_USER_BY_MAIL);
         ps.setString(1, mail);
         ResultSet rs = ps.executeQuery();
-        User user = new User(rs.getInt("id"))
-                .withUsername(rs.getString("username"))
-                .withMail(rs.getString("mail"))
-                .withPassword(rs.getString("password"));
+        if (rs.next()) {
+            user = new User(rs.getInt(1))
+                    .withUsername(rs.getString(2))
+                    .withMail(rs.getString(3))
+                    .withPassword(rs.getString(4));
+        }
         // TODO ajouter les roles (vérifier la requete SQL nécessaire)
 
         rs.close();

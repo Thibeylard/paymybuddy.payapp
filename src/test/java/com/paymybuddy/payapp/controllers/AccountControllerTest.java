@@ -1,4 +1,4 @@
-package com.paymybuddy.payapp;
+package com.paymybuddy.payapp.controllers;
 
 import com.paymybuddy.payapp.services.AccountService;
 import org.junit.Before;
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
@@ -31,11 +31,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("Account Controller tests on : ")
-public class AccountControllerTests {
+public class AccountControllerTest {
 
     @Autowired
     private WebApplicationContext context;
@@ -78,7 +78,7 @@ public class AccountControllerTests {
                 .params(params)
                 .with(csrf())
                 .with(anonymous()))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isBadRequest());
     }
 
     @Test

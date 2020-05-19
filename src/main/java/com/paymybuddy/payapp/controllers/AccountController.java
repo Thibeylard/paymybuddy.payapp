@@ -20,19 +20,6 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    // TODO définir type retour
-    /*
-    @GetMapping("/login")
-    public void login() {
-
-    }
-
-    // TODO définir type retour
-    @GetMapping("/logout")
-    public void logout() {
-
-    }
-    */
     @PostMapping("/registration")
     public ResponseEntity<Boolean> registration(@RequestParam(name = "username") final String username,
                                                 @RequestParam(name = "mail") final String mail,
@@ -40,7 +27,7 @@ public class AccountController {
         try {
             accountService.registrateUser(username, mail, password);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<Boolean>(false, HttpStatus.FORBIDDEN);
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<Boolean>(true, HttpStatus.OK);
     }

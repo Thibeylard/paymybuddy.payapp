@@ -8,9 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.tinylog.Logger;
 
-import java.sql.SQLException;
+import java.util.Optional;
 
 @Service
 public class UserCredentialsService implements UserDetailsService {
@@ -24,19 +23,7 @@ public class UserCredentialsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
-        User user = null;
-        try {
-            user = userDAO.findByMail(mail);
-        } catch (SQLException e) {
-            Logger.debug("SQL Exception occurred while searching for User");
-            e.printStackTrace();
-            throw new UsernameNotFoundException(mail);
-        }
-        if (user == null) {
-            Logger.debug("The is no User with mail {}", mail);
-            throw new UsernameNotFoundException(mail);
-        }
-
-        return new UserCredentials(user);
+        Optional<User> user = userDAO.findByMail(mail);
+        return new UserCredentials(user.orElseThrow(() -> new UsernameNotFoundException(mail)));
     }
 }

@@ -21,14 +21,14 @@ public class AccountController {
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<Boolean> registration(@RequestParam(name = "username") final String username,
-                                                @RequestParam(name = "mail") final String mail,
-                                                @RequestParam(name = "password") final String password) {
+    public ResponseEntity<String> registration(@RequestParam(name = "username") final String username,
+                                               @RequestParam(name = "mail") final String mail,
+                                               @RequestParam(name = "password") final String password) {
         try {
             accountService.registrateUser(username, mail, password);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+        return new ResponseEntity<String>("Registration succeed", HttpStatus.OK);
     }
 }

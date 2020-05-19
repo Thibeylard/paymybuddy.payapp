@@ -1,61 +1,95 @@
 package com.paymybuddy.payapp.daos;
 
+import com.paymybuddy.payapp.config.DatabaseConfiguration;
 import com.paymybuddy.payapp.constants.DBStatements;
 import com.paymybuddy.payapp.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.tinylog.Logger;
 
-import javax.sql.DataSource;
-import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
 @Repository
 public class UserDAOImpl implements UserDAO {
 
-    private final DataSource datasource;
+    private final DatabaseConfiguration databaseConfiguration;
 
     @Autowired
-    public UserDAOImpl(DataSource datasource) {
-        this.datasource = datasource;
+    public UserDAOImpl(DatabaseConfiguration databaseConfiguration) {
+        this.databaseConfiguration = databaseConfiguration;
     }
 
     @Override
-    public User findById(int id) {
+    public Optional<User> findById(final int id) {
         return null;
     }
 
     @Override
-    public User findByMail(@Email String mail) throws SQLException {
-        //TODO ajouter la validation de l'email
-        User user = null;
-        Connection con = datasource.getConnection();
-        PreparedStatement ps = con.prepareStatement(DBStatements.GET_USER_BY_MAIL);
-        ps.setString(1, mail);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            user = new User(rs.getInt(1))
-                    .withUsername(rs.getString(2))
-                    .withMail(rs.getString(3))
-                    .withPassword(rs.getString(4));
+    public Optional<User> findByMail(final String validMail) {
+        Optional<User> user = Optional.empty();
+        Connection con = databaseConfiguration.getConnection();
+        if (con != null) {
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            try {
+                ps = con.prepareStatement(DBStatements.GET_USER_BY_MAIL);
+                ps.setString(1, validMail);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    user = Optional.of(new User(rs.getInt(1))
+                            .withUsername(rs.getString(2))
+                            .withMail(rs.getString(3))
+                            .withPassword(rs.getString(4)));
+                    // TODO ajouter les roles (vérifier la requete SQL nécessaire)
+                }
+            } catch (SQLException e) {
+                Logger.error("An error occurred : User could not be found.");
+            } finally {
+                databaseConfiguration.closeResultSet(rs);
+                databaseConfiguration.closePreparedStatement(ps);
+                databaseConfiguration.closeConnection(con);
+            }
         }
-        // TODO ajouter les roles (vérifier la requete SQL nécessaire)
-
-        rs.close();
-        ps.close();
-        con.close();
 
         return user;
     }
 
     @Override
-    public User findByUsername(String username) {
+    public Optional<User> findByUsername(final String username) {
         return null;
     }
 
-    public DataSource getDatasource() {
-        return datasource;
+    @Override
+    public boolean saveUser(@NotNull final String username, @NotNull final String mail, @NotNull final String encodedPassword) throws IllegalArgumentException {
+
+        findByMail(mail).ifPresent(user -> {
+            throw new IllegalArgumentException("A User with this mail already exists.");
+        });
+
+        Connection con = databaseConfiguration.getConnection();
+        PreparedStatement ps = null;
+        boolean result = false;
+
+        if (con != null) {
+            try {
+                ps = con.prepareStatement(DBStatements.INSERT_USER);
+                ps.setString(0, username);
+                ps.setString(1, mail);
+                ps.setString(2, encodedPassword);
+                result = ps.execute();
+            } catch (SQLException e) {
+                Logger.error("An error occurred : Registration could not be validated.");
+            } finally {
+                databaseConfiguration.closePreparedStatement(ps);
+                databaseConfiguration.closeConnection(con);
+            }
+        }
+
+        return result;
     }
 }

@@ -11,6 +11,7 @@ import javax.validation.Validator;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.sql.SQLException;
 import java.util.Set;
 
 @Service
@@ -28,7 +29,9 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void registrateUser(@NotEmpty @Size(min = 5, max = 25) String username,
                                @Email String mail,
-                               @Size(min = 8) String password) throws IllegalArgumentException {
+                               @Size(min = 8) String password) throws SQLException, IllegalArgumentException {
+
+        //TODO Vérifier le fonctionnement des validation bean
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
         Set<ConstraintViolation<String>> violationSet = validator.validate(username);

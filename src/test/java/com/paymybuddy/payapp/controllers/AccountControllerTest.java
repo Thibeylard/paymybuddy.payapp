@@ -17,6 +17,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.sql.SQLException;
+
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -79,6 +81,20 @@ public class AccountControllerTest {
                 .with(csrf())
                 .with(anonymous()))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("User registration failed")
+    public void Given_databaseError_When_userRegistrates_Then_statusIsInternalServerError() throws Exception {
+        params.add("username", "user");
+        params.add("mail", "user@mail.com");
+        params.add("password", "pass");
+        doThrow(SQLException.class).when(mockAccountService).registrateUser(anyString(), anyString(), anyString());
+        mvc.perform(post("/registration")
+                .params(params)
+                .with(csrf())
+                .with(anonymous()))
+                .andExpect(status().isInternalServerError());
     }
 
     @Test

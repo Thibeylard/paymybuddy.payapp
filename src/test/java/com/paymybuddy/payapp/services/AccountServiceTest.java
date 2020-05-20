@@ -10,6 +10,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.sql.SQLException;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
@@ -23,29 +25,29 @@ public class AccountServiceTest {
     private UserDAO mockUserDAO;
 
     @Test(expected = IllegalArgumentException.class)
-    public void Given_usernameTooShort_When_registrates_Then_throwIllegalArgumentException() {
+    public void Given_usernameTooShort_When_registrates_Then_throwIllegalArgumentException() throws SQLException {
         accountService.registrateUser("a", "hello@mail.com", "longEnoughPassword");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void Given_usernameTooLong_When_registrates_Then_throwIllegalArgumentException() {
+    public void Given_usernameTooLong_When_registrates_Then_throwIllegalArgumentException() throws SQLException {
         accountService.registrateUser("VeryLongUsernameThatCannotBeSavedInDatabase", "hello@mail.com", "longEnoughPassword");
     }
 
 
     @Test(expected = IllegalArgumentException.class)
-    public void Given_invalidMail_When_registrates_Then_throwIllegalArgumentException() {
+    public void Given_invalidMail_When_registrates_Then_throwIllegalArgumentException() throws SQLException {
         accountService.registrateUser("ValidUsername", "hello@mail", "longEnoughPassword");
     }
 
 
     @Test(expected = IllegalArgumentException.class)
-    public void Given_invalidPassword_When_registrates_Then_throwIllegalArgumentException() {
+    public void Given_invalidPassword_When_registrates_Then_throwIllegalArgumentException() throws SQLException {
         accountService.registrateUser("ValidUsername", "hello@mail.com", "pass");
     }
 
     @Test
-    public void Given_validParams_When_registrates_Then_noIllegalArgumentExceptionThrown() {
+    public void Given_validParams_When_registrates_Then_noIllegalArgumentExceptionThrown() throws SQLException {
         accountService.registrateUser("ValidUsername", "hello@mail.com", "longEnoughPassword");
     }
 }

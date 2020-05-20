@@ -34,17 +34,21 @@ public class UserDAOImpl implements UserDAO {
         Optional<User> user = Optional.empty();
         Connection con = databaseConfiguration.getConnection();
         if (con != null) {
+            Logger.debug("Connection not null");
             PreparedStatement ps = null;
             ResultSet rs = null;
             try {
                 ps = con.prepareStatement(DBStatements.GET_USER_BY_MAIL);
                 ps.setString(1, validMail);
+                Logger.debug("ps OK");
                 rs = ps.executeQuery();
+                Logger.debug("rs OK");
                 if (rs.next()) {
-                    user = Optional.of(new User(rs.getInt(1))
-                            .withUsername(rs.getString(2))
-                            .withMail(rs.getString(3))
-                            .withPassword(rs.getString(4)));
+                    Logger.debug("rs has next");
+                    user = Optional.of(new User(rs.getInt("id"))
+                            .withUsername(rs.getString("username"))
+                            .withMail(rs.getString("mail"))
+                            .withPassword(rs.getString("password")));
                     // TODO ajouter les roles (vérifier la requete SQL nécessaire)
                 }
             } catch (SQLException e) {
@@ -65,15 +69,14 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public boolean saveUser(@NotNull final String username, @NotNull final String mail, @NotNull final String encodedPassword) throws IllegalArgumentException {
+    public void saveUser(@NotNull final String username, @NotNull final String mail, @NotNull final String encodedPassword) throws SQLException, IllegalArgumentException {
 
-        findByMail(mail).ifPresent(user -> {
+        if (findByMail(mail).isPresent()) {
             throw new IllegalArgumentException("A User with this mail already exists.");
-        });
+        }
 
         Connection con = databaseConfiguration.getConnection();
         PreparedStatement ps = null;
-        boolean result = false;
 
         if (con != null) {
             try {
@@ -81,15 +84,14 @@ public class UserDAOImpl implements UserDAO {
                 ps.setString(0, username);
                 ps.setString(1, mail);
                 ps.setString(2, encodedPassword);
-                result = ps.execute();
+                ps.execute();
             } catch (SQLException e) {
-                Logger.error("An error occurred : Registration could not be validated.");
+                Logger.error("Database error occurred.");
+                throw new SQLException("An error occurred : Registration could not be validated.");
             } finally {
                 databaseConfiguration.closePreparedStatement(ps);
                 databaseConfiguration.closeConnection(con);
             }
         }
-
-        return result;
     }
 }

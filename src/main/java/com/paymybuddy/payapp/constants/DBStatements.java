@@ -6,5 +6,5 @@ public final class DBStatements {
             "SELECT id, username, mail, password FROM User WHERE mail = ?";
 
     public static final String INSERT_USER =
-            "INSERT INTO User username, mail, password VALUES ( ?, ?, ?)";
+            "INSERT INTO User (username, mail, password) VALUES ( ?, ?, ?)";
 }

@@ -1,5 +1,7 @@
 package com.paymybuddy.payapp.controllers;
 
+import com.paymybuddy.payapp.models.User;
+import com.paymybuddy.payapp.models.UserCredentials;
 import com.paymybuddy.payapp.services.AccountService;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,6 +10,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,8 +26,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.sql.SQLException;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
@@ -39,15 +44,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Account Controller tests on : ")
 public class AccountControllerTest {
 
+    private final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    // Beans
     @Autowired
     private WebApplicationContext context;
-
+    @Autowired
+    private PasswordEncoder bcryptEncoder;
+    // Mocks
+    private MockMvc mvc;
     @MockBean
     private AccountService mockAccountService;
 
-    private MockMvc mvc;
     private String baseUrl;
-    private MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    @MockBean
+    private UserDetailsService mockUserDetailsService;
+    private UserDetails userDetails;
 
     @Before
     public void setup() {
@@ -56,6 +67,10 @@ public class AccountControllerTest {
                 .apply(springSecurity()) // Integrate SpringSecurity to SpringMVC
                 .build();
         baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        userDetails = new UserCredentials(new User(14)
+                .withUsername("user")
+                .withMail("user@mail.com")
+                .withPassword(bcryptEncoder.encode("userpass")));
     }
 
     @Test
@@ -64,13 +79,14 @@ public class AccountControllerTest {
         mvc.perform(get("/user/home")
                 .with(anonymous()))
                 .andExpect(redirectedUrl(this.baseUrl + "/login"));
+
         mvc.perform(get("/user/settings")
                 .with(anonymous()))
                 .andExpect(redirectedUrl(this.baseUrl + "/login"));
     }
 
     @Test
-    @DisplayName("User registration failed")
+    @DisplayName("User registration failed on 403")
     public void Given_anonymousUser_When_registratesWithUnavailableMail_Then_statusIsForbidden() throws Exception {
         params.add("username", "user");
         params.add("mail", "user@mail.com");
@@ -84,7 +100,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    @DisplayName("User registration failed")
+    @DisplayName("User registration failed on 405")
     public void Given_databaseError_When_userRegistrates_Then_statusIsInternalServerError() throws Exception {
         params.add("username", "user");
         params.add("mail", "user@mail.com");
@@ -114,6 +130,7 @@ public class AccountControllerTest {
     @Test
     @DisplayName("User login failed")
     public void Given_anonymousUser_When_loginWithWrongCredentials_Then_isNotAuthenticated() throws Exception {
+        when(mockUserDetailsService.loadUserByUsername(anyString())).thenThrow(UsernameNotFoundException.class);
         mvc.perform(formLogin()
                 .user("wronguser")
                 .password("wrongpassword"))
@@ -123,9 +140,10 @@ public class AccountControllerTest {
     @Test
     @DisplayName("User login succeed")
     public void Given_anonymousUser_When_loginWithValidCredentials_Then_isAuthenticated() throws Exception {
+        when(mockUserDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);
         mvc.perform(formLogin()
-                .user("martin@gmail.com")
-                .password("martinpass"))
+                .user("user@mail.com")
+                .password("userpass"))
                 .andExpect(authenticated());
     }
 
@@ -133,11 +151,11 @@ public class AccountControllerTest {
     @DisplayName("Authenticated user accesses")
     public void Given_authenticatedUser_When_requestAppAccess_Then_accessToRequestedPage() throws Exception {
         mvc.perform(get("/user/home")
-                .with(user("martin@gmail.com")))
+                .with(user("user@mail.com")))
                 .andExpect(status().isOk());
 
         mvc.perform(get("/user/settings")
-                .with(user("martin@gmail.com")))
+                .with(user("user@mail.com")))
                 .andExpect(status().isOk());
     }
 

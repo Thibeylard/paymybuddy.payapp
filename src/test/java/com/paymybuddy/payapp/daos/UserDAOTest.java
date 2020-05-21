@@ -1,126 +1,89 @@
 package com.paymybuddy.payapp.daos;
 
-import com.paymybuddy.payapp.config.DatabaseConfiguration;
-import com.paymybuddy.payapp.models.User;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("test_h2")
 @DisplayName("User DAO tests on : ")
 public class UserDAOTest {
 
-    @SpyBean
-    private UserDAO spyUserDAO;
+    @Autowired
+    private UserDAO userDAO;
 
-    @MockBean
-    private DatabaseConfiguration mockDbConfig;
+    @Autowired
+    private DataSource dataSource;
 
-    @Mock
-    private Connection mockCon;
-
-    @Mock
-    private PreparedStatement mockPs;
-
-    @Mock
-    private ResultSet mockRs;
+    @Before
+    public void databaseSetup() throws SQLException {
+        Connection connection = null;
+        PreparedStatement ps = null;
+        try {
+            connection = dataSource.getConnection();
+            ps = connection.prepareStatement(
+                    "INSERT INTO User (username, mail, password) " +
+                            "VALUES ('user', 'user@mail.com', 'userpass')"
+            );
+            ps.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            assert connection != null;
+            connection.close();
+            assert ps != null;
+            ps.close();
+        }
+    }
 
     @Test
-    public void Given_validUserMail_When_searchingForUser_Then_retrieveCorrespondingUser() throws SQLException {
-        User user = new User(5674)
-                .withUsername("Philip")
-                .withMail("philip@mail.com")
-                .withPassword("philippass");
-
-        when(mockDbConfig.getConnection()).thenReturn(mockCon);
-        when(mockCon.prepareStatement(anyString())).thenReturn(mockPs);
-        when(mockPs.executeQuery()).thenReturn(mockRs);
-        when(mockRs.next()).thenReturn(true);
-        when(mockRs.getInt("id")).thenReturn(5674);
-        when(mockRs.getString("username")).thenReturn("Philip");
-        when(mockRs.getString("mail")).thenReturn("philip@mail.com");
-        when(mockRs.getString("password")).thenReturn("philippass");
-
-
-        assertThat(spyUserDAO.findByMail("philip@mail.com"))
+    public void Given_validUserMail_When_searchingForUser_Then_retrieveCorrespondingUser() {
+        assertThat(userDAO.findByMail("user@mail.com"))
                 .isNotNull()
                 .isPresent()
                 .get()
-                .isEqualToComparingFieldByField(user);
-
-        verify(mockDbConfig).getConnection();
-        verify(mockCon).prepareStatement(anyString());
-        verify(mockPs).executeQuery();
-        verify(mockRs).next();
+                .hasFieldOrPropertyWithValue("username", "user")
+                .hasFieldOrPropertyWithValue("mail", "user@mail.com")
+                .hasFieldOrPropertyWithValue("password", "userpass");
     }
 
     @Test
-    public void Given_invalidUserMail_When_searchingForUser_Then_getEmptyUser() throws SQLException {
-        when(mockDbConfig.getConnection()).thenReturn(mockCon);
-        when(mockCon.prepareStatement(anyString())).thenReturn(mockPs);
-        when(mockPs.executeQuery()).thenReturn(mockRs);
-        when(mockRs.next()).thenReturn(false);
-
-        assertThat(spyUserDAO.findByMail("john@mail.com"))
+    public void Given_invalidUserMail_When_searchingForUser_Then_getEmptyUser() {
+        assertThat(userDAO.findByMail("john@mail.com"))
                 .isNotNull()
                 .isNotPresent();
     }
 
     @Test
-    public void Given_databaseError_When_searchingForUser_Then_getEmptyUser() throws SQLException {
-        when(mockDbConfig.getConnection()).thenReturn(mockCon);
-        when(mockCon.prepareStatement(anyString())).thenThrow(SQLException.class);
+    public void Given_availableMail_When_savingUser_Then_userIsStoredInDatabase() throws SQLException {
+        assertThat(userDAO.saveUser("user2", "user2@mail.com", "user2pass"))
+                .isTrue();
 
-        assertThat(spyUserDAO.findByMail("error@mail.com"))
+        assertThat(userDAO.findByMail("user2@mail.com"))
                 .isNotNull()
-                .isNotPresent();
-    }
-
-    @Test
-    public void Given_availableMail_When_savingUser_Then_noIllegalArgumentExceptionThrown() throws SQLException {
-        doReturn(Optional.empty()).when(spyUserDAO).findByMail(anyString());
-        when(mockDbConfig.getConnection()).thenReturn(mockCon);
-        when(mockCon.prepareStatement(anyString())).thenReturn(mockPs);
-        when(mockPs.execute()).thenReturn(true);
-
-        spyUserDAO.saveUser("userToSave", "user@mail.com", "userpass");
-        verify(spyUserDAO).findByMail(anyString());
+                .isPresent()
+                .get()
+                .hasFieldOrPropertyWithValue("username", "user2")
+                .hasFieldOrPropertyWithValue("mail", "user2@mail.com")
+                .hasFieldOrPropertyWithValue("password", "user2pass");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void Given_existingMail_When_savingUser_Then_IllegalArgumentExceptionThrown() throws SQLException {
-        doReturn(Optional.of(new User(12474))).when(spyUserDAO).findByMail(anyString());
-
-        spyUserDAO.saveUser("userToSave", "user@mail.com", "userpass");
-
-        verify(spyUserDAO).findByMail(anyString());
-
+    public void Given_existingMail_When_savingUser_Then_IllegalArgumentExceptionThrown() throws SQLException, IllegalArgumentException {
+        userDAO.saveUser("user", "user@mail.com", "userpass");
     }
 
-    @Test(expected = SQLException.class)
-    public void Given_databaseError_When_savingUser_Then_SQLExceptionThrown() throws SQLException {
-        doReturn(Optional.empty()).when(spyUserDAO).findByMail(anyString());
-        when(mockDbConfig.getConnection()).thenReturn(mockCon);
-        when(mockCon.prepareStatement(anyString())).thenThrow(SQLException.class);
-
-        spyUserDAO.saveUser("userToSave", "user@mail.com", "userpass");
-    }
 }

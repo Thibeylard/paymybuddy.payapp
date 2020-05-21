@@ -34,17 +34,14 @@ public class UserDAOImpl implements UserDAO {
         Optional<User> user = Optional.empty();
         Connection con = databaseConfiguration.getConnection();
         if (con != null) {
-            Logger.debug("Connection not null");
             PreparedStatement ps = null;
             ResultSet rs = null;
             try {
                 ps = con.prepareStatement(DBStatements.GET_USER_BY_MAIL);
                 ps.setString(1, validMail);
-                Logger.debug("ps OK");
                 rs = ps.executeQuery();
-                Logger.debug("rs OK");
                 if (rs.next()) {
-                    Logger.debug("rs has next");
+                    Logger.debug("User with {} as mail has been found", validMail);
                     user = Optional.of(new User(rs.getInt("id"))
                             .withUsername(rs.getString("username"))
                             .withMail(rs.getString("mail"))
@@ -69,29 +66,36 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public void saveUser(@NotNull final String username, @NotNull final String mail, @NotNull final String encodedPassword) throws SQLException, IllegalArgumentException {
+    public boolean saveUser(@NotNull final String username, @NotNull final String mail, @NotNull final String encodedPassword) throws SQLException, IllegalArgumentException {
 
+        Logger.debug("Asked to save user {}, {}, {}", username, mail, encodedPassword);
         if (findByMail(mail).isPresent()) {
+            Logger.debug("User mail unavailable.");
             throw new IllegalArgumentException("A User with this mail already exists.");
         }
 
         Connection con = databaseConfiguration.getConnection();
         PreparedStatement ps = null;
+        boolean result = false;
 
         if (con != null) {
             try {
                 ps = con.prepareStatement(DBStatements.INSERT_USER);
-                ps.setString(0, username);
-                ps.setString(1, mail);
-                ps.setString(2, encodedPassword);
+                ps.setString(1, username);
+                ps.setString(2, mail);
+                ps.setString(3, encodedPassword);
                 ps.execute();
+                result = true;
             } catch (SQLException e) {
                 Logger.error("Database error occurred.");
+                e.printStackTrace();
                 throw new SQLException("An error occurred : Registration could not be validated.");
             } finally {
                 databaseConfiguration.closePreparedStatement(ps);
                 databaseConfiguration.closeConnection(con);
             }
         }
+
+        return result;
     }
 }

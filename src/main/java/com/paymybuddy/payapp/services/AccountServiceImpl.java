@@ -6,7 +6,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
@@ -17,6 +16,8 @@ import java.util.Set;
 @Service
 public class AccountServiceImpl implements AccountService {
 
+    @Autowired
+    Validator validator;
     private final PasswordEncoder passwordEncoder;
     private final UserDAO userDAO;
 
@@ -32,7 +33,6 @@ public class AccountServiceImpl implements AccountService {
                                @Size(min = 8) String password) throws SQLException, IllegalArgumentException {
 
         //TODO Vérifier le fonctionnement des validation bean
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
         Set<ConstraintViolation<String>> violationSet = validator.validate(username);
         if (!violationSet.isEmpty())

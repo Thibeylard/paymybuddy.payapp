@@ -44,21 +44,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Account Controller tests on : ")
 public class AccountControllerTest {
 
-    private final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     // Beans
     @Autowired
     private WebApplicationContext context;
     @Autowired
     private PasswordEncoder bcryptEncoder;
+
     // Mocks
     private MockMvc mvc;
+    private final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     @MockBean
     private AccountService mockAccountService;
 
     private String baseUrl;
+    private UserDetails userDetails;
     @MockBean
     private UserDetailsService mockUserDetailsService;
-    private UserDetails userDetails;
 
     @Before
     public void setup() {
@@ -86,8 +87,8 @@ public class AccountControllerTest {
     }
 
     @Test
-    @DisplayName("User registration failed on 403")
-    public void Given_anonymousUser_When_registratesWithUnavailableMail_Then_statusIsForbidden() throws Exception {
+    @DisplayName("User registration failed on 404")
+    public void Given_anonymousUser_When_registratesWithUnavailableMail_Then_statusIsBadRequest() throws Exception {
         params.add("username", "user");
         params.add("mail", "user@mail.com");
         params.add("password", "pass");

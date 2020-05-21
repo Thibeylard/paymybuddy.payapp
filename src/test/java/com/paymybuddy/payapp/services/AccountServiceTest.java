@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
 
 @RunWith(SpringRunner.class)
@@ -24,25 +25,25 @@ public class AccountServiceTest {
     @MockBean
     private UserDAO mockUserDAO;
 
-    @Test(expected = IllegalArgumentException.class)
-    public void Given_usernameTooShort_When_registrates_Then_throwIllegalArgumentException() throws SQLException {
+    @Test(expected = ConstraintViolationException.class)
+    public void Given_usernameTooShort_When_registrates_Then_throwIllegalArgumentException() throws SQLException, IllegalArgumentException {
         accountService.registrateUser("a", "hello@mail.com", "longEnoughPassword");
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void Given_usernameTooLong_When_registrates_Then_throwIllegalArgumentException() throws SQLException {
+    @Test(expected = ConstraintViolationException.class)
+    public void Given_usernameTooLong_When_registrates_Then_throwIllegalArgumentException() throws SQLException, IllegalArgumentException {
         accountService.registrateUser("VeryLongUsernameThatCannotBeSavedInDatabase", "hello@mail.com", "longEnoughPassword");
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public void Given_invalidMail_When_registrates_Then_throwIllegalArgumentException() throws SQLException {
-        accountService.registrateUser("ValidUsername", "hello@mail", "longEnoughPassword");
+    @Test(expected = ConstraintViolationException.class)
+    public void Given_invalidMail_When_registrates_Then_throwIllegalArgumentException() throws SQLException, IllegalArgumentException {
+        accountService.registrateUser("ValidUsername", "hellomail", "longEnoughPassword");
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public void Given_invalidPassword_When_registrates_Then_throwIllegalArgumentException() throws SQLException {
+    @Test(expected = ConstraintViolationException.class)
+    public void Given_invalidPassword_When_registrates_Then_throwIllegalArgumentException() throws SQLException, IllegalArgumentException {
         accountService.registrateUser("ValidUsername", "hello@mail.com", "pass");
     }
 

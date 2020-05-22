@@ -1,5 +1,8 @@
 package com.paymybuddy.payapp.daos;
 
+import com.paymybuddy.payapp.enums.Role;
+import com.paymybuddy.payapp.models.User;
+import org.assertj.db.type.Table;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,8 +16,10 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.db.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
@@ -29,17 +34,40 @@ public class UserDAOTest {
     @Autowired
     private DataSource dataSource;
 
+
     @BeforeEach
     public void databaseSetup() throws SQLException {
         Connection connection = null;
         PreparedStatement ps = null;
+
         try {
             connection = dataSource.getConnection();
+
+            // Reset User Table
             ps = connection.prepareStatement(
-                    "INSERT INTO User (username, mail, password) " +
-                            "VALUES ('user', 'user@mail.com', 'userpass')"
+                    "DELETE FROM User;"
             );
             ps.execute();
+
+            ps = connection.prepareStatement(
+                    "DELETE FROM User_Role;"
+            );
+            ps.execute();
+
+            // Insert User 'user'
+            ps = connection.prepareStatement(
+                    "INSERT INTO User (id, username, mail, password) " +
+                            "VALUES (1, 'user', 'user@mail.com', 'userpass')"
+            );
+            ps.execute();
+
+            // Insert role for 'user'
+            ps = connection.prepareStatement(
+                    "INSERT INTO User_Role (user_id, role_id) " +
+                            "VALUES (1,1)"
+            );
+            ps.execute();
+
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -53,13 +81,16 @@ public class UserDAOTest {
     @Test
     @DisplayName("Get user by mail success")
     public void Given_validUserMail_When_searchingForUser_Then_retrieveCorrespondingUser() {
-        assertThat(userDAO.findByMail("user@mail.com"))
+        Optional<User> user = userDAO.findByMail("user@mail.com");
+        assertThat(user)
                 .isNotNull()
-                .isPresent()
-                .get()
-                .hasFieldOrPropertyWithValue("username", "user")
-                .hasFieldOrPropertyWithValue("mail", "user@mail.com")
-                .hasFieldOrPropertyWithValue("password", "userpass");
+                .isPresent();
+        assertThat(user.get().getUsername()).isEqualTo("user");
+        assertThat(user.get().getMail()).isEqualTo("user@mail.com");
+        assertThat(user.get().getPassword()).isEqualTo("userpass");
+        assertThat(user.get().getRoles())
+                .hasSize(1)
+                .contains(Role.USER);
     }
 
     @Test
@@ -76,13 +107,11 @@ public class UserDAOTest {
         assertThat(userDAO.saveUser("user2", "user2@mail.com", "user2pass"))
                 .isTrue();
 
-        assertThat(userDAO.findByMail("user2@mail.com"))
-                .isNotNull()
-                .isPresent()
-                .get()
-                .hasFieldOrPropertyWithValue("username", "user2")
-                .hasFieldOrPropertyWithValue("mail", "user2@mail.com")
-                .hasFieldOrPropertyWithValue("password", "user2pass");
+        Table userTable = new Table(dataSource, "User");
+        assertThat(userTable).row(1)
+                .value("username").isEqualTo("user2")
+                .value("mail").isEqualTo("user2@mail.com")
+                .value("password").isEqualTo("user2pass");
     }
 
     @Test

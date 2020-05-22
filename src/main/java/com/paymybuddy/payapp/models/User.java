@@ -4,6 +4,7 @@ import com.paymybuddy.payapp.enums.Role;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 
 
 public class User {
@@ -12,7 +13,7 @@ public class User {
     private @NotNull String username;
     private @NotNull @Email String mail;
     private @NotNull String password;
-    private Role[] roles;
+    private ArrayList<Role> roles;
 
     public User(int id) {
         this.id = id;
@@ -33,7 +34,7 @@ public class User {
         return this;
     }
 
-    public User withRoles(Role[] roles) {
+    public User withRoles(ArrayList<Role> roles) {
         this.roles = roles;
         return this;
     }
@@ -55,5 +56,9 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public ArrayList<Role> getRoles() {
+        return roles;
     }
 }

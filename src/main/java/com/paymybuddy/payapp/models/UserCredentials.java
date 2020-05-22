@@ -28,6 +28,10 @@ public class UserCredentials implements UserDetails {
         return user.getRoles();
     }
 
+    public User getUser() {
+        return user;
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

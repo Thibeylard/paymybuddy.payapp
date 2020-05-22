@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class User {
 
-    private @NotNull int id;
+    private final @NotNull int id;
     private @NotNull String username;
     private @NotNull @Email String mail;
     private @NotNull String password;

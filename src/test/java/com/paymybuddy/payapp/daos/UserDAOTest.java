@@ -1,13 +1,13 @@
 package com.paymybuddy.payapp.daos;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -15,8 +15,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("test_h2")
 @DisplayName("User DAO tests on : ")
@@ -28,7 +29,7 @@ public class UserDAOTest {
     @Autowired
     private DataSource dataSource;
 
-    @Before
+    @BeforeEach
     public void databaseSetup() throws SQLException {
         Connection connection = null;
         PreparedStatement ps = null;
@@ -50,6 +51,7 @@ public class UserDAOTest {
     }
 
     @Test
+    @DisplayName("Get user by mail success")
     public void Given_validUserMail_When_searchingForUser_Then_retrieveCorrespondingUser() {
         assertThat(userDAO.findByMail("user@mail.com"))
                 .isNotNull()
@@ -61,6 +63,7 @@ public class UserDAOTest {
     }
 
     @Test
+    @DisplayName("Get user by mail fail")
     public void Given_invalidUserMail_When_searchingForUser_Then_getEmptyUser() {
         assertThat(userDAO.findByMail("john@mail.com"))
                 .isNotNull()
@@ -68,6 +71,7 @@ public class UserDAOTest {
     }
 
     @Test
+    @DisplayName("Save user success")
     public void Given_availableMail_When_savingUser_Then_userIsStoredInDatabase() throws SQLException {
         assertThat(userDAO.saveUser("user2", "user2@mail.com", "user2pass"))
                 .isTrue();
@@ -81,9 +85,10 @@ public class UserDAOTest {
                 .hasFieldOrPropertyWithValue("password", "user2pass");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
+    @DisplayName("Save user fail : redundant email")
     public void Given_existingMail_When_savingUser_Then_IllegalArgumentExceptionThrown() throws SQLException, IllegalArgumentException {
-        userDAO.saveUser("user", "user@mail.com", "userpass");
+        assertThrows(IllegalArgumentException.class, () -> userDAO.saveUser("user", "user@mail.com", "userpass"));
     }
 
 }

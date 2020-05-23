@@ -1,5 +1,6 @@
 package com.paymybuddy.payapp.controllers;
 
+import com.paymybuddy.payapp.enums.Role;
 import com.paymybuddy.payapp.models.User;
 import com.paymybuddy.payapp.models.UserCredentials;
 import com.paymybuddy.payapp.services.AccountService;
@@ -24,6 +25,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.sql.SQLException;
+import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -71,7 +73,8 @@ public class AccountControllerTest {
         userDetails = new UserCredentials(new User(14)
                 .withUsername("user")
                 .withMail("user@mail.com")
-                .withPassword(bcryptEncoder.encode("userpass")));
+                .withPassword(bcryptEncoder.encode("userpass"))
+                .withRoles(Collections.singletonList(Role.USER)));
     }
 
     @Test
@@ -152,11 +155,11 @@ public class AccountControllerTest {
     @DisplayName("Authenticated user accesses")
     public void Given_authenticatedUser_When_requestAppAccess_Then_accessToRequestedPage() throws Exception {
         mvc.perform(get("/user/home")
-                .with(user("user@mail.com")))
+                .with(user("user@mail.com").roles(Role.USER.name())))
                 .andExpect(status().isOk());
 
         mvc.perform(get("/user/settings")
-                .with(user("user@mail.com")))
+                .with(user("user@mail.com").roles(Role.USER.name())))
                 .andExpect(status().isOk());
     }
 

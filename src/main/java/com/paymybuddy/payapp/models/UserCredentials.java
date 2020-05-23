@@ -7,29 +7,30 @@ import java.util.Collection;
 
 public class UserCredentials implements UserDetails {
 
-    private final User user;
+    private final String username; // User Mail, and not User username
+    private final String password; // Encoded password
+    private final Collection<? extends GrantedAuthority> roles;
+
 
     public UserCredentials(User user) {
-        this.user = user;
+        this.username = user.getMail();
+        this.password = user.getPassword();
+        this.roles = user.getRoles();
     }
 
     @Override
     public String getUsername() {
-        return user.getMail();
+        return this.username;
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return this.password;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getRoles();
-    }
-
-    public User getUser() {
-        return user;
+        return this.roles;
     }
 
     @Override

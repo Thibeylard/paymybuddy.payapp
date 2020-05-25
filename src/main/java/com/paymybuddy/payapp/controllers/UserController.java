@@ -7,17 +7,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.tinylog.Logger;
 
+import java.sql.SQLException;
 import java.util.Optional;
 
 @RestController
 @RequestMapping(produces = "application/json")
 public class UserController {
 
-    UserService userService;
+    private UserService userService;
 
     @Autowired
     public UserController(UserService userService) {
@@ -26,20 +26,32 @@ public class UserController {
 
     @GetMapping("/user/home")
     public ResponseEntity<User> home() {
-        return getUserFromPrincipal();
+        return userInstanceResponse();
     }
 
     @GetMapping("/user/settings")
     public ResponseEntity<User> settings() {
-        return getUserFromPrincipal();
+        return userInstanceResponse();
     }
 
-    private ResponseEntity<User> getUserFromPrincipal() {
+    private ResponseEntity<User> userInstanceResponse() {
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> user = userService.getUserByMail(principal.getUsername());
+        Optional<User> user = null;
+        try {
+            user = userService.getUserByMail(principal.getUsername());
+        } catch (SQLException e) {
+            Logger.error("A server error occurred : User could not be found.");
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
-    //TODO Ajouter la méthode PUT pour settings et les tests correspondants.
+    @PutMapping("/user/settings")
+    public ResponseEntity<Integer> updateSettings(@RequestParam(name = "password") String password,
+                                                  @RequestParam(name = "mail") String mail,
+                                                  @RequestParam(name = "username") String username,
+                                                  @RequestParam(name = "newPassword", required = false) String newPassword) {
+        return null;
+    }
 }

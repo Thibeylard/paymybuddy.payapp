@@ -104,7 +104,7 @@ public class UserDAOTest {
     @Test
     @DisplayName("Save user success")
     public void Given_availableMail_When_savingUser_Then_userIsStoredInDatabase() throws SQLException {
-        assertThat(userDAO.saveUser("user2", "user2@mail.com", "user2pass"))
+        assertThat(userDAO.save("user2", "user2@mail.com", "user2pass"))
                 .isTrue();
 
         Table userTable = new Table(dataSource, "User");
@@ -117,7 +117,7 @@ public class UserDAOTest {
     @Test
     @DisplayName("Save user fail : redundant email")
     public void Given_existingMail_When_savingUser_Then_IllegalArgumentExceptionThrown() throws SQLException, IllegalArgumentException {
-        assertThrows(IllegalArgumentException.class, () -> userDAO.saveUser("user", "user@mail.com", "userpass"));
+        assertThrows(IllegalArgumentException.class, () -> userDAO.save("user", "user@mail.com", "userpass"));
     }
 
 }

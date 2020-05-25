@@ -2,6 +2,7 @@ package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.UserDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Validator;
@@ -21,7 +22,7 @@ public class AccountServiceImpl implements AccountService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AccountServiceImpl(PasswordEncoder passwordEncoder, UserDAO userDAO, Validator validator) {
+    public AccountServiceImpl(PasswordEncoder passwordEncoder, UserDAO userDAO, @Qualifier("defaultValidator") Validator validator) {
         this.userDAO = userDAO;
         this.passwordEncoder = passwordEncoder;
     }
@@ -31,6 +32,6 @@ public class AccountServiceImpl implements AccountService {
                                @Email String mail,
                                @Size(min = 8, max = 80) String password) throws SQLException, IllegalArgumentException {
         password = passwordEncoder.encode(password);
-        userDAO.saveUser(username, mail, password);
+        userDAO.save(username, mail, password);
     }
 }

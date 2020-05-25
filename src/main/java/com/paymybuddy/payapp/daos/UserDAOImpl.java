@@ -79,8 +79,9 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public boolean saveUser(@NotNull final String username, @NotNull final String mail, @NotNull final String encodedPassword) throws SQLException, IllegalArgumentException {
+    public boolean save(@NotNull final String username, @NotNull final String mail, @NotNull final String encodedPassword) throws SQLException, IllegalArgumentException {
 
+        //TODO Remplacer cette gestion de l'erreur par l'analyse du code d'erreur de l'exception SQL
         if (findByMail(mail).isPresent()) {
             Logger.debug("User mail unavailable.");
             throw new IllegalArgumentException("A User with this mail already exists.");
@@ -136,5 +137,10 @@ public class UserDAOImpl implements UserDAO {
         }
 
         return result;
+    }
+
+    @Override
+    public boolean updateSettings(String username, String mail, String newPassword) throws SQLException {
+        return false;
     }
 }

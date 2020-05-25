@@ -21,11 +21,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Integer updateSettings(String password,
-                                  String mail,
-                                  String username,
-                                  String newPassword)
+    public void updateSettings(String password,
+                               String mail,
+                               String username,
+                               String newPassword)
             throws SQLException, ConstraintViolationException, BadCredentialsException {
-        return null;
     }
 }

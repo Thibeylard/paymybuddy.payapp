@@ -118,36 +118,24 @@ public class UserControllerTest {
     @WithMockUser(username = "user@mail.com")
     @DisplayName("PUT on User settings succeed")
     public void Given_authenticatedUser_When_updateSettings_Then_returnUserID() throws Exception {
-        Integer id = 6;
 
-        when(userService.updateSettings(anyString(), anyString(), anyString(), anyString())).thenReturn(id);
-
-        MvcResult result = mvc.perform(put("/user/settings")
+        mvc.perform(put("/user/settings")
                 .params(paramsPUT)
                 .with(csrf()))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        assertThat(result.getResponse().getContentAsString())
-                .isEqualTo(objectMapper.writeValueAsString(id));
+                .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(username = "user@mail.com")
     @DisplayName("PUT on User settings wrong values")
     public void Given_constraintEntryViolation_When_updateSettings_Then_statusIsBadRequest() throws Exception {
-
         doThrow(ConstraintViolationException.class).when(userService)
                 .updateSettings(anyString(), anyString(), anyString(), anyString());
 
-        MvcResult result = mvc.perform(put("/user/settings")
+        mvc.perform(put("/user/settings")
                 .params(paramsPUT)
                 .with(csrf()))
-                .andExpect(status().isBadRequest())
-                .andReturn();
-
-        assertThat(result.getResponse().getContentAsString())
-                .isEqualTo("");
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -158,31 +146,22 @@ public class UserControllerTest {
         doThrow(BadCredentialsException.class).when(userService)
                 .updateSettings(anyString(), anyString(), anyString(), anyString());
 
-        MvcResult result = mvc.perform(put("/user/settings")
+        mvc.perform(put("/user/settings")
                 .params(paramsPUT)
                 .with(csrf()))
-                .andExpect(status().isForbidden())
-                .andReturn();
-
-        assertThat(result.getResponse().getContentAsString())
-                .isEqualTo("");
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(username = "user@mail.com")
     @DisplayName("PUT on User settings server error")
     public void Given_constraintEntryViolation_When_updateSettings_Then_statusIsInternalServerError() throws Exception {
-
         doThrow(SQLException.class).when(userService)
                 .updateSettings(anyString(), anyString(), anyString(), anyString());
 
-        MvcResult result = mvc.perform(put("/user/settings")
+        mvc.perform(put("/user/settings")
                 .params(paramsPUT)
                 .with(csrf()))
-                .andExpect(status().isInternalServerError())
-                .andReturn();
-
-        assertThat(result.getResponse().getContentAsString())
-                .isEqualTo("");
+                .andExpect(status().isInternalServerError());
     }
 }

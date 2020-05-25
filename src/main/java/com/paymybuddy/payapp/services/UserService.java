@@ -1,6 +1,7 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.models.User;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolationException;
@@ -13,8 +14,8 @@ public interface UserService {
 
     public Optional<User> getUserByMail(final String mail) throws SQLException;
 
-    public Integer updateSettings(String password,
-                                  String mail,
-                                  String username,
-                                  String newPassword) throws SQLException, ConstraintViolationException;
+    public void updateSettings(String password,
+                               String mail,
+                               String username,
+                               String newPassword) throws SQLException, BadCredentialsException, ConstraintViolationException;
 }

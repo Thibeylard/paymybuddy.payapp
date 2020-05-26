@@ -39,7 +39,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("getUserById() results")
-    public void Given_idValue_When_findUserById_Then_returnDAOFindByIDResult() throws SQLException {
+    public void Given_idValue_When_findUserById_Then_returnDAOFindByIDResult() {
         Optional<User> user = Optional.of(new User(3));
         when(mockUserDAO.findById(anyInt())).thenReturn(user);
         assertThat(userService.getUserById(3))
@@ -53,7 +53,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("getUserByMail() results")
-    public void Given_idValue_When_findUserByMail_Then_returnDAOFindByMailResult() throws SQLException {
+    public void Given_idValue_When_findUserByMail_Then_returnDAOFindByMailResult() {
         Optional<User> user = Optional.of(new User(3));
         when(mockUserDAO.findByMail(anyString())).thenReturn(user);
         assertThat(userService.getUserByMail("user"))
@@ -69,7 +69,7 @@ public class UserServiceTest {
     @DisplayName("updateSettings() success")
     @WithMockUser(password = ENCODED_USERPASS_1)
     public void Given_validRequest_When_updateUserSettings_Then_doesNotThrowExceptions() throws SQLException {
-        userService.updateSettings("userpass", "user@mail.com", "newUsername", null);
+        userService.updateSettings(4, "userpass", "user@mail.com", "newUsername", null);
     }
 
     @Test
@@ -77,7 +77,7 @@ public class UserServiceTest {
     @WithMockUser(password = ENCODED_USERPASS_1)
     public void Given_invalidPassword_When_updateUserSettings_Then_throwsBadCredentialsException() {
         assertThrows(BadCredentialsException.class,
-                () -> userService.updateSettings("wrongpass", "user@mail.com", "newUsername", null));
+                () -> userService.updateSettings(12, "wrongpass", "user@mail.com", "newUsername", null));
     }
 
     @Test
@@ -85,15 +85,15 @@ public class UserServiceTest {
     @WithMockUser(password = ENCODED_USERPASS_1)
     public void Given_wrongSettings_When_updateUserSettings_Then_throwsConstraintViolationException() {
         assertThrows(ConstraintViolationException.class,
-                () -> userService.updateSettings("userpass", "user", "newUsername", null));
+                () -> userService.updateSettings(16, "userpass", "user", "newUsername", null));
     }
 
     @Test
     @DisplayName("updateSettings() server error")
     @WithMockUser(password = ENCODED_USERPASS_1)
     public void Given_databaseError_When_updateUserSettings_Then_throwsSQLException() throws SQLException {
-        when(mockUserDAO.updateSettings(anyString(), anyString(), nullable(String.class))).thenThrow(SQLException.class);
+        when(mockUserDAO.updateSettings(anyInt(), anyString(), anyString(), nullable(String.class))).thenThrow(SQLException.class);
         assertThrows(SQLException.class,
-                () -> userService.updateSettings("userpass", "user@mail.com", "newUsername", null));
+                () -> userService.updateSettings(8, "userpass", "user@mail.com", "newUsername", null));
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.tinylog.Logger;
 
-import javax.validation.constraints.NotNull;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -80,7 +79,9 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public boolean save(@NotNull final String username, @NotNull final String mail, @NotNull final String encodedPassword) throws SQLException, IllegalArgumentException {
+    public boolean save(final String username,
+                        final String mail,
+                        final String encodedPassword) throws SQLException, IllegalArgumentException {
 
         //TODO Remplacer cette gestion de l'erreur par l'analyse du code d'erreur de l'exception SQL
         if (findByMail(mail).isPresent()) {
@@ -128,7 +129,6 @@ public class UserDAOImpl implements UserDAO {
                 result = true;
             } catch (SQLException e) {
                 Logger.error("Database error occurred.");
-                e.printStackTrace();
                 throw new SQLException("An error occurred : Registration could not be validated.");
             } finally {
                 databaseConfiguration.closeResultSet(rs);
@@ -141,7 +141,10 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public boolean updateSettings(String mail, String username, String newPassword) throws SQLException {
+    public boolean updateSettings(final int id,
+                                  final String mail,
+                                  final String username,
+                                  final String newPassword) throws SQLException {
         return false;
     }
 }

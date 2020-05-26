@@ -19,8 +19,9 @@ public interface UserService {
     Optional<User> getUserByMail(final String mail);
 
     // TODO les Service doivent-ils vraiment lancer une exception SQL ? Parait peu respectueux du principe SOLID de l'interface
-    void updateSettings(String password,
-                        @Email String mail,
-                        @NotEmpty @Size(min = 5, max = 25) String username,
+    void updateSettings(final int id,
+                        final String password,
+                        final @Email String mail,
+                        final @NotEmpty @Size(min = 5, max = 25) String username,
                         @Nullable @Size(min = 8, max = 80) String newPassword) throws SQLException, BadCredentialsException, ConstraintViolationException;
 }

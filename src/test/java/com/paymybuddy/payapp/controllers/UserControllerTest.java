@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -116,7 +117,7 @@ public class UserControllerTest {
     @DisplayName("PUT on User settings wrong values")
     public void Given_constraintEntryViolation_When_updateSettings_Then_statusIsBadRequest() throws Exception {
         doThrow(ConstraintViolationException.class).when(userService)
-                .updateSettings(anyString(), anyString(), anyString(), anyString());
+                .updateSettings(anyInt(), anyString(), anyString(), anyString(), anyString());
 
         mvc.perform(put("/user/settings")
                 .params(paramsPUT)
@@ -130,7 +131,7 @@ public class UserControllerTest {
     public void Given_notMatchingPasswords_When_updateSettings_Then_statusIsForbidden() throws Exception {
 
         doThrow(BadCredentialsException.class).when(userService)
-                .updateSettings(anyString(), anyString(), anyString(), anyString());
+                .updateSettings(anyInt(), anyString(), anyString(), anyString(), anyString());
 
         mvc.perform(put("/user/settings")
                 .params(paramsPUT)
@@ -143,7 +144,7 @@ public class UserControllerTest {
     @DisplayName("PUT on User settings server error")
     public void Given_constraintEntryViolation_When_updateSettings_Then_statusIsInternalServerError() throws Exception {
         doThrow(SQLException.class).when(userService)
-                .updateSettings(anyString(), anyString(), anyString(), anyString());
+                .updateSettings(anyInt(), anyString(), anyString(), anyString(), anyString());
 
         mvc.perform(put("/user/settings")
                 .params(paramsPUT)

@@ -1,6 +1,7 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.UserDAO;
+import com.paymybuddy.payapp.enums.Role;
 import com.paymybuddy.payapp.models.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,6 +37,7 @@ public class UserServiceTest {
     private UserDAO mockUserDAO;
 
     private final String ENCODED_USERPASS_1 = "$2y$10$58Wl5KsCtAeuKkLesypM3uvGf2zgtg..TKvGCsMgnDjnsN3qGDxGK"; // userpass
+    private final String ENCODED_USERPASS_2 = "$2y$10$V3fEhtWLjKUZhLCFfGe59.nyMW5LnFb2iHmRu16P9x0vVU/BQKUby"; // hackerpass
 
 
     @Test
@@ -65,35 +68,56 @@ public class UserServiceTest {
                 .isEqualTo(user);
     }
 
+    private Optional<User> userToUpdate() {
+        return Optional.of(new User(4)
+                .withUsername("username")
+                .withMail("user@mail.com")
+                .withPassword(ENCODED_USERPASS_1)
+                .withRoles(Collections.singleton(Role.USER)));
+    }
+
     @Test
     @DisplayName("updateSettings() success")
-    @WithMockUser(password = ENCODED_USERPASS_1)
+    @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
     public void Given_validRequest_When_updateUserSettings_Then_doesNotThrowExceptions() throws SQLException {
+        when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
         userService.updateSettings(4, "userpass", "user@mail.com", "newUsername", null);
     }
 
     @Test
-    @DisplayName("updateSettings() wrong password")
-    @WithMockUser(password = ENCODED_USERPASS_1)
-    public void Given_invalidPassword_When_updateUserSettings_Then_throwsBadCredentialsException() {
+    @DisplayName("updateSettings() wrong principal")
+    @WithMockUser(username = "otherUser@mail.com", password = ENCODED_USERPASS_2)
+    public void Given_invalidPrincipal_When_updateUserSettings_Then_throwsBadCredentialsException() {
+        when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
         assertThrows(BadCredentialsException.class,
-                () -> userService.updateSettings(12, "wrongpass", "user@mail.com", "newUsername", null));
+                () -> userService.updateSettings(4, "hackerpass", "hacking@mail.com", "hackedU", "hackerpass"));
+    }
+
+    @Test
+    @DisplayName("updateSettings() wrong password")
+    @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
+    public void Given_invalidPassword_When_updateUserSettings_Then_throwsBadCredentialsException() {
+        when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
+        assertThrows(BadCredentialsException.class,
+                () -> userService.updateSettings(4, "wrongpass", "user@mail.com", "newUsername", null));
     }
 
     @Test
     @DisplayName("updateSettings() wrong params")
-    @WithMockUser(password = ENCODED_USERPASS_1)
+    @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
     public void Given_wrongSettings_When_updateUserSettings_Then_throwsConstraintViolationException() {
+        when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
         assertThrows(ConstraintViolationException.class,
-                () -> userService.updateSettings(16, "userpass", "user", "newUsername", null));
+                () -> userService.updateSettings(4, "userpass", "user", "username", null));
     }
 
     @Test
     @DisplayName("updateSettings() server error")
-    @WithMockUser(password = ENCODED_USERPASS_1)
+    @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
     public void Given_databaseError_When_updateUserSettings_Then_throwsSQLException() throws SQLException {
+        when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
         when(mockUserDAO.updateSettings(anyInt(), anyString(), anyString(), nullable(String.class))).thenThrow(SQLException.class);
         assertThrows(SQLException.class,
-                () -> userService.updateSettings(8, "userpass", "user@mail.com", "newUsername", null));
+                () -> userService.updateSettings(4, "userpass", "user@mail.com", "newUsername", null));
     }
 }

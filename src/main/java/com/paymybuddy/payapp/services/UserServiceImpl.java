@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -48,15 +49,20 @@ public class UserServiceImpl implements UserService {
                                @Nullable @Size(min = 8, max = 80) String newPassword)
             throws SQLException, ConstraintViolationException, BadCredentialsException {
 
-        String principalPassword = (String) SecurityContextHolder.getContext().getAuthentication().getCredentials();
-        if (!passwordEncoder.matches(password, principalPassword)) {
+        User userToUpdate = getUserById(id).orElseThrow(IllegalArgumentException::new);
+
+        UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (userToUpdate.getMail().equals(authUser.getUsername()) & // Check that authenticated user matches with user to modify
+                userToUpdate.getPassword().equals(authUser.getPassword()) & // + Additional password verification
+                passwordEncoder.matches(password, authUser.getPassword())) {
+            if (newPassword != null) {
+                newPassword = passwordEncoder.encode(newPassword);
+            }
+
+            userDAO.updateSettings(id, mail, username, newPassword);
+        } else {
             throw new BadCredentialsException("");
         }
-
-        if (newPassword != null) {
-            newPassword = passwordEncoder.encode(newPassword);
-        }
-
-        userDAO.updateSettings(id, mail, username, newPassword);
     }
 }

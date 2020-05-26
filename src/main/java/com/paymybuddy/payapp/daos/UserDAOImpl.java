@@ -96,7 +96,7 @@ public class UserDAOImpl implements UserDAO {
 
         if (con != null) {
             try {
-                long userId = 0;
+                int userId = 0;
                 // Start transaction
                 con.setAutoCommit(false);
 
@@ -113,12 +113,12 @@ public class UserDAOImpl implements UserDAO {
                 rs = ps.executeQuery();
 
                 if (rs.next()) {
-                    userId = rs.getLong("id");
+                    userId = rs.getInt("id");
                 }
 
                 // User id is inserted as user_id with a USER role_id by default
                 ps = con.prepareStatement(DBStatements.INSERT_USER_ROLE);
-                ps.setLong(1, userId);
+                ps.setInt(1, userId);
                 ps.setInt(2, Role.USER.getDatabaseId());
                 ps.execute();
 
@@ -128,8 +128,8 @@ public class UserDAOImpl implements UserDAO {
 
                 result = true;
             } catch (SQLException e) {
-                Logger.error("Database error occurred.");
-                throw new SQLException("An error occurred : Registration could not be validated.");
+                Logger.error(e.getMessage());
+                throw new SQLException("An error occurred : Could not save data.");
             } finally {
                 databaseConfiguration.closeResultSet(rs);
                 databaseConfiguration.closePreparedStatement(ps);
@@ -142,9 +142,41 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public boolean updateSettings(final int id,
-                                  final String mail,
                                   final String username,
+                                  final String mail,
                                   final String newPassword) throws SQLException {
-        return false;
+
+        Connection con = databaseConfiguration.getConnection();
+        PreparedStatement ps = null;
+        boolean result = false;
+
+        if (con != null) {
+            try {
+                // Start transaction
+                con.setAutoCommit(false);
+
+                // User is modified
+                ps = con.prepareStatement(DBStatements.UPDATE_USER);
+                ps.setString(1, username);
+                ps.setString(2, mail);
+                ps.setString(3, newPassword);
+                ps.setInt(4, id);
+                ps.execute();
+
+                // Transaction is over
+                con.commit();
+                con.setAutoCommit(true); // autocommit set back to true
+
+                result = true;
+            } catch (SQLException e) {
+                Logger.error(e.getMessage());
+                throw new SQLException("An error occurred : Could not update data.");
+            } finally {
+                databaseConfiguration.closePreparedStatement(ps);
+                databaseConfiguration.closeConnection(con);
+            }
+        }
+
+        return result;
     }
 }

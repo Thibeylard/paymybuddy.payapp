@@ -43,28 +43,32 @@ public class UserDAOTest {
         try {
             connection = dataSource.getConnection();
 
+            // Reset User_Role Table
+            ps = connection.prepareStatement(
+                    "DELETE FROM User_Role;"
+            );
+            ps.execute();
+
             // Reset User Table
             ps = connection.prepareStatement(
                     "DELETE FROM User;"
             );
             ps.execute();
 
-            ps = connection.prepareStatement(
-                    "DELETE FROM User_Role;"
-            );
-            ps.execute();
 
             // Insert User 'user'
             ps = connection.prepareStatement(
                     "INSERT INTO User (id, username, mail, password) " +
-                            "VALUES (1, 'user', 'user@mail.com', 'userpass')"
+                            "VALUES (1, 'username', 'user@mail.com', 'userpass')," +
+                            "(2, 'otherUser', 'otherUser@mail.com', 'otherUserpass')"
             );
             ps.execute();
 
             // Insert role for 'user'
             ps = connection.prepareStatement(
                     "INSERT INTO User_Role (user_id, role_id) " +
-                            "VALUES (1,1)"
+                            "VALUES (1,1)," +
+                            "(2,1)"
             );
             ps.execute();
 
@@ -85,7 +89,7 @@ public class UserDAOTest {
         assertThat(user)
                 .isNotNull()
                 .isPresent();
-        assertThat(user.get().getUsername()).isEqualTo("user");
+        assertThat(user.get().getUsername()).isEqualTo("username");
         assertThat(user.get().getMail()).isEqualTo("user@mail.com");
         assertThat(user.get().getPassword()).isEqualTo("userpass");
         assertThat(user.get().getRoles())
@@ -94,7 +98,7 @@ public class UserDAOTest {
     }
 
     @Test
-    @DisplayName("Get user by mail fail")
+    @DisplayName("Get user by mail failure")
     public void Given_invalidUserMail_When_searchingForUser_Then_getEmptyUser() {
         assertThat(userDAO.findByMail("john@mail.com"))
                 .isNotNull()
@@ -104,20 +108,38 @@ public class UserDAOTest {
     @Test
     @DisplayName("Save user success")
     public void Given_availableMail_When_savingUser_Then_userIsStoredInDatabase() throws SQLException {
-        assertThat(userDAO.save("user2", "user2@mail.com", "user2pass"))
+        assertThat(userDAO.save("username2", "user2@mail.com", "user2pass"))
                 .isTrue();
 
         Table userTable = new Table(dataSource, "User");
-        assertThat(userTable).row(1)
-                .value("username").isEqualTo("user2")
+        assertThat(userTable).row(2)
+                .value("username").isEqualTo("username2")
                 .value("mail").isEqualTo("user2@mail.com")
                 .value("password").isEqualTo("user2pass");
     }
 
     @Test
-    @DisplayName("Save user fail : redundant email")
-    public void Given_existingMail_When_savingUser_Then_IllegalArgumentExceptionThrown() throws SQLException, IllegalArgumentException {
-        assertThrows(IllegalArgumentException.class, () -> userDAO.save("user", "user@mail.com", "userpass"));
+    @DisplayName("Save user failure : redundant email")
+    public void Given_existingMail_When_savingUser_Then_IllegalArgumentExceptionThrown() throws IllegalArgumentException {
+        assertThrows(IllegalArgumentException.class, () -> userDAO.save("username", "user@mail.com", "userpass"));
+    }
+
+    @Test
+    @DisplayName("Update settings success")
+    public void Given_availableMail_When_updatingUser_Then_userSuccessfullyModified() throws SQLException {
+        assertThat(userDAO.updateSettings(1, "username2", "user2@mail.com", "userpass"))
+                .isTrue();
+        Table userTable = new Table(dataSource, "User");
+        assertThat(userTable).row(0)
+                .value("username").isEqualTo("username2")
+                .value("mail").isEqualTo("user2@mail.com")
+                .value("password").isEqualTo("userpass");
+    }
+
+    @Test
+    @DisplayName("Update settings failure : redundant email")
+    public void Given_existingMail_When_updatingUser_Then_SQLExceptionThrown() {
+        assertThrows(SQLException.class, () -> userDAO.updateSettings(2, "otherUser", "user@mail.com", "newOtherPass"));
     }
 
 }

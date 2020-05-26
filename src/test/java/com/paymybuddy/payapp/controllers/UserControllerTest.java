@@ -64,8 +64,8 @@ public class UserControllerTest {
                 .apply(springSecurity()) // Integrate SpringSecurity to SpringMVC
                 .build();
         paramsPUT.add("password", "somePass");
-        paramsPUT.add("mail", "someMail");
         paramsPUT.add("username", "someUsername");
+        paramsPUT.add("mail", "someMail");
         paramsPUT.add("newPassword", "");
     }
 

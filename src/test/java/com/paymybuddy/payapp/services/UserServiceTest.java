@@ -81,7 +81,7 @@ public class UserServiceTest {
     @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
     public void Given_validRequest_When_updateUserSettings_Then_doesNotThrowExceptions() throws SQLException {
         when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
-        userService.updateSettings(4, "userpass", "user@mail.com", "newUsername", null);
+        userService.updateSettings(4, "userpass", "newUsername", "user@mail.com", null);
     }
 
     @Test
@@ -90,7 +90,7 @@ public class UserServiceTest {
     public void Given_invalidPrincipal_When_updateUserSettings_Then_throwsBadCredentialsException() {
         when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
         assertThrows(BadCredentialsException.class,
-                () -> userService.updateSettings(4, "hackerpass", "hacking@mail.com", "hackedU", "hackerpass"));
+                () -> userService.updateSettings(4, "hackerpass", "hackedU", "hacking@mail.com", "hackerpass"));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class UserServiceTest {
     public void Given_invalidPassword_When_updateUserSettings_Then_throwsBadCredentialsException() {
         when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
         assertThrows(BadCredentialsException.class,
-                () -> userService.updateSettings(4, "wrongpass", "user@mail.com", "newUsername", null));
+                () -> userService.updateSettings(4, "wrongpass", "newUsername", "user@mail.com", null));
     }
 
     @Test
@@ -108,7 +108,7 @@ public class UserServiceTest {
     public void Given_wrongSettings_When_updateUserSettings_Then_throwsConstraintViolationException() {
         when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
         assertThrows(ConstraintViolationException.class,
-                () -> userService.updateSettings(4, "userpass", "user", "username", null));
+                () -> userService.updateSettings(4, "userpass", "username", "user", null));
     }
 
     @Test
@@ -118,6 +118,6 @@ public class UserServiceTest {
         when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
         when(mockUserDAO.updateSettings(anyInt(), anyString(), anyString(), nullable(String.class))).thenThrow(SQLException.class);
         assertThrows(SQLException.class,
-                () -> userService.updateSettings(4, "userpass", "user@mail.com", "newUsername", null));
+                () -> userService.updateSettings(4, "userpass", "newUsername", "user@mail.com", null));
     }
 }

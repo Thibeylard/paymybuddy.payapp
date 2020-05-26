@@ -44,8 +44,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateSettings(final int id,
                                final String password,
-                               final @Email String mail,
                                final @NotEmpty @Size(min = 5, max = 25) String username,
+                               final @Email String mail,
                                @Nullable @Size(min = 8, max = 80) String newPassword)
             throws SQLException, ConstraintViolationException, BadCredentialsException {
 
@@ -58,6 +58,8 @@ public class UserServiceImpl implements UserService {
                 passwordEncoder.matches(password, authUser.getPassword())) {
             if (newPassword != null) {
                 newPassword = passwordEncoder.encode(newPassword);
+            } else {
+                newPassword = userToUpdate.getPassword();
             }
 
             userDAO.updateSettings(id, mail, username, newPassword);

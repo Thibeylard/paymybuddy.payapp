@@ -15,7 +15,12 @@ public interface UserDAO {
 
     Optional<User> findByUsername(final String username);
 
-    boolean save(final String username, final String mail, final String password) throws IllegalArgumentException, SQLException;
+    boolean save(final String username,
+                 final String mail,
+                 final String password) throws IllegalArgumentException, SQLException;
 
-    boolean updateSettings(final int id, final String mail, final String username, final String newPassword) throws SQLException;
+    boolean updateSettings(final int id,
+                           final String username,
+                           final String mail,
+                           final String newPassword) throws SQLException;
 }

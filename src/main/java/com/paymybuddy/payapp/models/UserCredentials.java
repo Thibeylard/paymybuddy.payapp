@@ -18,6 +18,12 @@ public class UserCredentials implements UserDetails {
         this.roles = user.getRoles();
     }
 
+    public UserCredentials(String mail, String password, Collection<? extends GrantedAuthority> roles) {
+        this.username = mail;
+        this.password = password;
+        this.roles = roles;
+    }
+
     @Override
     public String getUsername() {
         return this.username;

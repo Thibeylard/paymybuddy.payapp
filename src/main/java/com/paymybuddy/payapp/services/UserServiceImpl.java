@@ -3,21 +3,31 @@ package com.paymybuddy.payapp.services;
 import com.paymybuddy.payapp.daos.UserDAO;
 import com.paymybuddy.payapp.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.sql.SQLException;
 import java.util.Optional;
 
 @Service
+@Validated
 public class UserServiceImpl implements UserService {
 
     private final UserDAO userDAO;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserDAO userDAO) {
+    public UserServiceImpl(UserDAO userDAO, PasswordEncoder passwordEncoder) {
         this.userDAO = userDAO;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -32,9 +42,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateSettings(String password,
-                               String mail,
-                               String username,
-                               String newPassword)
+                               @Email final String mail,
+                               @NotEmpty @Size(min = 5, max = 25) final String username,
+                               @Nullable @Size(min = 8, max = 80) String newPassword)
             throws SQLException, ConstraintViolationException, BadCredentialsException {
+
+        String principalPassword = (String) SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        if (!passwordEncoder.matches(password, principalPassword)) {
+            throw new BadCredentialsException("");
+        }
+
+        if (newPassword != null) {
+            newPassword = passwordEncoder.encode(newPassword);
+        }
+
+        userDAO.updateSettings(mail, username, newPassword);
     }
 }

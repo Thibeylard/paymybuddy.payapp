@@ -38,13 +38,7 @@ public class UserController {
 
     private ResponseEntity<User> userInstanceResponse() {
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> user = null;
-        try {
-            user = userService.getUserByMail(principal.getUsername());
-        } catch (SQLException e) {
-            Logger.error("A server error occurred : User could not be found.");
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        Optional<User> user = userService.getUserByMail(principal.getUsername());
         return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }

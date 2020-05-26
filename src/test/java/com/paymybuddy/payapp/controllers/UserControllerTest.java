@@ -102,20 +102,6 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(username = "user@mail.com")
-    @DisplayName("GET on User pages server error")
-    public void Given_cantReachDatabase_When_getAppURLs_Then_statusIsInternalServerError() throws Exception {
-        doThrow(SQLException.class).when(userService).getUserByMail(anyString());
-        doThrow(SQLException.class).when(userService).getUserByMail(anyString());
-
-        mvc.perform(get("/user/home"))
-                .andExpect(status().isInternalServerError());
-
-        mvc.perform(get("/user/settings"))
-                .andExpect(status().isInternalServerError());
-    }
-
-    @Test
-    @WithMockUser(username = "user@mail.com")
     @DisplayName("PUT on User settings succeed")
     public void Given_authenticatedUser_When_updateSettings_Then_returnUserID() throws Exception {
 

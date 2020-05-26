@@ -17,5 +17,5 @@ public interface UserDAO {
 
     boolean save(final String username, final String mail, final String password) throws IllegalArgumentException, SQLException;
 
-    boolean updateSettings(final String username, final String mail, final String newPassword) throws SQLException;
+    boolean updateSettings(final String mail, final String username, final String newPassword) throws SQLException;
 }

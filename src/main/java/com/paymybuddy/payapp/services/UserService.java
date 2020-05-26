@@ -1,21 +1,26 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.models.User;
+import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.sql.SQLException;
 import java.util.Optional;
 
 @Service
 public interface UserService {
-    public Optional<User> getUserById(final int userId) throws SQLException;
+    Optional<User> getUserById(final int userId);
 
-    public Optional<User> getUserByMail(final String mail) throws SQLException;
+    Optional<User> getUserByMail(final String mail);
 
-    public void updateSettings(String password,
-                               String mail,
-                               String username,
-                               String newPassword) throws SQLException, BadCredentialsException, ConstraintViolationException;
+    // TODO les Service doivent-ils vraiment lancer une exception SQL ? Parait peu respectueux du principe SOLID de l'interface
+    void updateSettings(String password,
+                        @Email String mail,
+                        @NotEmpty @Size(min = 5, max = 25) String username,
+                        @Nullable @Size(min = 8, max = 80) String newPassword) throws SQLException, BadCredentialsException, ConstraintViolationException;
 }

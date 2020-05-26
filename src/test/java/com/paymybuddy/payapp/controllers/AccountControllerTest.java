@@ -31,7 +31,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -149,18 +150,6 @@ public class AccountControllerTest {
                 .user("user@mail.com")
                 .password("userpass"))
                 .andExpect(authenticated());
-    }
-
-    @Test
-    @DisplayName("Authenticated user accesses")
-    public void Given_authenticatedUser_When_requestAppAccess_Then_accessToRequestedPage() throws Exception {
-        mvc.perform(get("/user/home")
-                .with(user("user@mail.com").roles(Role.USER.name())))
-                .andExpect(status().isOk());
-
-        mvc.perform(get("/user/settings")
-                .with(user("user@mail.com").roles(Role.USER.name())))
-                .andExpect(status().isOk());
     }
 
     @Test

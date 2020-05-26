@@ -63,6 +63,7 @@ public class UserDAOImpl implements UserDAO {
 
             } catch (SQLException e) {
                 Logger.error("An error occurred : User could not be found.");
+                e.printStackTrace();
             } finally {
                 databaseConfiguration.closeResultSet(rs);
                 databaseConfiguration.closePreparedStatement(ps);
@@ -140,7 +141,7 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public boolean updateSettings(String username, String mail, String newPassword) throws SQLException {
+    public boolean updateSettings(String mail, String username, String newPassword) throws SQLException {
         return false;
     }
 }

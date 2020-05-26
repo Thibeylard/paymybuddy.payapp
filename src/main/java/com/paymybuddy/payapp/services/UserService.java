@@ -23,5 +23,6 @@ public interface UserService {
                         final String password,
                         final @NotEmpty @Size(min = 5, max = 25) String username,
                         final @Email String mail,
-                        @Nullable @Size(min = 8, max = 80) String newPassword) throws SQLException, BadCredentialsException, ConstraintViolationException;
+                        @Nullable @Size(min = 8, max = 80) String newPassword)
+            throws SQLException, IllegalArgumentException, BadCredentialsException, ConstraintViolationException;
 }

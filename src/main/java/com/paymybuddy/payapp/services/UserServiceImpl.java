@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
                                final @NotEmpty @Size(min = 5, max = 25) String username,
                                final @Email String mail,
                                @Nullable @Size(min = 8, max = 80) String newPassword)
-            throws SQLException, ConstraintViolationException, BadCredentialsException {
+            throws SQLException, IllegalArgumentException, ConstraintViolationException, BadCredentialsException {
 
         User userToUpdate = getUserById(id).orElseThrow(IllegalArgumentException::new);
 

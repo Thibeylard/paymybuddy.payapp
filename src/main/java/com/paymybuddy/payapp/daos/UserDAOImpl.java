@@ -83,12 +83,6 @@ public class UserDAOImpl implements UserDAO {
                         final String mail,
                         final String encodedPassword) throws SQLException, IllegalArgumentException {
 
-        //TODO Remplacer cette gestion de l'erreur par l'analyse du code d'erreur de l'exception SQL
-        if (findByMail(mail).isPresent()) {
-            Logger.debug("User mail unavailable.");
-            throw new IllegalArgumentException("A User with this mail already exists.");
-        }
-
         Connection con = databaseConfiguration.getConnection();
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -129,6 +123,12 @@ public class UserDAOImpl implements UserDAO {
                 result = true;
             } catch (SQLException e) {
                 Logger.error(e.getMessage());
+
+                if (e.getErrorCode() == 23505) { // Check unique constraint violation
+                    Logger.debug("User mail unavailable.");
+                    throw new IllegalArgumentException("A User with this mail already exists.");
+                }
+
                 throw new SQLException("An error occurred : Could not save data.");
             } finally {
                 databaseConfiguration.closeResultSet(rs);
@@ -144,7 +144,7 @@ public class UserDAOImpl implements UserDAO {
     public boolean updateSettings(final int id,
                                   final String username,
                                   final String mail,
-                                  final String newPassword) throws SQLException {
+                                  final String newPassword) throws SQLException, IllegalArgumentException {
 
         Connection con = databaseConfiguration.getConnection();
         PreparedStatement ps = null;
@@ -170,6 +170,12 @@ public class UserDAOImpl implements UserDAO {
                 result = true;
             } catch (SQLException e) {
                 Logger.error(e.getMessage());
+
+                if (e.getErrorCode() == 23505) { // Check unique constraint violation
+                    Logger.debug("User mail unavailable.");
+                    throw new IllegalArgumentException("A User with this mail already exists.");
+                }
+
                 throw new SQLException("An error occurred : Could not update data.");
             } finally {
                 databaseConfiguration.closePreparedStatement(ps);

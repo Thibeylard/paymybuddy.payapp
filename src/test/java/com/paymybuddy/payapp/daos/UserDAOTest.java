@@ -138,8 +138,8 @@ public class UserDAOTest {
 
     @Test
     @DisplayName("Update settings failure : redundant email")
-    public void Given_existingMail_When_updatingUser_Then_SQLExceptionThrown() {
-        assertThrows(SQLException.class, () -> userDAO.updateSettings(2, "otherUser", "user@mail.com", "newOtherPass"));
+    public void Given_existingMail_When_updatingUser_Then_IllegalArgumentExceptionThrown() {
+        assertThrows(IllegalArgumentException.class, () -> userDAO.updateSettings(2, "otherUser", "user@mail.com", "newOtherPass"));
     }
 
 }

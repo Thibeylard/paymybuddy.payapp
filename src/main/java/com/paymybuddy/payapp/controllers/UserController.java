@@ -51,7 +51,7 @@ public class UserController {
                                                  @RequestParam(name = "newPassword", required = false) String newPassword) {
         try {
             userService.updateSettings(id, password, username, mail, newPassword);
-        } catch (ConstraintViolationException e) {
+        } catch (IllegalArgumentException | ConstraintViolationException e) {
             Logger.error(e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (BadCredentialsException e) {

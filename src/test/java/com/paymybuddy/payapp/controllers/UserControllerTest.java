@@ -29,7 +29,8 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -104,7 +105,7 @@ public class UserControllerTest {
     @WithMockUser(username = "user@mail.com")
     @DisplayName("PUT on User settings succeed")
     public void Given_authenticatedUser_When_updateSettings_Then_returnUserID() throws Exception {
-        doNothing().when(userService).updateSettings(anyInt(), anyString(), nullable(String.class), nullable(String.class), nullable(String.class));
+        doNothing().when(userService).updateSettings(anyString(), anyString(), anyString(), nullable(String.class));
         mvc.perform(put("/user/settings")
                 .params(paramsPUT)
                 .with(csrf()))
@@ -116,7 +117,7 @@ public class UserControllerTest {
     @DisplayName("PUT on User settings wrong values")
     public void Given_constraintEntryViolation_When_updateSettings_Then_statusIsBadRequest() throws Exception {
         doThrow(ConstraintViolationException.class).when(userService)
-                .updateSettings(anyInt(), anyString(), nullable(String.class), nullable(String.class), nullable(String.class));
+                .updateSettings(anyString(), anyString(), anyString(), nullable(String.class));
 
         mvc.perform(put("/user/settings")
                 .params(paramsPUT)
@@ -130,7 +131,7 @@ public class UserControllerTest {
     public void Given_notMatchingPasswords_When_updateSettings_Then_statusIsForbidden() throws Exception {
 
         doThrow(BadCredentialsException.class).when(userService)
-                .updateSettings(anyInt(), anyString(), nullable(String.class), nullable(String.class), nullable(String.class));
+                .updateSettings(anyString(), anyString(), anyString(), nullable(String.class));
 
         mvc.perform(put("/user/settings")
                 .params(paramsPUT)
@@ -143,7 +144,7 @@ public class UserControllerTest {
     @DisplayName("PUT on User settings server error")
     public void Given_constraintEntryViolation_When_updateSettings_Then_statusIsInternalServerError() throws Exception {
         doThrow(SQLException.class).when(userService)
-                .updateSettings(anyInt(), anyString(), nullable(String.class), nullable(String.class), nullable(String.class));
+                .updateSettings(anyString(), anyString(), anyString(), nullable(String.class));
 
         mvc.perform(put("/user/settings")
                 .params(paramsPUT)

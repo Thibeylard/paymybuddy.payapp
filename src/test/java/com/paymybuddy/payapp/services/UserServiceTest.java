@@ -81,7 +81,7 @@ public class UserServiceTest {
     @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
     public void Given_validRequest_When_updateUserSettings_Then_doesNotThrowExceptions() throws SQLException {
         when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
-        userService.updateSettings(4, "userpass", "newUsername", "user@mail.com", ENCODED_USERPASS_1);
+        userService.updateSettings("userpass", "newUsername", "user@mail.com", ENCODED_USERPASS_1);
     }
 
     @Test
@@ -90,19 +90,10 @@ public class UserServiceTest {
     public void Given_existingMail_When_updateUserSettings_Then_throwsIllegalArgumentException() throws SQLException {
 
         when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
-        when(mockUserDAO.updateSettings(anyInt(), anyString(), anyString(), anyString()))
+        when(mockUserDAO.updateSettings(anyString(), anyString(), anyString(), anyString()))
                 .thenThrow(IllegalArgumentException.class);
         assertThrows(IllegalArgumentException.class,
-                () -> userService.updateSettings(4, "userpass", "newUsername", "user@mail.com", ENCODED_USERPASS_1));
-    }
-
-    @Test
-    @DisplayName("updateSettings() wrong principal")
-    @WithMockUser(username = "otherUser@mail.com", password = ENCODED_USERPASS_2)
-    public void Given_invalidPrincipal_When_updateUserSettings_Then_throwsBadCredentialsException() {
-        when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
-        assertThrows(BadCredentialsException.class,
-                () -> userService.updateSettings(4, "hackerpass", "hackedU", "hacking@mail.com", "hackerpass"));
+                () -> userService.updateSettings("userpass", "newUsername", "user@mail.com", ENCODED_USERPASS_1));
     }
 
     @Test
@@ -111,7 +102,7 @@ public class UserServiceTest {
     public void Given_invalidPassword_When_updateUserSettings_Then_throwsBadCredentialsException() {
         when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
         assertThrows(BadCredentialsException.class,
-                () -> userService.updateSettings(4, "wrongpass", "newUsername", "user@mail.com", ENCODED_USERPASS_1));
+                () -> userService.updateSettings("wrongpass", "newUsername", "user@mail.com", ENCODED_USERPASS_1));
     }
 
     @Test
@@ -120,7 +111,7 @@ public class UserServiceTest {
     public void Given_wrongSettings_When_updateUserSettings_Then_throwsConstraintViolationException() {
         when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
         assertThrows(ConstraintViolationException.class,
-                () -> userService.updateSettings(4, "userpass", "username", "user", ENCODED_USERPASS_1));
+                () -> userService.updateSettings("userpass", "username", "user", ENCODED_USERPASS_1));
     }
 
     @Test
@@ -128,8 +119,8 @@ public class UserServiceTest {
     @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
     public void Given_databaseError_When_updateUserSettings_Then_throwsSQLException() throws SQLException {
         when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
-        when(mockUserDAO.updateSettings(anyInt(), anyString(), anyString(), nullable(String.class))).thenThrow(SQLException.class);
+        when(mockUserDAO.updateSettings(anyString(), anyString(), anyString(), nullable(String.class))).thenThrow(SQLException.class);
         assertThrows(SQLException.class,
-                () -> userService.updateSettings(4, "userpass", "newUsername", "user@mail.com", ENCODED_USERPASS_1));
+                () -> userService.updateSettings("userpass", "newUsername", "user@mail.com", ENCODED_USERPASS_1));
     }
 }

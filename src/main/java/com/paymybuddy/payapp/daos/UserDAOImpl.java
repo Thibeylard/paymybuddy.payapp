@@ -141,10 +141,10 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public boolean updateSettings(final int id,
-                                  final String username,
-                                  final String mail,
-                                  final String newPassword) throws SQLException, IllegalArgumentException {
+    public boolean updateSettings(final String principalMail,
+                                  final String usernameToSet,
+                                  final String mailToSet,
+                                  final String passwordToSet) throws SQLException, IllegalArgumentException {
 
         Connection con = databaseConfiguration.getConnection();
         PreparedStatement ps = null;
@@ -157,10 +157,10 @@ public class UserDAOImpl implements UserDAO {
 
                 // User is modified
                 ps = con.prepareStatement(DBStatements.UPDATE_USER);
-                ps.setString(1, username);
-                ps.setString(2, mail);
-                ps.setString(3, newPassword);
-                ps.setInt(4, id);
+                ps.setString(1, usernameToSet);
+                ps.setString(2, mailToSet);
+                ps.setString(3, passwordToSet);
+                ps.setString(4, principalMail);
                 ps.execute();
 
                 // Transaction is over

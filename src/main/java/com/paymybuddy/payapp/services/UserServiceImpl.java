@@ -2,9 +2,11 @@ package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.UserDAO;
 import com.paymybuddy.payapp.models.User;
+import com.paymybuddy.payapp.models.UserCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,27 +44,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateSettings(final int id,
-                               final String password,
-                               final @NotEmpty @Size(min = 5, max = 25) String username,
-                               final @Email String mail,
-                               @Nullable @Size(min = 8, max = 80) String newPassword)
+    public void updateSettings(final String password,
+                               final @NotEmpty @Size(min = 5, max = 25) String usernameToSet,
+                               final @Email String mailToSet,
+                               @Nullable @Size(min = 8, max = 80) String passwordToSet)
             throws SQLException, IllegalArgumentException, ConstraintViolationException, BadCredentialsException {
-
-        User userToUpdate = getUserById(id).orElseThrow(IllegalArgumentException::new);
 
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if (userToUpdate.getMail().equals(authUser.getUsername()) & // Check that authenticated user matches with user to modify
-                userToUpdate.getPassword().equals(authUser.getPassword()) & // + Additional password verification
-                passwordEncoder.matches(password, authUser.getPassword())) {
-            if (newPassword != null) {
-                newPassword = passwordEncoder.encode(newPassword);
+        if (passwordEncoder.matches(password, authUser.getPassword())) {
+            if (passwordToSet != null) {
+                passwordToSet = passwordEncoder.encode(passwordToSet);
             } else {
-                newPassword = userToUpdate.getPassword();
+                passwordToSet = authUser.getPassword();
             }
 
-            userDAO.updateSettings(id, mail, username, newPassword);
+            if (userDAO.updateSettings(authUser.getUsername(), usernameToSet, mailToSet, passwordToSet)) {
+                authUser = new UserCredentials(mailToSet, passwordToSet, authUser.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(authUser, passwordToSet));
+            }
         } else {
             throw new BadCredentialsException("");
         }

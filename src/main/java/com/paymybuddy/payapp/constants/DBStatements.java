@@ -18,6 +18,6 @@ public final class DBStatements {
             "INSERT INTO User_Role (user_id, role_id) VALUES ( ?, ?)";
 
     public static final String UPDATE_USER =
-            "UPDATE User SET (username, mail, password) = ( ?, ?, ?) WHERE User.id = ?";
+            "UPDATE User SET (username, mail, password) = ( ?, ?, ?) WHERE User.mail = ?";
 
 }

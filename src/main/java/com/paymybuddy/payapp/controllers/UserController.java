@@ -44,13 +44,12 @@ public class UserController {
     }
 
     @PutMapping("/user/settings")
-    public ResponseEntity<String> updateSettings(@RequestParam(name = "id") int id,
-                                                 @RequestParam(name = "password") String password,
-                                                 @RequestParam(name = "username") String username,
-                                                 @RequestParam(name = "mail") String mail,
-                                                 @RequestParam(name = "newPassword", required = false) String newPassword) {
+    public ResponseEntity<String> updateSettings(@RequestParam(name = "password") String password,
+                                                 @RequestParam(name = "username") String usernameToSet,
+                                                 @RequestParam(name = "mail") String mailToSet,
+                                                 @RequestParam(name = "newPassword", required = false) String passwordToSet) {
         try {
-            userService.updateSettings(id, password, username, mail, newPassword);
+            userService.updateSettings(password, usernameToSet, mailToSet, passwordToSet);
         } catch (IllegalArgumentException | ConstraintViolationException e) {
             Logger.error(e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

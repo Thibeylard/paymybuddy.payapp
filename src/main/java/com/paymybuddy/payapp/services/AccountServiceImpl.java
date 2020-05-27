@@ -7,7 +7,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
+import org.tinylog.Logger;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -27,10 +29,14 @@ public class AccountServiceImpl implements AccountService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * @see AccountService
+     */
     @Override
     public void registrateUser(@NotEmpty @Size(min = 5, max = 25) String username,
                                @Email String mail,
-                               @Size(min = 8, max = 80) String password) throws SQLException, IllegalArgumentException {
+                               @Size(min = 8, max = 80) String password) throws SQLException, IllegalArgumentException, ConstraintViolationException {
+        Logger.debug("Encode user password.");
         password = passwordEncoder.encode(password);
         userDAO.save(username, mail, password);
     }

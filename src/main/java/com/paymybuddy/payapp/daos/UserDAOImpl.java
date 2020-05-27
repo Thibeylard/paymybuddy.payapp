@@ -26,7 +26,7 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public Optional<User> findById(final int id) {
+    public Optional<User> findById(final int userId) {
         return null;
     }
 
@@ -43,11 +43,11 @@ public class UserDAOImpl implements UserDAO {
                 ps.setString(1, validMail);
                 rs = ps.executeQuery();
                 if (rs.next()) {
-                    Logger.debug("User with {} as mail has been found", validMail);
                     user = Optional.of(new User(rs.getInt("id"))
                             .withUsername(rs.getString("username"))
                             .withMail(rs.getString("mail"))
                             .withPassword(rs.getString("password")));
+                    Logger.debug("User {} has been retrieved", validMail);
 
                     ps = con.prepareStatement(DBStatements.GET_USER_ROLES);
                     ps.setLong(1, user.get().getId());
@@ -55,10 +55,13 @@ public class UserDAOImpl implements UserDAO {
 
                     while (rs.next()) {
                         roles.add(Role.getRoleFromDatabaseId(rs.getInt("role_id")));
+                        Logger.debug("User {} roles have been retrieved and assigned", user.get().getMail());
                     }
 
                     user = Optional.of(user.get().withRoles(roles));
                 }
+
+                // else e.g (rs.next() == false), user remains an Optional.empty()
 
             } catch (SQLException e) {
                 Logger.error("An error occurred : User could not be found.");
@@ -71,11 +74,6 @@ public class UserDAOImpl implements UserDAO {
         }
 
         return user;
-    }
-
-    @Override
-    public Optional<User> findByUsername(final String username) {
-        return null;
     }
 
     @Override
@@ -93,6 +91,7 @@ public class UserDAOImpl implements UserDAO {
                 int userId = 0;
                 // Start transaction
                 con.setAutoCommit(false);
+                Logger.debug("Start transaction.");
 
                 // New User is inserted in database
                 ps = con.prepareStatement(DBStatements.INSERT_USER);
@@ -100,6 +99,7 @@ public class UserDAOImpl implements UserDAO {
                 ps.setString(2, mail);
                 ps.setString(3, encodedPassword);
                 ps.execute();
+                Logger.debug("New User inserted in User table.");
 
                 // New User id is retrieved
                 ps = con.prepareStatement(DBStatements.GET_USER_ID_BY_MAIL);
@@ -108,6 +108,9 @@ public class UserDAOImpl implements UserDAO {
 
                 if (rs.next()) {
                     userId = rs.getInt("id");
+                    Logger.debug("Retrieved new User ID : {}", userId);
+                } else {
+                    throw new SQLException();
                 }
 
                 // User id is inserted as user_id with a USER role_id by default
@@ -115,9 +118,11 @@ public class UserDAOImpl implements UserDAO {
                 ps.setInt(1, userId);
                 ps.setInt(2, Role.USER.getDatabaseId());
                 ps.execute();
+                Logger.debug("User role inserted in User_Role table.");
 
                 // Transaction is over
                 con.commit();
+                Logger.debug("Commit SQL transaction.");
                 con.setAutoCommit(true); // autocommit set back to true
 
                 result = true;
@@ -154,6 +159,7 @@ public class UserDAOImpl implements UserDAO {
             try {
                 // Start transaction
                 con.setAutoCommit(false);
+                Logger.debug("Start transaction.");
 
                 // User is modified
                 ps = con.prepareStatement(DBStatements.UPDATE_USER);
@@ -163,8 +169,10 @@ public class UserDAOImpl implements UserDAO {
                 ps.setString(4, principalMail);
                 ps.execute();
 
+                Logger.debug("User values updated.");
                 // Transaction is over
                 con.commit();
+                Logger.debug("Commit SQL transaction.");
                 con.setAutoCommit(true); // autocommit set back to true
 
                 result = true;

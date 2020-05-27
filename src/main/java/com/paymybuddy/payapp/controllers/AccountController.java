@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.tinylog.Logger;
 
 import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
@@ -28,12 +29,16 @@ public class AccountController {
                                                @RequestParam(name = "mail") final String mail,
                                                @RequestParam(name = "password") final String password) {
         try {
+            Logger.debug("POST request for user registration.");
             accountService.registrateUser(username, mail, password);
         } catch (IllegalArgumentException | ConstraintViolationException e) {
+            Logger.error(e.getMessage());
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (SQLException e) {
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            Logger.error(e.getMessage());
+            return new ResponseEntity<String>("Sorry, an error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        Logger.info("User has successfully registered.");
         return new ResponseEntity<String>("Registration succeed", HttpStatus.OK);
     }
 }

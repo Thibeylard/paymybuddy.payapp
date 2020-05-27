@@ -80,8 +80,8 @@ public class UserServiceTest {
     @DisplayName("updateSettings() success")
     @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
     public void Given_validRequest_When_updateUserSettings_Then_doesNotThrowExceptions() throws SQLException {
-        when(mockUserDAO.findById(anyInt())).thenReturn(userToUpdate());
-        userService.updateSettings("userpass", "newUsername", "user@mail.com", ENCODED_USERPASS_1);
+        when(mockUserDAO.updateSettings(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
+        userService.updateSettings("userpass", "newUsername", "user@mail.com", null);
     }
 
     @Test

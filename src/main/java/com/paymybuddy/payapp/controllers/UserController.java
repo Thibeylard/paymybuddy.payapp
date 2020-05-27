@@ -26,16 +26,29 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("/")
+    public String homeRedirection() {
+        Logger.info("Redirection to home.");
+        return "redirect:" + "/user/home";
+    }
+
     @GetMapping("/user/home")
     public ResponseEntity<User> home() {
+        Logger.debug("Request for user home.");
         return userInstanceResponse();
     }
 
     @GetMapping("/user/settings")
     public ResponseEntity<User> settings() {
+        Logger.debug("Request for user settings.");
         return userInstanceResponse();
     }
 
+    /**
+     * Common method used for request that need to return Principal User instance.
+     *
+     * @return User or null in response body
+     */
     private ResponseEntity<User> userInstanceResponse() {
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<User> user = userService.getUserByMail(principal.getUsername());
@@ -49,6 +62,7 @@ public class UserController {
                                                  @RequestParam(name = "mail") String mailToSet,
                                                  @RequestParam(name = "newPassword", required = false) String passwordToSet) {
         try {
+            Logger.debug("Request to update user settings.");
             userService.updateSettings(password, usernameToSet, mailToSet, passwordToSet);
         } catch (IllegalArgumentException | ConstraintViolationException e) {
             Logger.error(e.getMessage());
@@ -60,7 +74,7 @@ public class UserController {
             Logger.error("A server error occurred : User could not be found.");
             return new ResponseEntity<>("An error occurred.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
+        Logger.info("Successfully update settings");
         return new ResponseEntity<>("Successfully update settings", HttpStatus.OK);
     }
 }

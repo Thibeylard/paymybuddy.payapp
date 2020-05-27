@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.tinylog.Logger;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Email;
@@ -33,16 +34,25 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * @see UserService
+     */
     @Override
     public Optional<User> getUserById(int userId) {
         return userDAO.findById(userId);
     }
 
+    /**
+     * @see UserService
+     */
     @Override
     public Optional<User> getUserByMail(String mail) {
         return userDAO.findByMail(mail);
     }
 
+    /**
+     * @see UserService
+     */
     @Override
     public void updateSettings(final String password,
                                final @NotEmpty @Size(min = 5, max = 25) String usernameToSet,
@@ -54,12 +64,14 @@ public class UserServiceImpl implements UserService {
 
         if (passwordEncoder.matches(password, authUser.getPassword())) {
             if (passwordToSet != null) {
+                Logger.debug("Encoding new password.");
                 passwordToSet = passwordEncoder.encode(passwordToSet);
             } else {
                 passwordToSet = authUser.getPassword();
             }
 
             if (userDAO.updateSettings(authUser.getUsername(), usernameToSet, mailToSet, passwordToSet)) {
+                Logger.debug("User update OK. Update authentication principal.");
                 authUser = new UserCredentials(mailToSet, passwordToSet, authUser.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(authUser, passwordToSet));
             }

@@ -1,5 +1,6 @@
-package com.paymybuddy.payapp.daos;
+package com.paymybuddy.payapp.integration;
 
+import com.paymybuddy.payapp.daos.UserDAO;
 import com.paymybuddy.payapp.enums.Role;
 import com.paymybuddy.payapp.models.User;
 import org.assertj.db.type.Table;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @ActiveProfiles("test_h2")
 @DisplayName("User DAO tests on : ")
-public class UserDAOTest {
+public class UserDAOIT {
 
     @Autowired
     private UserDAO userDAO;

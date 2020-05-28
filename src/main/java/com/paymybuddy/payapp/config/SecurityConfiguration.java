@@ -46,6 +46,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .formLogin()
 
                 .and()
+                .csrf().ignoringAntMatchers("/registration")
+
+                .and()
                 .rememberMe().tokenRepository(jdbcTokenRepository);
     }
 

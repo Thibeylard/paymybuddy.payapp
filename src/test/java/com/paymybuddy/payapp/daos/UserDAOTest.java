@@ -16,6 +16,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -108,7 +109,8 @@ public class UserDAOTest {
     @Test
     @DisplayName("Save user success")
     public void Given_availableMail_When_savingUser_Then_userIsStoredInDatabase() throws SQLException {
-        assertThat(userDAO.save("username2", "user2@mail.com", "user2pass"))
+        User user = new User("username2", "user2@mail.com", "user2pass", Collections.singletonList(Role.USER));
+        assertThat(userDAO.save(user))
                 .isTrue();
 
         Table userTable = new Table(dataSource, "User");
@@ -121,7 +123,8 @@ public class UserDAOTest {
     @Test
     @DisplayName("Save user failure : redundant email")
     public void Given_existingMail_When_savingUser_Then_IllegalArgumentExceptionThrown() throws IllegalArgumentException {
-        assertThrows(IllegalArgumentException.class, () -> userDAO.save("username", "user@mail.com", "userpass"));
+        User user = new User("username", "user@mail.com", "userpass", Collections.singletonList(Role.USER));
+        assertThrows(IllegalArgumentException.class, () -> userDAO.save(user));
     }
 
     @Test

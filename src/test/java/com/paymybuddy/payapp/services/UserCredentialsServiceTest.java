@@ -37,11 +37,10 @@ public class UserCredentialsServiceTest {
     @Test
     @DisplayName("loadUserByUsername() success")
     public void Given_validMail_When_loadUserByUsername_Then_returnUser() {
-        User foundUser = new User(1)
-                .withUsername("username")
-                .withMail("user@mail.com")
-                .withPassword("userpass")
-                .withRoles(Collections.singletonList(Role.USER));
+        User foundUser = new User("username",
+                "user@mail.com",
+                "userpass",
+                Collections.singletonList(Role.USER));
         UserCredentials principal = new UserCredentials(foundUser.getMail(), foundUser.getPassword(), foundUser.getRoles());
         Optional<User> daoResponse = Optional.of(foundUser);
 

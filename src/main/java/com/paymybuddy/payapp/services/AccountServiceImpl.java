@@ -1,6 +1,8 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.UserDAO;
+import com.paymybuddy.payapp.enums.Role;
+import com.paymybuddy.payapp.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +16,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.sql.SQLException;
+import java.util.Collections;
 
 @Service
 @Validated
@@ -38,6 +41,6 @@ public class AccountServiceImpl implements AccountService {
                                @Size(min = 8, max = 80) String password) throws SQLException, IllegalArgumentException, ConstraintViolationException {
         Logger.debug("Encode user password.");
         password = passwordEncoder.encode(password);
-        userDAO.save(username, mail, password);
+        userDAO.save(new User(username, mail, password, Collections.singletonList(Role.USER)));
     }
 }

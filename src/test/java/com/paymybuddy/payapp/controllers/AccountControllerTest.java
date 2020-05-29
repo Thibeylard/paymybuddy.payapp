@@ -71,11 +71,10 @@ public class AccountControllerTest {
                 .apply(springSecurity()) // Integrate SpringSecurity to SpringMVC
                 .build();
         baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-        userDetails = new UserCredentials(new User(14)
-                .withUsername("user")
-                .withMail("user@mail.com")
-                .withPassword(bcryptEncoder.encode("userpass"))
-                .withRoles(Collections.singletonList(Role.USER)));
+        userDetails = new UserCredentials(new User("user",
+                "user@mail.com",
+                bcryptEncoder.encode("userpass"),
+                Collections.singleton(Role.USER)));
     }
 
     @Test

@@ -28,15 +28,11 @@ public interface UserDAO {
     /**
      * Save new User in database
      *
-     * @param username User.username
-     * @param mail     User.mail UNIQUE
-     * @param password User.password (encrypted)
+     * @param user User object
      * @throws SQLException             if SQL operation fails
      * @throws IllegalArgumentException if mail is not available
      */
-    boolean save(final String username,
-                 final String mail,
-                 final String password) throws IllegalArgumentException, SQLException;
+    boolean save(final User user) throws IllegalArgumentException, SQLException;
 
     /**
      * Update User where mail = principalMail with values usernameToSet, mailToSet, passwordToSet

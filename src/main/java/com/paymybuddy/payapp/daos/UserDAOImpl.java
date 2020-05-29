@@ -38,20 +38,18 @@ public class UserDAOImpl implements UserDAO {
                 ps.setInt(1, userId);
                 rs = ps.executeQuery();
                 if (rs.next()) {
-                    user = Optional.of(new User(rs.getInt("id"))
-                            .withUsername(rs.getString("username"))
-                            .withMail(rs.getString("mail"))
-                            .withPassword(rs.getString("password")));
-                    Logger.debug("User with id {} has been retrieved", userId);
-
-                    user = Optional.of(user.get().withRoles(getUserRolesByID(con, userId)));
+                    user = Optional.of(new User(rs.getInt("id"),
+                            rs.getString("username"),
+                            rs.getString("mail"),
+                            rs.getString("password"),
+                            getUserRolesByID(con, userId)));
                 }
 
                 // else e.g (rs.next() == false), user remains an Optional.empty()
 
             } catch (SQLException e) {
                 Logger.error("An error occurred : User could not be found.");
-                e.printStackTrace();
+                user = Optional.empty();
             } finally {
                 databaseConfiguration.closeResultSet(rs);
                 databaseConfiguration.closePreparedStatement(ps);
@@ -74,20 +72,18 @@ public class UserDAOImpl implements UserDAO {
                 ps.setString(1, validMail);
                 rs = ps.executeQuery();
                 if (rs.next()) {
-                    user = Optional.of(new User(rs.getInt("id"))
-                            .withUsername(rs.getString("username"))
-                            .withMail(rs.getString("mail"))
-                            .withPassword(rs.getString("password")));
-                    Logger.debug("User {} has been retrieved", validMail);
-
-                    user = Optional.of(user.get().withRoles(getUserRolesByID(con, user.get().getId())));
+                    user = Optional.of(new User(rs.getInt("id"),
+                            rs.getString("username"),
+                            rs.getString("mail"),
+                            rs.getString("password"),
+                            getUserRolesByID(con, rs.getInt("id"))));
                 }
 
                 // else e.g (rs.next() == false), user remains an Optional.empty()
 
             } catch (SQLException e) {
                 Logger.error("An error occurred : User could not be found.");
-                e.printStackTrace();
+                user = Optional.empty();
             } finally {
                 databaseConfiguration.closeResultSet(rs);
                 databaseConfiguration.closePreparedStatement(ps);
@@ -100,9 +96,7 @@ public class UserDAOImpl implements UserDAO {
 
     //TODO Modifier la signature de la méthode : Recevoir un User à la place (sur le modèle de Transaction)
     @Override
-    public boolean save(final String username,
-                        final String mail,
-                        final String encodedPassword) throws SQLException, IllegalArgumentException {
+    public boolean save(final User user) throws SQLException, IllegalArgumentException {
 
         Connection con = databaseConfiguration.getConnection();
         PreparedStatement ps = null;
@@ -118,15 +112,15 @@ public class UserDAOImpl implements UserDAO {
 
                 // New User is inserted in database
                 ps = con.prepareStatement(DBStatements.INSERT_USER);
-                ps.setString(1, username);
-                ps.setString(2, mail);
-                ps.setString(3, encodedPassword);
+                ps.setString(1, user.getUsername());
+                ps.setString(2, user.getMail());
+                ps.setString(3, user.getPassword());
                 ps.execute();
                 Logger.debug("New User inserted in User table.");
 
                 // New User id is retrieved
                 ps = con.prepareStatement(DBStatements.GET_USER_ID_BY_MAIL);
-                ps.setString(1, mail);
+                ps.setString(1, user.getMail());
                 rs = ps.executeQuery();
 
                 if (rs.next()) {
@@ -136,12 +130,14 @@ public class UserDAOImpl implements UserDAO {
                     throw new SQLException();
                 }
 
-                // User id is inserted as user_id with a USER role_id by default
-                ps = con.prepareStatement(DBStatements.INSERT_USER_ROLE);
-                ps.setInt(1, userId);
-                ps.setInt(2, Role.USER.getDatabaseId());
-                ps.execute();
-                Logger.debug("User role inserted in User_Role table.");
+                for (Role role : user.getRoles()) {
+                    // User id is inserted as user_id with a USER role_id by default
+                    ps = con.prepareStatement(DBStatements.INSERT_USER_ROLE);
+                    ps.setInt(1, userId);
+                    ps.setInt(2, role.getDatabaseId());
+                    ps.execute();
+                    Logger.debug("User role inserted in User_Role table.");
+                }
 
                 // Transaction is over
                 con.commit();

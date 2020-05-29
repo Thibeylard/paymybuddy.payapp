@@ -73,11 +73,10 @@ public class UserControllerTest {
     @WithMockUser(username = "user@mail.com")
     @DisplayName("GET on User pages succeed")
     public void Given_authenticatedUser_When_getAppURLs_Then_returnUserSpecificInstance() throws Exception {
-        User user = new User(6)
-                .withMail("user@mail.com")
-                .withUsername("user")
-                .withPassword(bcryptEncoder.encode("userpass"))
-                .withRoles(Collections.singleton(Role.USER));
+        User user = new User("user",
+                "user@mail.com",
+                bcryptEncoder.encode("userpass"),
+                Collections.singleton(Role.USER));
         String userJson = objectMapper.writeValueAsString(user);
 
         when(userService.getUserByMail(anyString()))

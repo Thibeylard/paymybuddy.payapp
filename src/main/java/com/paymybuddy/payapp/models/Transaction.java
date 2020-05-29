@@ -8,7 +8,7 @@ import java.util.Optional;
 public class Transaction {
 
     /**
-     * ID in database. Null at creation.
+     * ID in database. Null at in-app creation.
      */
     private final @Nullable
     Integer id;

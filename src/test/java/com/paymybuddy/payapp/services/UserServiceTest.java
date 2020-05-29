@@ -43,7 +43,10 @@ public class UserServiceTest {
     @Test
     @DisplayName("getUserById() results")
     public void Given_idValue_When_findUserById_Then_returnDAOFindByIDResult() {
-        Optional<User> user = Optional.of(new User(3));
+        Optional<User> user = Optional.of(new User("username",
+                "user@mail.com",
+                "userpass",
+                Collections.singleton(Role.USER)));
         when(mockUserDAO.findById(anyInt())).thenReturn(user);
         assertThat(userService.getUserById(3))
                 .isEqualTo(user);
@@ -57,7 +60,10 @@ public class UserServiceTest {
     @Test
     @DisplayName("getUserByMail() results")
     public void Given_idValue_When_findUserByMail_Then_returnDAOFindByMailResult() {
-        Optional<User> user = Optional.of(new User(3));
+        Optional<User> user = Optional.of(new User("username",
+                "user@mail.com",
+                "userpass",
+                Collections.singleton(Role.USER)));
         when(mockUserDAO.findByMail(anyString())).thenReturn(user);
         assertThat(userService.getUserByMail("user"))
                 .isEqualTo(user);
@@ -69,11 +75,10 @@ public class UserServiceTest {
     }
 
     private Optional<User> userToUpdate() {
-        return Optional.of(new User(4)
-                .withUsername("username")
-                .withMail("user@mail.com")
-                .withPassword(ENCODED_USERPASS_1)
-                .withRoles(Collections.singleton(Role.USER)));
+        return Optional.of(new User("username",
+                "user@mail.com",
+                ENCODED_USERPASS_1,
+                Collections.singleton(Role.USER)));
     }
 
     @Test

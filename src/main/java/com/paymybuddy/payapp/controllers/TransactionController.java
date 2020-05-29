@@ -15,7 +15,7 @@ public class TransactionController {
         return null;
     }
 
-    @PostMapping("/contacts")
+    @PostMapping("/transactions")
     public ResponseEntity<String> makeTransaction(@RequestParam(name = "userID") int userID,
                                                   @RequestParam(name = "recipientMail") String recipientMail,
                                                   @RequestParam(name = "amount") double amount,

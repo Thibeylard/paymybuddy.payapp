@@ -3,6 +3,9 @@ package com.paymybuddy.payapp.constants;
 public final class DBStatements {
 
     //TODO Changer les requêtes préparées pour qu'elles correspondent au URL des controllers.
+    public static final String GET_USER_BY_ID =
+            "SELECT id, username, mail, password FROM User WHERE id = ?";
+
     public static final String GET_USER_BY_MAIL =
             "SELECT id, username, mail, password FROM User WHERE mail = ?";
 

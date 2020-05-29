@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Optional;
 
 @Repository
@@ -25,16 +26,45 @@ public class UserDAOImpl implements UserDAO {
         this.databaseConfiguration = databaseConfiguration;
     }
 
-    //TODO Rédiger la méthode findByID
     @Override
     public Optional<User> findById(final int userId) {
-        return null;
+        Optional<User> user = Optional.empty();
+        Connection con = databaseConfiguration.getConnection();
+        if (con != null) {
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            try {
+                ps = con.prepareStatement(DBStatements.GET_USER_BY_ID);
+                ps.setInt(1, userId);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    user = Optional.of(new User(rs.getInt("id"))
+                            .withUsername(rs.getString("username"))
+                            .withMail(rs.getString("mail"))
+                            .withPassword(rs.getString("password")));
+                    Logger.debug("User with id {} has been retrieved", userId);
+
+                    user = Optional.of(user.get().withRoles(getUserRolesByID(con, userId)));
+                }
+
+                // else e.g (rs.next() == false), user remains an Optional.empty()
+
+            } catch (SQLException e) {
+                Logger.error("An error occurred : User could not be found.");
+                e.printStackTrace();
+            } finally {
+                databaseConfiguration.closeResultSet(rs);
+                databaseConfiguration.closePreparedStatement(ps);
+                databaseConfiguration.closeConnection(con);
+            }
+        }
+
+        return user;
     }
 
     @Override
     public Optional<User> findByMail(final String validMail) {
         Optional<User> user = Optional.empty();
-        ArrayList<Role> roles = new ArrayList<>();
         Connection con = databaseConfiguration.getConnection();
         if (con != null) {
             PreparedStatement ps = null;
@@ -50,16 +80,7 @@ public class UserDAOImpl implements UserDAO {
                             .withPassword(rs.getString("password")));
                     Logger.debug("User {} has been retrieved", validMail);
 
-                    ps = con.prepareStatement(DBStatements.GET_USER_ROLES);
-                    ps.setLong(1, user.get().getId());
-                    rs = ps.executeQuery();
-
-                    while (rs.next()) {
-                        roles.add(Role.getRoleFromDatabaseId(rs.getInt("role_id")));
-                        Logger.debug("User {} roles have been retrieved and assigned", user.get().getMail());
-                    }
-
-                    user = Optional.of(user.get().withRoles(roles));
+                    user = Optional.of(user.get().withRoles(getUserRolesByID(con, user.get().getId())));
                 }
 
                 // else e.g (rs.next() == false), user remains an Optional.empty()
@@ -90,7 +111,7 @@ public class UserDAOImpl implements UserDAO {
 
         if (con != null) {
             try {
-                int userId = 0;
+                int userId;
                 // Start transaction
                 con.setAutoCommit(false);
                 Logger.debug("Start transaction.");
@@ -194,5 +215,28 @@ public class UserDAOImpl implements UserDAO {
         }
 
         return result;
+    }
+
+
+    /**
+     * Get roles of User that was just retrieved.
+     *
+     * @param con    Database connection
+     * @param userId Id of retrieved User
+     * @return Roles as Collection
+     * @throws SQLException if database exception occurs
+     */
+    private Collection<Role> getUserRolesByID(Connection con, int userId) throws SQLException {
+        ArrayList<Role> roles = new ArrayList<>();
+        PreparedStatement ps = con.prepareStatement(DBStatements.GET_USER_ROLES);
+        ps.setInt(1, userId);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            roles.add(Role.getRoleFromDatabaseId(rs.getInt("role_id")));
+            Logger.debug("User roles have been retrieved");
+        }
+
+        return roles;
     }
 }

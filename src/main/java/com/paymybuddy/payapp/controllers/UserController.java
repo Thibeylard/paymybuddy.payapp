@@ -21,6 +21,7 @@ public class UserController {
 
     private UserService userService;
 
+
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
@@ -33,27 +34,28 @@ public class UserController {
     }
 
     @GetMapping("/user/home")
-    public ResponseEntity<User> home() {
+    public ResponseEntity<User> home() { // Return complete User (w/ Contacts, Transactions)
         Logger.debug("Request for user home.");
         return userInstanceResponse();
     }
 
-    @GetMapping("/user/settings")
+    // TODO Changer /user/settings pour /user/profile ?
+    @GetMapping("/user/settings") // Return limited User (no Contacts, no Transactions)
     public ResponseEntity<User> settings() {
         Logger.debug("Request for user settings.");
         return userInstanceResponse();
     }
 
-    /**
-     * Common method used for request that need to return Principal User instance.
-     *
-     * @return User or null in response body
-     */
-    private ResponseEntity<User> userInstanceResponse() {
-        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> user = userService.getUserByMail(principal.getUsername());
-        return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
+    @GetMapping("/user/contact")
+    public ResponseEntity<User> contacts() { // Return limited User (w/ Contacts, no Transactions)
+        Logger.debug("Request for user contacts.");
+        return null;
+    }
+
+    @GetMapping("/user/balance")
+    public ResponseEntity<Double> balance() { // Return User calculated User balance
+        Logger.debug("Request for user balance.");
+        return null;
     }
 
     @PutMapping("/user/settings")
@@ -77,4 +79,17 @@ public class UserController {
         Logger.info("Successfully update settings");
         return new ResponseEntity<>("Successfully update settings", HttpStatus.OK);
     }
+
+    /**
+     * Common method used for request that need to return Principal User instance.
+     *
+     * @return User or null in response body
+     */
+    private ResponseEntity<User> userInstanceResponse() {
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> user = userService.getUserByMail(principal.getUsername());
+        return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
+    }
+
 }

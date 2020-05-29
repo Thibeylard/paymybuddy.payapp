@@ -32,7 +32,7 @@ public class User {
     /**
      * Other User instance connected to this User
      */
-    private Collection<User> connections;
+    private Collection<User> contacts;
     /**
      * User transactions
      */
@@ -68,8 +68,8 @@ public class User {
         return this;
     }
 
-    public User withConnections(Collection<User> connections) {
-        this.connections = connections;
+    public User withContacts(Collection<User> contacts) {
+        this.contacts = contacts;
         return this;
     }
 
@@ -101,8 +101,8 @@ public class User {
         return roles;
     }
 
-    public Collection<User> getConnections() {
-        return connections;
+    public Collection<User> getContacts() {
+        return contacts;
     }
 
     public Collection<Transaction> getTransactions() {

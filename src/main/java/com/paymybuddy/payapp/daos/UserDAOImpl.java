@@ -25,6 +25,7 @@ public class UserDAOImpl implements UserDAO {
         this.databaseConfiguration = databaseConfiguration;
     }
 
+    //TODO Rédiger la méthode findByID
     @Override
     public Optional<User> findById(final int userId) {
         return null;
@@ -76,6 +77,7 @@ public class UserDAOImpl implements UserDAO {
         return user;
     }
 
+    //TODO Modifier la signature de la méthode : Recevoir un User à la place (sur le modèle de Transaction)
     @Override
     public boolean save(final String username,
                         final String mail,

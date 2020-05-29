@@ -28,15 +28,15 @@ public class Transaction {
     /**
      * Initial transaction amount.
      */
-    private Double initialAmount;
+    private final Double initialAmount;
     /**
      * 5% app monetized total.
      */
-    private Double total;
+    private final Double total;
     /**
      * Basic description of transaction
      */
-    private String description;
+    private final String description;
 
     /**
      * Constructor used to retrieve a transaction from database

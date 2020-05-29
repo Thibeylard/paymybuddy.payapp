@@ -1,10 +1,11 @@
-package com.paymybuddy.payapp.services;
+package com.paymybuddy.payapp.daos;
 
 import com.paymybuddy.payapp.models.Transaction;
 
 import java.util.Collection;
 
-public interface TransactionService {
+public interface TransactionDAO {
+
     /**
      * Get all transactions where userId correspond either to creditorId or debtorId in Transaction table.
      *
@@ -14,7 +15,7 @@ public interface TransactionService {
     Collection<Transaction> getTransactionsByUserId(int userId);
 
     /**
-     * Get all debit transactions of User identified by userId.
+     * Get all transactions where userId correspond to debtorId in Transaction table.
      *
      * @param userId Id of User
      * @return All User debit transactions as Transaction Collection
@@ -22,12 +23,18 @@ public interface TransactionService {
     Collection<Transaction> getDebitTransactionsByUserId(int userId);
 
     /**
-     * Get all credit transactions of User identified by userId.
+     * Get all transactions where userId correspond to creditorID in Transaction table.
      *
      * @param userId Id of User
      * @return All User credit transactions as Transaction Collection
      */
     Collection<Transaction> getCreditTransactionsByUserId(int userId);
 
-    boolean makeTransaction(String creditorUsername, String description, double amount);
+    /**
+     * Save transaction in Transaction table.
+     *
+     * @param transaction Transaction as object
+     * @return true if operation succeed
+     */
+    boolean save(Transaction transaction);
 }

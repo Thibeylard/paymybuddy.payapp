@@ -94,7 +94,6 @@ public class UserDAOImpl implements UserDAO {
         return user;
     }
 
-    //TODO Modifier la signature de la méthode : Recevoir un User à la place (sur le modèle de Transaction)
     @Override
     public boolean save(final User user) throws SQLException, IllegalArgumentException {
 

@@ -39,8 +39,7 @@ public class UserController {
         return userInstanceResponse();
     }
 
-    // TODO Changer /user/settings pour /user/profile ?
-    @GetMapping("/user/settings") // Return limited User (no Contacts, no Transactions)
+    @GetMapping("/user/profile") // Return limited User (no Contacts, no Transactions)
     public ResponseEntity<User> settings() {
         Logger.debug("Request for user settings.");
         return userInstanceResponse();
@@ -58,7 +57,7 @@ public class UserController {
         return null;
     }
 
-    @PutMapping("/user/settings")
+    @PutMapping("/user/profile")
     public ResponseEntity<String> updateSettings(@RequestParam(name = "password") String password,
                                                  @RequestParam(name = "username") String usernameToSet,
                                                  @RequestParam(name = "mail") String mailToSet,

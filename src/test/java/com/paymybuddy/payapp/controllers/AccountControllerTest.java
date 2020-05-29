@@ -84,7 +84,7 @@ public class AccountControllerTest {
                 .with(anonymous()))
                 .andExpect(redirectedUrl(this.baseUrl + "/login"));
 
-        mvc.perform(get("/user/settings")
+        mvc.perform(get("/user/profile")
                 .with(anonymous()))
                 .andExpect(redirectedUrl(this.baseUrl + "/login"));
     }

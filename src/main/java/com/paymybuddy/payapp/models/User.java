@@ -14,34 +14,38 @@ public class User {
     /**
      * ID in database. Null at in-app creation.
      */
-    private final @Nullable
-    Integer id;
+    @Nullable
+    private final Integer id;
     /**
      * User pseudonym
      */
-    private final @NotNull String username;
+    @NotNull
+    private final String username;
     /**
      * User mail and identifier (= username in Spring Security context)
      */
-    private final @NotNull String mail;
+    @NotNull
+    private final String mail;
     /**
      * User encrypted password
      */
-    private final @NotNull String password;
+    @NotNull
+    private final String password;
     /**
      * User roles defining app authorizations
      */
-    private final @NotNull Collection<Role> roles;
+    @NotNull
+    private final Collection<Role> roles;
     /**
      * Other User instance connected to this User. Null if User partially retrieved.
      */
-    private @Nullable
-    Collection<User> contacts;
+    @Nullable
+    private Collection<User> contacts;
     /**
      * User transactions.  Null if User partially retrieved.
      */
-    private @Nullable
-    Collection<Transaction> transactions;
+    @Nullable
+    private Collection<Transaction> transactions;
 
     public User(@NotNull String username,
                 @NotNull String mail,
@@ -56,7 +60,11 @@ public class User {
         this.transactions = new ArrayList<Transaction>();
     }
 
-    public User(int id, @NotNull String username, @NotNull String mail, @NotNull String password, @NotNull Collection<Role> roles) {
+    public User(int id,
+                @NotNull String username,
+                @NotNull String mail,
+                @NotNull String password,
+                @NotNull Collection<Role> roles) {
         this.id = id;
         this.username = username;
         this.mail = mail;

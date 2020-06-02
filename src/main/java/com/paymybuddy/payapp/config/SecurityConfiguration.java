@@ -37,13 +37,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/user/**").authenticated()
-                .antMatchers(HttpMethod.PUT, "/user/settings").authenticated()
-                .antMatchers("/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/registration").permitAll()
+                .antMatchers("/login").permitAll()
+                .antMatchers(HttpMethod.GET).authenticated()
+                .antMatchers(HttpMethod.PUT).authenticated()
+                .antMatchers(HttpMethod.POST).authenticated()
+                .antMatchers(HttpMethod.DELETE).authenticated()
 
                 .and()
                 .formLogin()
+                .successForwardUrl("/user")
 
                 .and()
                 .rememberMe().tokenRepository(jdbcTokenRepository);

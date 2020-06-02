@@ -80,11 +80,15 @@ public class AccountControllerTest {
     @Test
     @DisplayName("Anonymous user redirections")
     public void Given_anonymousUser_When_requestAppAccess_Then_redirectedToLogin() throws Exception {
-        mvc.perform(get("/user/home")
+        mvc.perform(get("/user")
                 .with(anonymous()))
                 .andExpect(redirectedUrl(this.baseUrl + "/login"));
 
-        mvc.perform(get("/user/profile")
+        mvc.perform(get("/contacts")
+                .with(anonymous()))
+                .andExpect(redirectedUrl(this.baseUrl + "/login"));
+
+        mvc.perform(get("/transactions")
                 .with(anonymous()))
                 .andExpect(redirectedUrl(this.baseUrl + "/login"));
     }

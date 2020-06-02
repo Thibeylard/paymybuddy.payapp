@@ -71,7 +71,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(username = "user@mail.com")
-    @DisplayName("GET on User pages succeed")
+    @DisplayName("GET on User ")
     public void Given_authenticatedUser_When_getAppURLs_Then_returnUserSpecificInstance() throws Exception {
         User user = new User("user",
                 "user@mail.com",
@@ -85,14 +85,7 @@ public class UserControllerTest {
 
         MvcResult result;
 
-        result = mvc.perform(get("/user/home"))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        assertThat(result.getResponse().getContentAsString())
-                .isEqualTo(userJson);
-
-        result = mvc.perform(get("/user/profile"))
+        result = mvc.perform(get("/user"))
                 .andExpect(status().isOk())
                 .andReturn();
 

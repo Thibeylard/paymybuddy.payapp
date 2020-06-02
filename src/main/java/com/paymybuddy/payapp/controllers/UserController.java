@@ -19,7 +19,7 @@ import java.util.Optional;
 @RequestMapping(produces = "application/json")
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
 
     @Autowired
@@ -27,32 +27,18 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/")
-    public String homeRedirection() {
-        Logger.info("Redirection to home.");
-        return "redirect:" + "/user/home";
+
+    @GetMapping("/user") // Return basic view of current User (no Contacts, no Transactions)
+    public ResponseEntity<User> getUser() {
+        Logger.debug("Request for principal user.");
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> user = userService.getUserByMail(principal.getUsername());
+        return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
-    @GetMapping("/user/home")
-    public ResponseEntity<User> home() { // Return complete User (w/ Contacts, Transactions)
-        Logger.debug("Request for user home.");
-        return userInstanceResponse();
-    }
-
-    @GetMapping("/user/profile") // Return limited User (no Contacts, no Transactions)
-    public ResponseEntity<User> settings() {
-        Logger.debug("Request for user settings.");
-        return userInstanceResponse();
-    }
-
-    @GetMapping("/user/contact")
-    public ResponseEntity<User> contacts() { // Return limited User (w/ Contacts, no Transactions)
-        Logger.debug("Request for user contacts.");
-        return null;
-    }
-
-    @GetMapping("/user/balance")
-    public ResponseEntity<Double> balance() { // Return User calculated User balance
+    @GetMapping("/user/balance") // Return User balance
+    public ResponseEntity<Double> balance() {
         Logger.debug("Request for user balance.");
         return null;
     }
@@ -77,18 +63,6 @@ public class UserController {
         }
         Logger.info("Successfully update settings");
         return new ResponseEntity<>("Successfully update settings", HttpStatus.OK);
-    }
-
-    /**
-     * Common method used for request that need to return Principal User instance.
-     *
-     * @return User or null in response body
-     */
-    private ResponseEntity<User> userInstanceResponse() {
-        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> user = userService.getUserByMail(principal.getUsername());
-        return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
 }

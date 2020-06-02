@@ -40,7 +40,7 @@ public class User {
      * Other User instance connected to this User. Null if User partially retrieved.
      */
     @Nullable
-    private Collection<User> contacts;
+    private Collection<Contact> contacts;
     /**
      * User transactions.  Null if User partially retrieved.
      */
@@ -56,7 +56,7 @@ public class User {
         this.mail = mail;
         this.password = password;
         this.roles = roles;
-        this.contacts = new ArrayList<User>();
+        this.contacts = new ArrayList<Contact>();
         this.transactions = new ArrayList<Transaction>();
     }
 
@@ -74,7 +74,7 @@ public class User {
         this.transactions = null;
     }
 
-    public User withContacts(Collection<User> contacts) {
+    public User withContacts(Collection<Contact> contacts) {
         this.contacts = contacts;
         return this;
     }
@@ -107,7 +107,7 @@ public class User {
         return roles;
     }
 
-    public Optional<Collection<User>> getContacts() {
+    public Optional<Collection<Contact>> getContacts() {
         return Optional.ofNullable(contacts);
     }
 

@@ -49,6 +49,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .successForwardUrl("/user")
 
                 .and()
+                .csrf().ignoringAntMatchers("/registration")
+
+                .and()
                 .rememberMe().tokenRepository(jdbcTokenRepository);
     }
 

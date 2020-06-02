@@ -1,6 +1,6 @@
 package com.paymybuddy.payapp.controllers;
 
-import com.paymybuddy.payapp.models.User;
+import com.paymybuddy.payapp.models.Contact;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +11,7 @@ import java.util.Collection;
 public class ContactController {
 
     @GetMapping("/contacts")
-    public ResponseEntity<Collection<User>> getUserContacts(@RequestParam(name = "userID") int userID) {
+    public ResponseEntity<Collection<Contact>> getUserContacts(@RequestParam(name = "userID") int userID) {
         return null;
     }
 

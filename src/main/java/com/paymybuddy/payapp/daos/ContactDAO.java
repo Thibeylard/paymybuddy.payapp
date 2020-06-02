@@ -1,6 +1,6 @@
 package com.paymybuddy.payapp.daos;
 
-import com.paymybuddy.payapp.models.User;
+import com.paymybuddy.payapp.models.Contact;
 
 import java.util.Collection;
 
@@ -12,7 +12,7 @@ public interface ContactDAO {
      * @param userId Id of User
      * @return All User contacts as User Collection
      */
-    Collection<User> getContactsByUserId(int userId);
+    Collection<Contact> getContactsByUserId(int userId);
 
     /**
      * Save connection between two users in Contact table.

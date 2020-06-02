@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,9 +28,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -57,19 +58,21 @@ public class ContactControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("GET Contacts Success")
     public void Given_userId_When_getUserContacts_Then_returnContactServiceValue() throws Exception {
         // Empty collection
         Collection<Contact> contacts = Collections.emptyList();
         when(contactService.getContactsByUserId(anyInt())).thenReturn(contacts);
         String contactsJson = objectMapper.writeValueAsString(contacts);
+        params.add("userID", "4");
 
         MvcResult result;
         result = mvc.perform(get("/contacts")
-                .with(user("username")))
+                .params(params))
+                .andExpect(status().isOk())// Status OK
                 .andReturn();
-        assertThat(result.getResponse().getStatus())
-                .isEqualTo(HttpStatus.OK); // Status OK
+
         assertThat(result.getResponse().getContentAsString())
                 .isEqualTo(contactsJson);
 
@@ -79,33 +82,36 @@ public class ContactControllerTest {
         contactsJson = objectMapper.writeValueAsString(contacts);
 
         result = mvc.perform(get("/contacts")
-                .with(user("username")))
+                .params(params))
+                .andExpect(status().isOk())// Status OK
                 .andReturn();
-        assertThat(result.getResponse().getStatus())
-                .isEqualTo(HttpStatus.OK); // Status OK
+
         assertThat(result.getResponse().getContentAsString())
                 .isEqualTo(contactsJson);
     }
 
     @Test
+    @WithMockUser
     @DisplayName("GET Contacts Exception")
     public void Given_databaseError_When_getUserContacts_Then_returnNull() throws Exception {
         // Empty collection
         Collection<Contact> contacts = Collections.emptyList();
         doThrow(SQLException.class).when(contactService).getContactsByUserId(anyInt());
+        params.add("userID", "4");
 
         MvcResult result;
         result = mvc.perform(get("/contacts")
-                .with(user("username")))
+                .params(params))
+                .andExpect(status().isInternalServerError())// Status INTERNAL SERVER ERROR
                 .andReturn();
-        assertThat(result.getResponse().getStatus())
-                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR); // Status INTERNAL SERVER ERROR
+
         assertThat(result.getResponse().getContentAsString())
-                .isEqualTo("{}");
+                .isEqualTo("");
 
     }
 
     @Test
+    @WithMockUser
     @DisplayName("POST Contact Success")
     public void Given_userIdAndContactMail_When_addContact_Then_statusIsCreated() throws Exception {
         doNothing().when(contactService).addContact(anyInt(), anyString());
@@ -115,15 +121,16 @@ public class ContactControllerTest {
         MvcResult result;
         result = mvc.perform(post("/contacts")
                 .params(params)
-                .with(user("username")))
+                .with(csrf()))
+                .andExpect(status().isCreated())// Status CREATED
                 .andReturn();
-        assertThat(result.getResponse().getStatus())
-                .isEqualTo(HttpStatus.CREATED); // Status CREATED
+
         assertThat(result.getResponse().getContentAsString().isBlank())
                 .isFalse();
     }
 
     @Test
+    @WithMockUser
     @DisplayName("POST Contact Exception")
     public void Given_databaseError_When_addContact_Then_statusIsServerError() throws Exception {
         doThrow(SQLException.class).when(contactService).addContact(anyInt(), anyString());
@@ -133,15 +140,16 @@ public class ContactControllerTest {
         MvcResult result;
         result = mvc.perform(post("/contacts")
                 .params(params)
-                .with(user("username")))
+                .with(csrf()))
+                .andExpect(status().isInternalServerError())// Status INTERNAL SERVER ERROR
                 .andReturn();
-        assertThat(result.getResponse().getStatus())
-                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR); // Status INTERNAL SERVER ERROR
+
         assertThat(result.getResponse().getContentAsString().isBlank())
                 .isFalse();
     }
 
     @Test
+    @WithMockUser
     @DisplayName("DELETE Contact Success")
     public void Given_userIdAndContactMail_When_deleteContact_Then_statusIsOK() throws Exception {
         doNothing().when(contactService).deleteContact(anyInt(), anyString());
@@ -151,15 +159,16 @@ public class ContactControllerTest {
         MvcResult result;
         result = mvc.perform(delete("/contacts")
                 .params(params)
-                .with(user("username")))
+                .with(csrf()))
+                .andExpect(status().isOk())// Status OK
                 .andReturn();
-        assertThat(result.getResponse().getStatus())
-                .isEqualTo(HttpStatus.OK); // Status OK
+
         assertThat(result.getResponse().getContentAsString().isBlank())
                 .isFalse();
     }
 
     @Test
+    @WithMockUser
     @DisplayName("DELETE Contact Exception")
     public void Given_databaseError_When_deleteContact_Then_statusIsServerError() throws Exception {
         doThrow(SQLException.class).when(contactService).deleteContact(anyInt(), anyString());
@@ -169,10 +178,10 @@ public class ContactControllerTest {
         MvcResult result;
         result = mvc.perform(delete("/contacts")
                 .params(params)
-                .with(user("username")))
+                .with(csrf()))
+                .andExpect(status().isInternalServerError())// Status INTERNAL SERVER ERROR
                 .andReturn();
-        assertThat(result.getResponse().getStatus())
-                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR); // Status INTERNAL SERVER ERROR
+
         assertThat(result.getResponse().getContentAsString().isBlank())
                 .isFalse();
     }

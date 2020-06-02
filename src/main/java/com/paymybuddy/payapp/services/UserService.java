@@ -3,7 +3,6 @@ package com.paymybuddy.payapp.services;
 import com.paymybuddy.payapp.models.User;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.stereotype.Service;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Email;
@@ -12,7 +11,6 @@ import javax.validation.constraints.Size;
 import java.sql.SQLException;
 import java.util.Optional;
 
-@Service
 public interface UserService {
     /**
      * Retrieved User base on ID

@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 @Repository
-public class ContactDAOImpl implements ContactDAO {
+public class ContactDAOSpringJdbc implements ContactDAO {
 
     /**
      * @see ContactDAO

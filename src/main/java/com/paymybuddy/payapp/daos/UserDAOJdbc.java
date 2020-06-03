@@ -17,12 +17,12 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Repository
-public class UserDAOImpl implements UserDAO {
+public class UserDAOJdbc implements UserDAO {
 
     private final DatabaseConfiguration databaseConfiguration;
 
     @Autowired
-    public UserDAOImpl(DatabaseConfiguration databaseConfiguration) {
+    public UserDAOJdbc(DatabaseConfiguration databaseConfiguration) {
         this.databaseConfiguration = databaseConfiguration;
     }
 

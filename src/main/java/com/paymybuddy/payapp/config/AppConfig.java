@@ -15,16 +15,19 @@ import javax.sql.DataSource;
 @Configuration
 public class AppConfig {
 
+    // Bean validation
     @Bean
     public MethodValidationPostProcessor validationPostProcessor() {
         return new MethodValidationPostProcessor();
     }
 
+    // Security with BCryptPasswordEncoder
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // Remember me persistent token
     @Bean
     @Autowired
     public PersistentTokenRepository persistentTokenRepository(final DataSource dataSource) {
@@ -33,8 +36,10 @@ public class AppConfig {
         return tokenRepository;
     }
 
+    // JSON Jackson Object Mapper Singleton
     @Bean
     public ObjectMapper getJacksonObjectMapper() {
         return new ObjectMapper();
     }
+
 }

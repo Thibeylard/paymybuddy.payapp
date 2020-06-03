@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @ActiveProfiles("test_h2")
 @DisplayName("ContactDAO tests on : ")
-public class ContactDAOIT {
+public class ContactDAOSpringJdbcIT {
     @Autowired
     private ContactDAO contactDAO;
 
@@ -89,7 +90,7 @@ public class ContactDAOIT {
             );
             ps.execute();
 
-        } catch (SQLException e) {
+        } catch (DataAccessException e) {
             e.printStackTrace();
         } finally {
             assert connection != null;
@@ -119,10 +120,11 @@ public class ContactDAOIT {
     public void Given_userIdAndContactMail_When_addContact_Then_correspondingElementAddedToContactTable() throws Exception {
         Table contactTable = new Table(dataSource, "Contact");
 
+        Assertions.assertThat(contactTable).hasNumberOfRows(4);
+
         assertThat(contactDAO.save(4, "user2@mail.com"))
                 .isTrue();
 
-        Assertions.assertThat(contactTable).hasNumberOfRows(4);
 
         Assertions.assertThat(contactTable)
                 .hasNumberOfRows(5)
@@ -134,10 +136,10 @@ public class ContactDAOIT {
     @Test
     @WithMockUser
     @DisplayName("addContact() Exceptions")
-    public void Given_databaseError_When_addContact_Then_throwsSQLException() throws Exception {
-        assertThrows(SQLException.class, () -> contactDAO.save(1, "user2@mail.com")); // Already contacts
-        assertThrows(SQLException.class, () -> contactDAO.save(6, "user2@mail.com")); // User 6 doesn't exist
-        assertThrows(SQLException.class, () -> contactDAO.save(1, "user8@mail.com")); // User 8 doesn't exist
+    public void Given_databaseError_When_addContact_Then_throwsDataAccessException() throws Exception {
+        assertThrows(DataAccessException.class, () -> contactDAO.save(1, "user2@mail.com")); // Already contacts
+        assertThrows(DataAccessException.class, () -> contactDAO.save(6, "user2@mail.com")); // User 6 doesn't exist
+        assertThrows(DataAccessException.class, () -> contactDAO.save(1, "user8@mail.com")); // User 8 doesn't exist
     }
 
     @Test
@@ -152,6 +154,7 @@ public class ContactDAOIT {
 
         assertThat(contactDAO.delete(3, "user1@mail.com")) // Params inverted to delete row |1|3|
                 .isTrue();
+
         Assertions.assertThat(contactTable).row(1)  // Second row |1|3| has been deleted. So third row |4|1| is supposed to be second now
                 .value("user_a_id").isEqualTo(4)
                 .value("user_b_id").isEqualTo(1);
@@ -166,9 +169,9 @@ public class ContactDAOIT {
     @Test
     @WithMockUser
     @DisplayName("deleteContact() Exceptions")
-    public void Given_databaseError_When_deleteContact_Then_throwsSQLException() throws Exception {
-        assertThrows(SQLException.class, () -> contactDAO.delete(4, "user3@mail.com")); // Not contacts
-        assertThrows(SQLException.class, () -> contactDAO.save(6, "user2@mail.com")); // User 6 doesn't exist at all
-        assertThrows(SQLException.class, () -> contactDAO.save(1, "user8@mail.com")); // User 8 doesn't exist at all
+    public void Given_databaseError_When_deleteContact_Then_throwsDataAccessException() throws Exception {
+        assertThrows(DataAccessException.class, () -> contactDAO.delete(4, "user3@mail.com")); // Not contacts
+        assertThrows(DataAccessException.class, () -> contactDAO.save(6, "user2@mail.com")); // User 6 doesn't exist at all
+        assertThrows(DataAccessException.class, () -> contactDAO.save(1, "user8@mail.com")); // User 8 doesn't exist at all
     }
 }

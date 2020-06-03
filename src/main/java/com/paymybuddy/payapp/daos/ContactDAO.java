@@ -2,6 +2,7 @@ package com.paymybuddy.payapp.daos;
 
 import com.paymybuddy.payapp.models.Contact;
 
+import java.sql.SQLException;
 import java.util.Collection;
 
 public interface ContactDAO {
@@ -12,7 +13,8 @@ public interface ContactDAO {
      * @param userId Id of User
      * @return All User contacts as User Collection
      */
-    Collection<Contact> getContactsByUserId(int userId);
+    Collection<Contact> getContactsByUserId(int userId)
+            throws SQLException;
 
     /**
      * Save connection between two users in Contact table.
@@ -21,7 +23,8 @@ public interface ContactDAO {
      * @param contactMail Contact mail
      * @return true if operation succeed
      */
-    boolean save(int userId, String contactMail);
+    boolean save(int userId, String contactMail)
+            throws SQLException;
 
     /**
      * Delete connection between two users in Contact table.
@@ -30,5 +33,6 @@ public interface ContactDAO {
      * @param contactMail Contact mail
      * @return true if operation succeed
      */
-    boolean delete(int userId, String contactMail);
+    boolean delete(int userId, String contactMail)
+            throws SQLException;
 }

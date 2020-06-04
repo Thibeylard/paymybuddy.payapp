@@ -4,10 +4,10 @@ import com.paymybuddy.payapp.constants.DBStatements;
 import com.paymybuddy.payapp.models.Contact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.sql.SQLException;
 import java.util.Collection;
 
 @Repository
@@ -38,25 +38,29 @@ public class ContactDAOSpringJdbc implements ContactDAO {
     /**
      * @see ContactDAO
      */
-    //TODO Régler le problème d'inversion des id
     @Override
     public boolean save(int userId, String contactMail) throws DataAccessException {
-        Integer contact_id = jdbcTemplate.queryForObject(DBStatements.GET_USER_BY_MAIL,
+        Integer contactId = jdbcTemplate.queryForObject(DBStatements.GET_USER_BY_MAIL,
                 new Object[]{contactMail},
                 (rs, rowNum) ->
                         rs.getInt("id"));
-        return jdbcTemplate.update(DBStatements.INSERT_CONTACT, userId, contact_id) == 1; // True if one row affected
+        return jdbcTemplate.update(DBStatements.INSERT_CONTACT, userId, contactId) == 1; // True if one row affected
     }
 
     /**
      * @see ContactDAO
      */
     @Override
-    public boolean delete(int userId, String contactMail) throws SQLException {
-        Integer contact_id = jdbcTemplate.queryForObject(DBStatements.GET_USER_BY_MAIL,
+    public boolean delete(int userId, String contactMail) throws DataAccessException {
+        Integer contactId = jdbcTemplate.queryForObject(DBStatements.GET_USER_BY_MAIL,
                 new Object[]{contactMail},
                 (rs, rowNum) ->
                         rs.getInt("id"));
-        return jdbcTemplate.update(DBStatements.DELETE_CONTACT, userId, contact_id) == 1; // True if one row affected
+        if (jdbcTemplate.update(DBStatements.DELETE_CONTACT, userId, contactId) == 0) { // If no row affected, then check inverted combination.
+            if (jdbcTemplate.update(DBStatements.DELETE_CONTACT, contactId, userId) == 0) { // If still no row affected, throw Exception
+                throw new InvalidDataAccessApiUsageException("Contact cannot be deleted because it does not exists.");
+            }
+        }
+        return true;
     }
 }

@@ -1,39 +1,36 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.models.Contact;
+import org.springframework.dao.DataAccessException;
 
-import java.sql.SQLException;
 import java.util.Collection;
 
 public interface ContactService {
 
     /**
-     * Get all contacts of User identified by userId
+     * Get all contacts of authenticated User from Contact table
      *
-     * @param userId Id of User
      * @return All User contacts as User Collection
-     * @throws SQLException if error occurs during database operation
+     * @throws DataAccessException if error occurs during database operation
      */
-    Collection<Contact> getContactsByUserId(int userId)
-            throws SQLException;
+    Collection<Contact> getUserContacts()
+            throws DataAccessException;
 
     /**
-     * Add to User identified by userId the User identified by contactID as Contact.
+     * Add contact between authenticated User and another User identified by contactMail.
      *
-     * @param userId      Reference User ID
-     * @param contactMail Contact mail
-     * @throws SQLException if error occurs during database operation
+     * @param contactMail User mail
+     * @throws DataAccessException if error occurs during database operation
      */
-    void addContact(int userId, String contactMail)
-            throws SQLException;
+    void addContact(String contactMail)
+            throws DataAccessException;
 
     /**
-     * Delete from User identified by userId contacts the User identified by contactID.
+     * Delete contact between authenticated User and another User identified by contactMail.
      *
-     * @param userId      Reference User ID
-     * @param contactMail Contact mail
-     * @throws SQLException if error occurs during database operation
+     * @param contactMail User mail
+     * @throws DataAccessException if error occurs during database operation
      */
-    void deleteContact(int userId, String contactMail)
-            throws SQLException;
+    void deleteContact(String contactMail)
+            throws DataAccessException;
 }

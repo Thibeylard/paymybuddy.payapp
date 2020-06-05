@@ -34,7 +34,7 @@ public class UserDAOJdbc implements UserDAO {
             PreparedStatement ps = null;
             ResultSet rs = null;
             try {
-                ps = con.prepareStatement(DBStatements.GET_USER_BY_ID);
+                ps = con.prepareStatement(DBStatements.GET_USER_BY_ID_CLASSIC_JDBC);
                 ps.setInt(1, userId);
                 rs = ps.executeQuery();
                 if (rs.next()) {
@@ -68,7 +68,7 @@ public class UserDAOJdbc implements UserDAO {
             PreparedStatement ps = null;
             ResultSet rs = null;
             try {
-                ps = con.prepareStatement(DBStatements.GET_USER_BY_MAIL);
+                ps = con.prepareStatement(DBStatements.GET_USER_BY_MAIL_CLASSIC_JDBC);
                 ps.setString(1, validMail);
                 rs = ps.executeQuery();
                 if (rs.next()) {
@@ -110,7 +110,7 @@ public class UserDAOJdbc implements UserDAO {
                 Logger.debug("Start transaction.");
 
                 // New User is inserted in database
-                ps = con.prepareStatement(DBStatements.INSERT_USER);
+                ps = con.prepareStatement(DBStatements.INSERT_USER_CLASSIC_JDBC);
                 ps.setString(1, user.getUsername());
                 ps.setString(2, user.getMail());
                 ps.setString(3, user.getPassword());
@@ -118,7 +118,7 @@ public class UserDAOJdbc implements UserDAO {
                 Logger.debug("New User inserted in User table.");
 
                 // New User id is retrieved
-                ps = con.prepareStatement(DBStatements.GET_USER_ID_BY_MAIL);
+                ps = con.prepareStatement(DBStatements.GET_USER_ID_BY_MAIL_CLASSIC_JDBC);
                 ps.setString(1, user.getMail());
                 rs = ps.executeQuery();
 
@@ -131,7 +131,7 @@ public class UserDAOJdbc implements UserDAO {
 
                 for (Role role : user.getRoles()) {
                     // User id is inserted as user_id with a USER role_id by default
-                    ps = con.prepareStatement(DBStatements.INSERT_USER_ROLE);
+                    ps = con.prepareStatement(DBStatements.INSERT_USER_ROLE_CLASSIC_JDBC);
                     ps.setInt(1, userId);
                     ps.setInt(2, role.getDatabaseId());
                     ps.execute();
@@ -180,7 +180,7 @@ public class UserDAOJdbc implements UserDAO {
                 Logger.debug("Start transaction.");
 
                 // User is modified
-                ps = con.prepareStatement(DBStatements.UPDATE_USER);
+                ps = con.prepareStatement(DBStatements.UPDATE_USER_CLASSIC_JDBC);
                 ps.setString(1, usernameToSet);
                 ps.setString(2, mailToSet);
                 ps.setString(3, passwordToSet);
@@ -223,7 +223,7 @@ public class UserDAOJdbc implements UserDAO {
      */
     private Collection<Role> getUserRolesByID(Connection con, int userId) throws SQLException {
         ArrayList<Role> roles = new ArrayList<>();
-        PreparedStatement ps = con.prepareStatement(DBStatements.GET_USER_ROLES);
+        PreparedStatement ps = con.prepareStatement(DBStatements.GET_USER_ROLES_CLASSIC_JDBC);
         ps.setInt(1, userId);
         ResultSet rs = ps.executeQuery();
 

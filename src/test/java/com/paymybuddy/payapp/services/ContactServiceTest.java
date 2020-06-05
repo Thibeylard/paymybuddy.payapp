@@ -8,20 +8,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -43,17 +42,17 @@ public class ContactServiceTest {
     public void Given_userId_When_getUserContacts_Then_returnContactDAOValue() throws Exception {
 
         Collection<Contact> contactsEmpty = Collections.emptyList();
-        Collection<Contact> contacts = Collections.singletonList(new Contact(4, "username2", "username2@mail.com"));
-        when(contactDAO.getContactsByUserId(anyInt()))
+        Collection<Contact> contacts = Collections.singletonList(new Contact(2, "username2", "username2@mail.com"));
+        when(contactDAO.getContactsByUserMail(anyString()))
                 .thenReturn(contactsEmpty)
                 .thenReturn(contacts);
 
         // Empty collection
-        assertThat(contactService.getContactsByUserId(4))
+        assertThat(contactService.getUserContacts())
                 .isEqualTo(contactsEmpty);
 
         // At least singleton list
-        assertThat(contactService.getContactsByUserId(4))
+        assertThat(contactService.getUserContacts())
                 .isEqualTo(contacts);
     }
 
@@ -61,9 +60,9 @@ public class ContactServiceTest {
     @WithMockUser
     @DisplayName("getContacts() Exception")
     public void Given_databaseError_When_getUserContacts_Then_throwsSameException() throws Exception {
-        doThrow(SQLException.class).when(contactDAO).getContactsByUserId(anyInt());
+        doThrow(DataRetrievalFailureException.class).when(contactDAO).getContactsByUserMail(anyString());
 
-        assertThrows(SQLException.class, () -> contactService.getContactsByUserId(4));
+        assertThrows(DataRetrievalFailureException.class, () -> contactService.getUserContacts());
 
     }
 
@@ -71,37 +70,37 @@ public class ContactServiceTest {
     @WithMockUser
     @DisplayName("addContact() Success")
     public void Given_userIdAndContactMail_When_addContact_Then_nothingIsThrown() throws Exception {
-        when(contactDAO.save(anyInt(), anyString())).thenReturn(true);
+        when(contactDAO.save(anyString(), anyString())).thenReturn(true);
 
-        assertDoesNotThrow(() -> contactService.addContact(4, "someuser@mail.com"));
-        verify(contactDAO, times(1)).save(anyInt(), anyString());
+        assertDoesNotThrow(() -> contactService.addContact("someuser@mail.com"));
+        verify(contactDAO, times(1)).save(anyString(), anyString());
     }
 
     @Test
     @WithMockUser
     @DisplayName("addContact() Exception")
     public void Given_databaseError_When_addContact_Then_throwsSameException() throws Exception {
-        doThrow(SQLException.class).when(contactDAO).save(anyInt(), anyString());
+        doThrow(DataRetrievalFailureException.class).when(contactDAO).save(anyString(), anyString());
 
-        assertThrows(SQLException.class, () -> contactService.addContact(4, "someuser@mail.com"));
+        assertThrows(DataRetrievalFailureException.class, () -> contactService.addContact("someuser@mail.com"));
     }
 
     @Test
     @WithMockUser
     @DisplayName("deleteContact() Success")
     public void Given_userIdAndContactMail_When_deleteContact_Then_nothingIsThrown() throws Exception {
-        when(contactDAO.delete(anyInt(), anyString())).thenReturn(true);
+        when(contactDAO.delete(anyString(), anyString())).thenReturn(true);
 
-        assertDoesNotThrow(() -> contactService.deleteContact(4, "someuser@mail.com"));
-        verify(contactDAO, times(1)).delete(anyInt(), anyString());
+        assertDoesNotThrow(() -> contactService.deleteContact("someuser@mail.com"));
+        verify(contactDAO, times(1)).delete(anyString(), anyString());
     }
 
     @Test
     @WithMockUser
     @DisplayName("deleteContact() Exception")
     public void Given_databaseError_When_deleteContact_Then_throwsSameException() throws Exception {
-        doThrow(SQLException.class).when(contactDAO).delete(anyInt(), anyString());
+        doThrow(DataRetrievalFailureException.class).when(contactDAO).delete(anyString(), anyString());
 
-        assertThrows(SQLException.class, () -> contactService.deleteContact(4, "someuser@mail.com"));
+        assertThrows(DataRetrievalFailureException.class, () -> contactService.deleteContact("someuser@mail.com"));
     }
 }

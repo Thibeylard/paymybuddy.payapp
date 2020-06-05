@@ -104,13 +104,13 @@ public class ContactDAOSpringJdbcIT {
     @WithMockUser
     @DisplayName("getContacts() Success")
     public void Given_userId_When_getUserContacts_Then_returnUserContacts() throws Exception {
-        assertThat(contactDAO.getContactsByUserId(1))
+        assertThat(contactDAO.getContactsByUserMail("user1@mail.com"))
                 .hasSize(3);
-        assertThat(contactDAO.getContactsByUserId(2))
+        assertThat(contactDAO.getContactsByUserMail("user2@mail.com"))
                 .hasSize(2);
-        assertThat(contactDAO.getContactsByUserId(3))
+        assertThat(contactDAO.getContactsByUserMail("user3@mail.com"))
                 .hasSize(2);
-        assertThat(contactDAO.getContactsByUserId(4))
+        assertThat(contactDAO.getContactsByUserMail("user4@mail.com"))
                 .hasSize(1);
     }
 
@@ -122,7 +122,7 @@ public class ContactDAOSpringJdbcIT {
 
         Assertions.assertThat(contactTable).hasNumberOfRows(4);
 
-        assertThat(contactDAO.save(4, "user2@mail.com"))
+        assertThat(contactDAO.save("user4@mail.com", "user2@mail.com"))
                 .isTrue();
 
         contactTable = new Table(dataSource, "Contact");
@@ -138,9 +138,9 @@ public class ContactDAOSpringJdbcIT {
     @WithMockUser
     @DisplayName("addContact() Exceptions")
     public void Given_databaseError_When_addContact_Then_throwsDataAccessException() throws Exception {
-        assertThrows(DataAccessException.class, () -> contactDAO.save(1, "user2@mail.com")); // Already contacts
-        assertThrows(DataAccessException.class, () -> contactDAO.save(6, "user2@mail.com")); // User 6 doesn't exist
-        assertThrows(DataAccessException.class, () -> contactDAO.save(1, "user8@mail.com")); // User 8 doesn't exist
+        assertThrows(DataAccessException.class, () -> contactDAO.save("user1@mail.com", "user2@mail.com")); // Already contacts
+        assertThrows(DataAccessException.class, () -> contactDAO.save("user6@mail.com", "user2@mail.com")); // User 6 doesn't exist
+        assertThrows(DataAccessException.class, () -> contactDAO.save("user1@mail.com", "user8@mail.com")); // User 8 doesn't exist
     }
 
     @Test
@@ -155,7 +155,7 @@ public class ContactDAOSpringJdbcIT {
                 .value("user_a_id").isEqualTo(1)
                 .value("user_b_id").isEqualTo(3);
 
-        assertThat(contactDAO.delete(3, "user1@mail.com")) // Params inverted to delete row |1|3|
+        assertThat(contactDAO.delete("user3@mail.com", "user1@mail.com")) // Params inverted to delete row |1|3|
                 .isTrue();
 
         contactTable = new Table(dataSource, "Contact");
@@ -166,7 +166,7 @@ public class ContactDAOSpringJdbcIT {
                 .value("user_a_id").isEqualTo(2)
                 .value("user_b_id").isEqualTo(3);
 
-        assertThat(contactDAO.delete(2, "user3@mail.com")) // Params to delete row |2|3|
+        assertThat(contactDAO.delete("user2@mail.com", "user3@mail.com")) // Params to delete row |2|3|
                 .isTrue();
 
         contactTable = new Table(dataSource, "Contact");
@@ -182,8 +182,8 @@ public class ContactDAOSpringJdbcIT {
     @WithMockUser
     @DisplayName("deleteContact() Exceptions")
     public void Given_databaseError_When_deleteContact_Then_throwsDataAccessException() throws Exception {
-        assertThrows(DataAccessException.class, () -> contactDAO.delete(4, "user3@mail.com")); // Not contacts
-        assertThrows(DataAccessException.class, () -> contactDAO.save(6, "user2@mail.com")); // User 6 doesn't exist at all
-        assertThrows(DataAccessException.class, () -> contactDAO.save(1, "user8@mail.com")); // User 8 doesn't exist at all
+        assertThrows(DataAccessException.class, () -> contactDAO.delete("user4@mail.com", "user3@mail.com")); // Not contacts
+        assertThrows(DataAccessException.class, () -> contactDAO.save("user6@mail.com", "user2@mail.com")); // User 6 doesn't exist at all
+        assertThrows(DataAccessException.class, () -> contactDAO.save("user1@mail.com", "user8@mail.com")); // User 8 doesn't exist at all
     }
 }

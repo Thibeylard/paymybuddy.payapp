@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -20,12 +21,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -63,7 +62,7 @@ public class ContactControllerTest {
     public void Given_userId_When_getUserContacts_Then_returnContactServiceValue() throws Exception {
         // Empty collection
         Collection<Contact> contacts = Collections.emptyList();
-        when(contactService.getContactsByUserId(anyInt())).thenReturn(contacts);
+        when(contactService.getUserContacts()).thenReturn(contacts);
         String contactsJson = objectMapper.writeValueAsString(contacts);
         params.add("userID", "4");
 
@@ -78,7 +77,7 @@ public class ContactControllerTest {
 
         // At least one element in collection
         contacts = Collections.singletonList(new Contact(4, "username2", "username2@mail.com"));
-        when(contactService.getContactsByUserId(anyInt())).thenReturn(contacts);
+        when(contactService.getUserContacts()).thenReturn(contacts);
         contactsJson = objectMapper.writeValueAsString(contacts);
 
         result = mvc.perform(get("/contacts")
@@ -96,7 +95,7 @@ public class ContactControllerTest {
     public void Given_databaseError_When_getUserContacts_Then_returnNull() throws Exception {
         // Empty collection
         Collection<Contact> contacts = Collections.emptyList();
-        doThrow(SQLException.class).when(contactService).getContactsByUserId(anyInt());
+        doThrow(DataRetrievalFailureException.class).when(contactService).getUserContacts();
         params.add("userID", "4");
 
         MvcResult result;
@@ -114,7 +113,7 @@ public class ContactControllerTest {
     @WithMockUser
     @DisplayName("POST Contact Success")
     public void Given_userIdAndContactMail_When_addContact_Then_statusIsCreated() throws Exception {
-        doNothing().when(contactService).addContact(anyInt(), anyString());
+        doNothing().when(contactService).addContact(anyString());
         params.add("userID", "4");
         params.add("contactMail", "contact@mail.com");
 
@@ -133,7 +132,7 @@ public class ContactControllerTest {
     @WithMockUser
     @DisplayName("POST Contact Exception")
     public void Given_databaseError_When_addContact_Then_statusIsServerError() throws Exception {
-        doThrow(SQLException.class).when(contactService).addContact(anyInt(), anyString());
+        doThrow(DataRetrievalFailureException.class).when(contactService).addContact(anyString());
         params.add("userID", "4");
         params.add("contactMail", "contact@mail.com");
 
@@ -152,7 +151,7 @@ public class ContactControllerTest {
     @WithMockUser
     @DisplayName("DELETE Contact Success")
     public void Given_userIdAndContactMail_When_deleteContact_Then_statusIsOK() throws Exception {
-        doNothing().when(contactService).deleteContact(anyInt(), anyString());
+        doNothing().when(contactService).deleteContact(anyString());
         params.add("userID", "4");
         params.add("contactMail", "contact@mail.com");
 
@@ -171,7 +170,7 @@ public class ContactControllerTest {
     @WithMockUser
     @DisplayName("DELETE Contact Exception")
     public void Given_databaseError_When_deleteContact_Then_statusIsServerError() throws Exception {
-        doThrow(SQLException.class).when(contactService).deleteContact(anyInt(), anyString());
+        doThrow(DataRetrievalFailureException.class).when(contactService).deleteContact(anyString());
         params.add("userID", "4");
         params.add("contactMail", "contact@mail.com");
 

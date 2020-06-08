@@ -104,7 +104,7 @@ public class TransactionServiceTest {
     @Test
     @WithMockUser
     @DisplayName("makeTransaction() Success")
-    public void Given_validParams_When_makeTransaction_Then_nothingIsThrown() throws Exception {
+    public void Given_validParams_When_makeTransaction_Then_nothingIsThrown() {
         when(transactionDAO.save(anyString(), anyString(), any(ZonedDateTime.class), anyString(), anyDouble(), anyDouble())).thenReturn(true);
 
         assertDoesNotThrow(() -> transactionService.makeTransaction("someuser@mail.com", "sampleDesription", 10.00));
@@ -114,7 +114,7 @@ public class TransactionServiceTest {
     @Test
     @WithMockUser
     @DisplayName("makeTransaction() Exceptions")
-    public void Given_databaseError_When_makeTransaction_Then_throwsDAOException() throws Exception {
+    public void Given_databaseError_When_makeTransaction_Then_throwsDAOException() {
         doThrow(DataRetrievalFailureException.class).when(transactionDAO).save(anyString(), anyString(), any(ZonedDateTime.class), anyString(), anyDouble(), anyDouble());
         assertThrows(DataRetrievalFailureException.class, () -> transactionService.makeTransaction("someuser@mail.com", "sampleDesription", 10.00));
     }

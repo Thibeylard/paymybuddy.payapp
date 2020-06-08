@@ -76,7 +76,7 @@ public class ContactServiceTest {
     @Test
     @WithMockUser
     @DisplayName("addContact() Exception")
-    public void Given_databaseError_When_addContact_Then_throwsDAOException() throws Exception {
+    public void Given_databaseError_When_addContact_Then_throwsDAOException() {
         doThrow(DataRetrievalFailureException.class).when(contactDAO).save(anyString(), anyString());
 
         assertThrows(DataRetrievalFailureException.class, () -> contactService.addContact("someuser@mail.com"));
@@ -85,7 +85,7 @@ public class ContactServiceTest {
     @Test
     @WithMockUser
     @DisplayName("deleteContact() Success")
-    public void Given_contactMail_When_deleteContact_Then_nothingIsThrown() throws Exception {
+    public void Given_contactMail_When_deleteContact_Then_nothingIsThrown() {
         when(contactDAO.delete(anyString(), anyString())).thenReturn(true);
 
         assertDoesNotThrow(() -> contactService.deleteContact("someuser@mail.com"));
@@ -95,7 +95,7 @@ public class ContactServiceTest {
     @Test
     @WithMockUser
     @DisplayName("deleteContact() Exception")
-    public void Given_databaseError_When_deleteContact_Then_throwsDAOException() throws Exception {
+    public void Given_databaseError_When_deleteContact_Then_throwsDAOException() {
         doThrow(DataRetrievalFailureException.class).when(contactDAO).delete(anyString(), anyString());
 
         assertThrows(DataRetrievalFailureException.class, () -> contactService.deleteContact("someuser@mail.com"));

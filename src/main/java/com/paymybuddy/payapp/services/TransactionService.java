@@ -6,28 +6,32 @@ import java.util.Collection;
 
 public interface TransactionService {
     /**
-     * Get all transactions where userId correspond either to creditorId or debtorId in Transaction table.
+     * Get all transactions of authenticated User.
      *
-     * @param userId Id of User
      * @return All User transactions as Transaction Collection
      */
-    Collection<Transaction> getTransactionsByUserId(int userId);
+    Collection<Transaction> getUserTransactions();
 
     /**
-     * Get all debit transactions of User identified by userId.
+     * Get all debit transactions of authenticated User.
      *
-     * @param userId Id of User
      * @return All User debit transactions as Transaction Collection
      */
-    Collection<Transaction> getDebitTransactionsByUserId(int userId);
+    Collection<Transaction> getUserDebitTransactions();
 
     /**
-     * Get all credit transactions of User identified by userId.
+     * Get all credit transactions of authenticated User.
      *
-     * @param userId Id of User
      * @return All User credit transactions as Transaction Collection
      */
-    Collection<Transaction> getCreditTransactionsByUserId(int userId);
+    Collection<Transaction> getUserCreditTransactions();
 
-    boolean makeTransaction(String creditorUsername, String description, double amount);
+    /**
+     * Send money to User identified by recipientMail.
+     *
+     * @param recipientMail Mail of User that receives money
+     * @param description   Transaction description
+     * @param amount        Transaction amount
+     */
+    void makeTransaction(String recipientMail, String description, double amount);
 }

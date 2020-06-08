@@ -210,7 +210,7 @@ public class TransactionControllerTest {
         params.add("amount", "10.00");
 
         MvcResult result;
-        result = mvc.perform(post("/contacts")
+        result = mvc.perform(post("/transactions")
                 .params(params)
                 .with(csrf()))
                 .andExpect(status().isInternalServerError())// Status INTERNAL SERVER ERROR

@@ -3,6 +3,7 @@ package com.paymybuddy.payapp.services;
 import com.paymybuddy.payapp.daos.TransactionDAO;
 import com.paymybuddy.payapp.models.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +24,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @see TransactionService
      */
     @Override
-    public Collection<Transaction> getUserTransactions() {
+    public Collection<Transaction> getUserTransactions() throws DataAccessException {
         return null;
     }
 
@@ -31,7 +32,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @see TransactionService
      */
     @Override
-    public Collection<Transaction> getUserDebitTransactions() {
+    public Collection<Transaction> getUserDebitTransactions() throws DataAccessException {
         return null;
     }
 
@@ -39,7 +40,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @see TransactionService
      */
     @Override
-    public Collection<Transaction> getUserCreditTransactions() {
+    public Collection<Transaction> getUserCreditTransactions() throws DataAccessException {
         return null;
     }
 
@@ -48,7 +49,7 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     @Transactional(readOnly = false)
-    public void makeTransaction(String recipientMail, String description, double amount) {
+    public void makeTransaction(String recipientMail, String description, double amount) throws DataAccessException {
 
     }
 }

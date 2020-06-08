@@ -1,6 +1,7 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.models.Transaction;
+import org.springframework.dao.DataAccessException;
 
 import java.util.Collection;
 
@@ -10,21 +11,24 @@ public interface TransactionService {
      *
      * @return All User transactions as Transaction Collection
      */
-    Collection<Transaction> getUserTransactions();
+    Collection<Transaction> getUserTransactions()
+            throws DataAccessException;
 
     /**
      * Get all debit transactions of authenticated User.
      *
      * @return All User debit transactions as Transaction Collection
      */
-    Collection<Transaction> getUserDebitTransactions();
+    Collection<Transaction> getUserDebitTransactions()
+            throws DataAccessException;
 
     /**
      * Get all credit transactions of authenticated User.
      *
      * @return All User credit transactions as Transaction Collection
      */
-    Collection<Transaction> getUserCreditTransactions();
+    Collection<Transaction> getUserCreditTransactions()
+            throws DataAccessException;
 
     /**
      * Send money to User identified by recipientMail.
@@ -33,5 +37,6 @@ public interface TransactionService {
      * @param description   Transaction description
      * @param amount        Transaction amount
      */
-    void makeTransaction(String recipientMail, String description, double amount);
+    void makeTransaction(String recipientMail, String description, double amount)
+            throws DataAccessException;
 }

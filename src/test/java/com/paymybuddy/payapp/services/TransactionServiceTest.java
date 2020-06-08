@@ -68,24 +68,24 @@ public class TransactionServiceTest {
         // --------------------------------------------------------------------- At least one element in collection for all getTransactions methods
 
         // --------------------------------------------------------------------- All transactions
-        when(transactionDAO.getTransactionsByUserMail(anyString())).thenReturn(transactionsEmpty);
+        when(transactionDAO.getTransactionsByUserMail(anyString())).thenReturn(transactions);
         assertThat(transactionService.getUserTransactions())
                 .isEqualTo(transactions);
 
         // --------------------------------------------------------------------- Debit transactions
-        when(transactionDAO.getDebitTransactionsByUserMail(anyString())).thenReturn(transactionsEmpty);
+        when(transactionDAO.getDebitTransactionsByUserMail(anyString())).thenReturn(transactions);
         assertThat(transactionService.getUserDebitTransactions())
                 .isEqualTo(transactions);
 
         // --------------------------------------------------------------------- Credit transactions
-        when(transactionDAO.getCreditTransactionsByUserMail(anyString())).thenReturn(transactionsEmpty);
+        when(transactionDAO.getCreditTransactionsByUserMail(anyString())).thenReturn(transactions);
         assertThat(transactionService.getUserCreditTransactions())
                 .isEqualTo(transactions);
     }
 
     @Test
     @WithMockUser
-    @DisplayName("getContacts() Exception")
+    @DisplayName("getTransactions() Exceptions")
     public void Given_databaseError_When_getUserContacts_Then_throwsDAOException() {
         // --------------------------------------------------------------------- All transactions
         doThrow(DataRetrievalFailureException.class).when(transactionDAO).getTransactionsByUserMail(anyString());
@@ -93,7 +93,7 @@ public class TransactionServiceTest {
 
         // --------------------------------------------------------------------- Debit transactions
         doThrow(DataRetrievalFailureException.class).when(transactionDAO).getDebitTransactionsByUserMail(anyString());
-        assertThrows(DataRetrievalFailureException.class, () -> transactionService.getUserCreditTransactions());
+        assertThrows(DataRetrievalFailureException.class, () -> transactionService.getUserDebitTransactions());
 
         // --------------------------------------------------------------------- Credit transactions
         doThrow(DataRetrievalFailureException.class).when(transactionDAO).getCreditTransactionsByUserMail(anyString());
@@ -105,17 +105,17 @@ public class TransactionServiceTest {
     @WithMockUser
     @DisplayName("makeTransaction() Success")
     public void Given_validParams_When_makeTransaction_Then_nothingIsThrown() throws Exception {
-        when(transactionDAO.save(any(Transaction.class))).thenReturn(true);
+        when(transactionDAO.save(anyString(), anyString(), any(ZonedDateTime.class), anyString(), anyDouble(), anyDouble())).thenReturn(true);
 
         assertDoesNotThrow(() -> transactionService.makeTransaction("someuser@mail.com", "sampleDesription", 10.00));
-        verify(transactionDAO, times(1)).save(any(Transaction.class));
+        verify(transactionDAO, times(1)).save(anyString(), anyString(), any(ZonedDateTime.class), anyString(), anyDouble(), anyDouble());
     }
 
     @Test
     @WithMockUser
-    @DisplayName("makeTransaction() Exception")
+    @DisplayName("makeTransaction() Exceptions")
     public void Given_databaseError_When_makeTransaction_Then_throwsDAOException() throws Exception {
-        doThrow(DataRetrievalFailureException.class).when(transactionDAO).save(any(Transaction.class));
+        doThrow(DataRetrievalFailureException.class).when(transactionDAO).save(anyString(), anyString(), any(ZonedDateTime.class), anyString(), anyDouble(), anyDouble());
         assertThrows(DataRetrievalFailureException.class, () -> transactionService.makeTransaction("someuser@mail.com", "sampleDesription", 10.00));
     }
 }

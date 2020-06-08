@@ -124,6 +124,7 @@ public class ContactControllerTest {
                 .andExpect(status().isCreated())// Status CREATED
                 .andReturn();
 
+        // Check that a String was passed to give some information
         assertThat(result.getResponse().getContentAsString().isBlank())
                 .isFalse();
     }
@@ -143,6 +144,7 @@ public class ContactControllerTest {
                 .andExpect(status().isInternalServerError())// Status INTERNAL SERVER ERROR
                 .andReturn();
 
+        // Check that a String was passed to give some information
         assertThat(result.getResponse().getContentAsString().isBlank())
                 .isFalse();
     }
@@ -162,6 +164,7 @@ public class ContactControllerTest {
                 .andExpect(status().isOk())// Status OK
                 .andReturn();
 
+        // Check that a String was passed to give some information
         assertThat(result.getResponse().getContentAsString().isBlank())
                 .isFalse();
     }
@@ -181,6 +184,7 @@ public class ContactControllerTest {
                 .andExpect(status().isInternalServerError())// Status INTERNAL SERVER ERROR
                 .andReturn();
 
+        // Check that a String was passed to give some information
         assertThat(result.getResponse().getContentAsString().isBlank())
                 .isFalse();
     }

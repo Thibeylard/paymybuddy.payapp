@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Size;
-import java.time.ZonedDateTime;
 import java.util.Collection;
 
 @Service
@@ -20,13 +19,11 @@ import java.util.Collection;
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionDAO transactionDAO;
-    private final ClockService clockService;
     private final MonetizationService monetizationService;
 
     @Autowired
-    public TransactionServiceImpl(TransactionDAO transactionDAO, ClockService clockService, MonetizationService monetizationService) {
+    public TransactionServiceImpl(TransactionDAO transactionDAO, MonetizationService monetizationService) {
         this.transactionDAO = transactionDAO;
-        this.clockService = clockService;
         this.monetizationService = monetizationService;
     }
 
@@ -66,9 +63,8 @@ public class TransactionServiceImpl implements TransactionService {
                                 final @Size(min = 5, max = 30) String description,
                                 final double amount) throws DataAccessException {
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        ZonedDateTime time = clockService.now();
         double total = amount - monetizationService.monetize(amount);
-        transactionDAO.save(authUser.getUsername(), recipientMail, time, description, amount, total);
+        transactionDAO.save(authUser.getUsername(), recipientMail, description, amount, total);
 
     }
 }

@@ -1,6 +1,7 @@
 package com.paymybuddy.payapp.integration;
 
 import com.paymybuddy.payapp.daos.TransactionDAO;
+import com.paymybuddy.payapp.services.ClockService;
 import org.assertj.db.api.Assertions;
 import org.assertj.db.type.Table;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -22,6 +24,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -34,10 +37,14 @@ public class TransactionDAOSpringJdbcIT {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
+    @SpyBean
+    ClockService clockService;
+    private Map<String, ZonedDateTime> transactionTimes;
+
     @BeforeEach
     public void databaseSetup() {
 
-        Map<String, ZonedDateTime> transactionTimes = new HashMap<>();
+        transactionTimes = new HashMap<>();
         transactionTimes.put("transaction1Time",
                 ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.systemDefault()));
         transactionTimes.put("transaction2Time",
@@ -50,6 +57,8 @@ public class TransactionDAOSpringJdbcIT {
                 ZonedDateTime.of(2020, 1, 5, 0, 0, 0, 0, ZoneId.systemDefault()));
         transactionTimes.put("transaction6Time",
                 ZonedDateTime.of(2020, 1, 6, 0, 0, 0, 0, ZoneId.systemDefault()));
+        transactionTimes.put("transaction7Time",
+                ZonedDateTime.of(2020, 1, 7, 0, 0, 0, 0, ZoneId.systemDefault()));
 
         try {
             // Reset Transaction Table
@@ -133,7 +142,7 @@ public class TransactionDAOSpringJdbcIT {
     @WithMockUser
     @DisplayName("makeTransaction() Success")
     public void Given_authenticatedUser_When_makeTransaction_Then_tableTransactionUpdated() {
-        ZonedDateTime transactionTime = ZonedDateTime.of(2020, 1, 7, 0, 0, 0, 0, ZoneId.systemDefault());
+        doReturn(transactionTimes.get("transaction7time")).when(clockService).now();
 
         Table transactionTable = new Table(jdbcTemplate.getJdbcTemplate().getDataSource(), "Transaction");
 
@@ -142,7 +151,6 @@ public class TransactionDAOSpringJdbcIT {
         assertThat(transactionDAO.save(
                 "user4@mail.com",
                 "user1@mail.com",
-                transactionTime,
                 "transaction7",
                 50.00,
                 47.50))
@@ -155,7 +163,7 @@ public class TransactionDAOSpringJdbcIT {
                 .row(6)
                 .value("debtor_id").isEqualTo(4)
                 .value("creditor_id").isEqualTo(1)
-                .value("date").isEqualTo(transactionTime)
+                .value("date").isEqualTo(transactionTimes.get("transaction7time"))
                 .value("description").isEqualTo("transaction7")
                 .value("amount").isEqualTo(50.00)
                 .value("total").isEqualTo(47.50);
@@ -166,12 +174,10 @@ public class TransactionDAOSpringJdbcIT {
     @WithMockUser
     @DisplayName("makeTransaction() Exception")
     public void Given_databaseError_When_makeTransaction_Then_throwException() {
-        ZonedDateTime transactionTime = ZonedDateTime.of(2020, 1, 7, 0, 0, 0, 0, ZoneId.systemDefault());
         // User 6 doesn't exist
         assertThrows(DataAccessException.class, () -> transactionDAO.save(
                 "user4@mail.com",
                 "user6@mail.com",
-                transactionTime,
                 "transaction7",
                 50.00,
                 47.50));

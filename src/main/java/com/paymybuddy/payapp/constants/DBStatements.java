@@ -29,10 +29,10 @@ public final class DBStatements {
 
     //  Spring NamedParameterJDBCTemplate Statements -------------------------------------------------
 
-    // CONTACT Table statements
     public static final String GET_USER_BY_MAIL =
             "SELECT id, username, mail, password FROM User WHERE mail = :userMail";
 
+    // CONTACT Table statements
     public static final String GET_CONTACTS_ID =
             "SELECT user_b_id AS contact_id FROM Contact WHERE user_a_id = :userID UNION " +
                     "SELECT user_a_id AS contact_id FROM Contact WHERE user_b_id = :userID";
@@ -46,5 +46,20 @@ public final class DBStatements {
     public static final String DELETE_CONTACT =
             "DELETE FROM Contact WHERE (user_a_id = :userID AND user_b_id = :contactID) " +
                     "OR (user_a_id = :contactID AND user_b_id = :userID)";
+
+    // TRANSACTION Table statements
+
+    public static final String GET_DEBIT_TRANSACTIONS =
+            "SELECT id, debtor_id, creditor_id, amount, description, date, total FROM TRANSACTION WHERE debtor_id = :userID";
+
+    public static final String GET_CREDIT_TRANSACTIONS =
+            "SELECT id, debtor_id, creditor_id, amount, description, date, total FROM TRANSACTION WHERE creditor_id = :userID";
+
+    public static final String GET_TRANSACTIONS =
+            GET_DEBIT_TRANSACTIONS + " UNION " + GET_CREDIT_TRANSACTIONS;
+
+    public static final String INSERT_TRANSACTION =
+            "INSERT INTO TRANSACTION (debtor_id, creditor_id, amount, description, date, total) VALUES " +
+                    "(:userID, :contactID, :amount, :description, :date, :total)";
 
 }

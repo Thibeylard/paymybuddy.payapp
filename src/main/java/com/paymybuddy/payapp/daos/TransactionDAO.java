@@ -3,7 +3,6 @@ package com.paymybuddy.payapp.daos;
 import com.paymybuddy.payapp.models.Transaction;
 import org.springframework.dao.DataAccessException;
 
-import java.time.ZonedDateTime;
 import java.util.Collection;
 
 public interface TransactionDAO {
@@ -40,7 +39,6 @@ public interface TransactionDAO {
      *
      * @param userMail      User as debtor
      * @param recipientMail Recipient as creditor
-     * @param dateTime      Time of transaction
      * @param description   Simple description for transaction
      * @param amount        Amount of money
      * @param total         Real amount after monetization
@@ -48,7 +46,6 @@ public interface TransactionDAO {
      */
     boolean save(final String userMail,
                  final String recipientMail,
-                 final ZonedDateTime dateTime,
                  final String description,
                  final double amount,
                  final double total)

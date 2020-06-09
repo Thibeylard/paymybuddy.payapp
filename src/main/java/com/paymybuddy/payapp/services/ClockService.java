@@ -12,6 +12,11 @@ public interface ClockService {
     ZonedDateTime now();
 
     /**
+     * Get ClockService zoneId attribute.
+     */
+    ZoneId getZone();
+
+    /**
      * Set ClockService zoneId attribute.
      */
     void setZone(final ZoneId zoneId);

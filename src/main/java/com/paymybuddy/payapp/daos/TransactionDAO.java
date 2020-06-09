@@ -14,7 +14,7 @@ public interface TransactionDAO {
      * @param userMail Mail of User to look for transactions
      * @return All User transactions as Transaction Collection
      */
-    Collection<Transaction> getTransactionsByUserMail(String userMail)
+    Collection<Transaction> getTransactionsByUserMail(final String userMail)
             throws DataAccessException;
 
     /**
@@ -23,7 +23,7 @@ public interface TransactionDAO {
      * @param userMail Mail of User to look for transactions
      * @return All User debit transactions as Transaction Collection
      */
-    Collection<Transaction> getDebitTransactionsByUserMail(String userMail)
+    Collection<Transaction> getDebitTransactionsByUserMail(final String userMail)
             throws DataAccessException;
 
     /**
@@ -32,7 +32,7 @@ public interface TransactionDAO {
      * @param userMail Mail of User to look for transactions
      * @return All User credit transactions as Transaction Collection
      */
-    Collection<Transaction> getCreditTransactionsByUserMail(String userMail)
+    Collection<Transaction> getCreditTransactionsByUserMail(final String userMail)
             throws DataAccessException;
 
     /**
@@ -46,6 +46,11 @@ public interface TransactionDAO {
      * @param total         Real amount after monetization
      * @return true if operation succeed
      */
-    boolean save(String userMail, String recipientMail, ZonedDateTime dateTime, String description, double amount, double total)
+    boolean save(final String userMail,
+                 final String recipientMail,
+                 final ZonedDateTime dateTime,
+                 final String description,
+                 final double amount,
+                 final double total)
             throws DataAccessException;
 }

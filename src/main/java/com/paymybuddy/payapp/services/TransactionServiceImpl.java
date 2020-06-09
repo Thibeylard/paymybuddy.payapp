@@ -8,11 +8,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Size;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 
 @Service
+@Validated
 @Transactional(readOnly = true)
 public class TransactionServiceImpl implements TransactionService {
 
@@ -59,7 +62,9 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     @Transactional(readOnly = false)
-    public void makeTransaction(String recipientMail, String description, double amount) throws DataAccessException {
+    public void makeTransaction(final String recipientMail,
+                                final @Size(min = 5, max = 30) String description,
+                                final double amount) throws DataAccessException {
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         ZonedDateTime time = clockService.now();
         double total = amount - monetizationService.monetize(amount);

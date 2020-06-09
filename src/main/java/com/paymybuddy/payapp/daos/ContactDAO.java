@@ -13,7 +13,7 @@ public interface ContactDAO {
      * @param userMail User mail
      * @return All User contacts as User Collection
      */
-    Collection<Contact> getContactsByUserMail(String userMail)
+    Collection<Contact> getContactsByUserMail(final String userMail)
             throws DataAccessException;
 
     /**
@@ -23,7 +23,8 @@ public interface ContactDAO {
      * @param contactMail Contact mail
      * @return true if operation succeed
      */
-    boolean save(String userMail, String contactMail)
+    boolean save(final String userMail,
+                 final String contactMail)
             throws DataAccessException;
 
     /**
@@ -33,6 +34,7 @@ public interface ContactDAO {
      * @param contactMail Contact mail
      * @return true if operation succeed
      */
-    boolean delete(String userMail, String contactMail)
+    boolean delete(final String userMail,
+                   final String contactMail)
             throws DataAccessException;
 }

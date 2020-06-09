@@ -22,7 +22,7 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
      */
 
     @Override
-    public Collection<Transaction> getDebitTransactionsByUserMail(String userMail) throws DataAccessException {
+    public Collection<Transaction> getDebitTransactionsByUserMail(final String userMail) throws DataAccessException {
         return null;
     }
 
@@ -31,7 +31,7 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
      */
 
     @Override
-    public Collection<Transaction> getCreditTransactionsByUserMail(String userMail) throws DataAccessException {
+    public Collection<Transaction> getCreditTransactionsByUserMail(final String userMail) throws DataAccessException {
         return null;
     }
 
@@ -39,7 +39,12 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
      * @see TransactionDAO
      */
     @Override
-    public boolean save(String userMail, String recipientMail, ZonedDateTime dateTime, String description, double amount, double total) throws DataAccessException {
+    public boolean save(final String userMail,
+                        final String recipientMail,
+                        final ZonedDateTime dateTime,
+                        final String description,
+                        final double amount,
+                        final double total) throws DataAccessException {
         return false;
     }
 }

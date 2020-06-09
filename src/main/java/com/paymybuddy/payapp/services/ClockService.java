@@ -14,5 +14,5 @@ public interface ClockService {
     /**
      * Set ClockService zoneId attribute.
      */
-    void setZone(ZoneId zoneId);
+    void setZone(final ZoneId zoneId);
 }

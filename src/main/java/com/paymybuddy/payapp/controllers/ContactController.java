@@ -37,7 +37,7 @@ public class ContactController {
     }
 
     @PostMapping("/contacts")
-    public ResponseEntity<String> addContact(@RequestParam(name = "contactMail") String contactMail) {
+    public ResponseEntity<String> addContact(@RequestParam(name = "contactMail") final String contactMail) {
         Logger.debug("Requested contact creation between authenticated user and user with mail {}", contactMail);
         try {
             contactService.addContact(contactMail);
@@ -50,7 +50,7 @@ public class ContactController {
     }
 
     @DeleteMapping("/contacts")
-    public ResponseEntity<String> deleteContact(@RequestParam(name = "contactMail") String contactMail) {
+    public ResponseEntity<String> deleteContact(@RequestParam(name = "contactMail") final String contactMail) {
         Logger.debug("Requested deletion of contact between authenticated user and user with mail {}", contactMail);
         try {
             contactService.deleteContact(contactMail);

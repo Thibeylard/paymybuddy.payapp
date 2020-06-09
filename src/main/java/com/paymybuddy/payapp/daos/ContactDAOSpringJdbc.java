@@ -27,7 +27,7 @@ public class ContactDAOSpringJdbc implements ContactDAO {
      * @see ContactDAO
      */
     @Override
-    public Collection<Contact> getContactsByUserMail(String userMail) throws DataAccessException {
+    public Collection<Contact> getContactsByUserMail(final String userMail) throws DataAccessException {
         Integer userID = jdbcTemplate.queryForObject(DBStatements.GET_USER_BY_MAIL,
                 new MapSqlParameterSource("userMail", userMail),
                 (rs, rowNum) ->
@@ -49,7 +49,8 @@ public class ContactDAOSpringJdbc implements ContactDAO {
      * @see ContactDAO
      */
     @Override
-    public boolean save(String userMail, String contactMail) throws DataAccessException {
+    public boolean save(final String userMail,
+                        final String contactMail) throws DataAccessException {
         return jdbcTemplate.update(DBStatements.INSERT_CONTACT, getContactsIDs(userMail, contactMail)) == 1; // True if one row affected
     }
 
@@ -57,7 +58,8 @@ public class ContactDAOSpringJdbc implements ContactDAO {
      * @see ContactDAO
      */
     @Override
-    public boolean delete(String userMail, String contactMail) throws DataAccessException {
+    public boolean delete(final String userMail,
+                          final String contactMail) throws DataAccessException {
         if (jdbcTemplate.update(DBStatements.DELETE_CONTACT, getContactsIDs(userMail, contactMail)) == 0) { // If still no row affected, throw Exception
             throw new InvalidDataAccessApiUsageException("Contact cannot be deleted because it does not exists.");
         }
@@ -71,7 +73,8 @@ public class ContactDAOSpringJdbc implements ContactDAO {
      * @param contactMail second User as Contact
      * @return Map of retrieved userID and contactID
      */
-    private Map<String, Integer> getContactsIDs(String userMail, String contactMail) {
+    private Map<String, Integer> getContactsIDs(final String userMail,
+                                                final String contactMail) {
         Map<String, Integer> contactsIDs = new HashMap<>();
         Integer userID = jdbcTemplate.queryForObject(DBStatements.GET_USER_BY_MAIL,
                 new MapSqlParameterSource("userMail", userMail),

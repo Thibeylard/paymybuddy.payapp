@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Collection;
 
 @RestController
@@ -65,15 +66,15 @@ public class TransactionController {
     }
 
     @PostMapping("/transactions")
-    public ResponseEntity<String> makeTransaction(@RequestParam(name = "recipientMail") String recipientMail,
-                                                  @RequestParam(name = "description") String description,
-                                                  @RequestParam(name = "amount") double amount) {
+    public ResponseEntity<String> makeTransaction(@RequestParam(name = "recipientMail") final String recipientMail,
+                                                  @RequestParam(name = "description") final String description,
+                                                  @RequestParam(name = "amount") final double amount) {
         Logger.debug("Requested transaction creation between authenticated user and user with mail {}", recipientMail);
         try {
             transactionService.makeTransaction(recipientMail, description, amount);
             Logger.info("New transaction created between users.");
             return new ResponseEntity<>("SUCCESS", HttpStatus.CREATED);
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | ConstraintViolationException e) {
             Logger.error(e.getMessage());
             return new ResponseEntity<>("ERROR : See logs for further details.", HttpStatus.INTERNAL_SERVER_ERROR);
         }

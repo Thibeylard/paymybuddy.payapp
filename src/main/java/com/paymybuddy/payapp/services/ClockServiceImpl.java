@@ -25,7 +25,7 @@ public class ClockServiceImpl implements ClockService {
      * @see ClockService
      */
     @Override
-    public void setZone(ZoneId zoneId) {
+    public void setZone(final ZoneId zoneId) {
         this.zoneId = zoneId;
     }
 }

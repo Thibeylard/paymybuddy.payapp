@@ -22,7 +22,7 @@ public interface ContactService {
      * @param contactMail User mail
      * @throws DataAccessException if error occurs during database operation
      */
-    void addContact(String contactMail)
+    void addContact(final String contactMail)
             throws DataAccessException;
 
     /**
@@ -31,6 +31,6 @@ public interface ContactService {
      * @param contactMail User mail
      * @throws DataAccessException if error occurs during database operation
      */
-    void deleteContact(String contactMail)
+    void deleteContact(final String contactMail)
             throws DataAccessException;
 }

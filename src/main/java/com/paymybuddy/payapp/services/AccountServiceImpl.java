@@ -36,8 +36,8 @@ public class AccountServiceImpl implements AccountService {
      * @see AccountService
      */
     @Override
-    public void registrateUser(@NotEmpty @Size(min = 5, max = 25) String username,
-                               @Email String mail,
+    public void registrateUser(final @NotEmpty @Size(min = 5, max = 25) String username,
+                               final @Email String mail,
                                @Size(min = 8, max = 80) String password) throws SQLException, IllegalArgumentException, ConstraintViolationException {
         Logger.debug("Encode user password.");
         password = passwordEncoder.encode(password);

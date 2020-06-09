@@ -44,10 +44,10 @@ public class UserController {
     }
 
     @PutMapping("/user/profile")
-    public ResponseEntity<String> updateSettings(@RequestParam(name = "password") String password,
-                                                 @RequestParam(name = "username") String usernameToSet,
-                                                 @RequestParam(name = "mail") String mailToSet,
-                                                 @RequestParam(name = "newPassword", required = false) String passwordToSet) {
+    public ResponseEntity<String> updateSettings(@RequestParam(name = "password") final String password,
+                                                 @RequestParam(name = "username") final String usernameToSet,
+                                                 @RequestParam(name = "mail") final String mailToSet,
+                                                 @RequestParam(name = "newPassword", required = false) final String passwordToSet) {
         try {
             Logger.debug("Request to update user settings.");
             userService.updateSettings(password, usernameToSet, mailToSet, passwordToSet);

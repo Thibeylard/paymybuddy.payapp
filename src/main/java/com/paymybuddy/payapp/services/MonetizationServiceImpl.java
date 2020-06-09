@@ -12,7 +12,7 @@ public class MonetizationServiceImpl implements MonetizationService {
     }
 
     @Override
-    public double monetize(double amount) {
+    public double monetize(final double amount) {
         return amount * percentage;
     }
 }

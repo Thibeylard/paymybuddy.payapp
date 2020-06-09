@@ -36,7 +36,7 @@ public class ContactServiceImpl implements ContactService {
      * @see ContactService
      */
     @Override
-    public void addContact(String contactMail) throws DataAccessException {
+    public void addContact(final String contactMail) throws DataAccessException {
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         contactDAO.save(authUser.getUsername(), contactMail);
     }
@@ -45,7 +45,7 @@ public class ContactServiceImpl implements ContactService {
      * @see ContactService
      */
     @Override
-    public void deleteContact(String contactMail) throws DataAccessException {
+    public void deleteContact(final String contactMail) throws DataAccessException {
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         contactDAO.delete(authUser.getUsername(), contactMail);
     }

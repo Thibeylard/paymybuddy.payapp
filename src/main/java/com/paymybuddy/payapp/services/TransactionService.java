@@ -3,6 +3,7 @@ package com.paymybuddy.payapp.services;
 import com.paymybuddy.payapp.models.Transaction;
 import org.springframework.dao.DataAccessException;
 
+import javax.validation.constraints.Size;
 import java.util.Collection;
 
 public interface TransactionService {
@@ -37,6 +38,8 @@ public interface TransactionService {
      * @param description   Transaction description
      * @param amount        Transaction amount
      */
-    void makeTransaction(String recipientMail, String description, double amount)
+    void makeTransaction(final String recipientMail,
+                         final @Size(min = 5, max = 30) String description,
+                         final double amount)
             throws DataAccessException;
 }

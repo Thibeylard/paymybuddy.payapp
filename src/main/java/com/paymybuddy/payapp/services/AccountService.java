@@ -18,7 +18,7 @@ public interface AccountService {
      * @throws IllegalArgumentException     if mail is not available
      * @throws ConstraintViolationException if params do not match criteria
      */
-    void registrateUser(@NotEmpty @Size(min = 5, max = 25) String username,
-                        @Email String mail,
+    void registrateUser(final @NotEmpty @Size(min = 5, max = 25) String username,
+                        final @Email String mail,
                         @Size(min = 8, max = 80) String password) throws SQLException, IllegalArgumentException, ConstraintViolationException;
 }

@@ -29,7 +29,7 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
      */
     @Override
     public Collection<Transaction> getTransactionsByUserMail(final String userMail) throws DataAccessException {
-        return getTransactions(userMail, DBStatements.GET_TRANSACTIONS);
+        return getTransactions(userMail, DBStatements.GET_ALL_TRANSACTIONS);
     }
 
     /**
@@ -49,16 +49,8 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
     }
 
     private Collection<Transaction> getTransactions(final String userMail, final String statement) {
-        // TODO y a t-il un moyen d'éviter cette duplication de code ?
-        Integer userID = jdbcTemplate.queryForObject(DBStatements.GET_USER_BY_MAIL,
-                new MapSqlParameterSource("userMail", userMail),
-                (rs, rowNum) ->
-                        rs.getInt("id"));
-
-        assert userID != null;
-
         return jdbcTemplate.query(statement,
-                new MapSqlParameterSource("userID", userID),
+                new MapSqlParameterSource("userMail", userMail),
                 (rs, rowNum) ->
                         new Transaction(
                                 rs.getInt("id"),

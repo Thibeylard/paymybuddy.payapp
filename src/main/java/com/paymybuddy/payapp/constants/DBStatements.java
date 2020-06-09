@@ -33,12 +33,15 @@ public final class DBStatements {
             "SELECT id, username, mail, password FROM User WHERE mail = :userMail";
 
     // CONTACT Table statements
+
+    // TODO Refaire les requêtes en utilisant les mails
     public static final String GET_CONTACTS_ID =
             "SELECT user_b_id AS contact_id FROM Contact WHERE user_a_id = :userID UNION " +
                     "SELECT user_a_id AS contact_id FROM Contact WHERE user_b_id = :userID";
 
     public static final String GET_CONTACTS =
             "SELECT id, username, mail FROM User WHERE id IN (" + GET_CONTACTS_ID + ")";
+
 
     public static final String INSERT_CONTACT =
             "INSERT INTO Contact (user_a_id, user_b_id) VALUES ( :userID, :contactID)";
@@ -48,14 +51,17 @@ public final class DBStatements {
                     "OR (user_a_id = :contactID AND user_b_id = :userID)";
 
     // TRANSACTION Table statements
+    private static final String GET_TRANSACTIONS_MODEL =
+            "SELECT t.id, debtor_id, creditor_id, amount, description, date, total FROM TRANSACTION AS t " +
+                    "INNER JOIN USER AS u on u.mail = :userMail ";
 
     public static final String GET_DEBIT_TRANSACTIONS =
-            "SELECT id, debtor_id, creditor_id, amount, description, date, total FROM TRANSACTION WHERE debtor_id = :userID";
+            GET_TRANSACTIONS_MODEL + "WHERE u.id = debtor_id";
 
     public static final String GET_CREDIT_TRANSACTIONS =
-            "SELECT id, debtor_id, creditor_id, amount, description, date, total FROM TRANSACTION WHERE creditor_id = :userID";
+            GET_TRANSACTIONS_MODEL + "WHERE u.id = creditor_id";
 
-    public static final String GET_TRANSACTIONS =
+    public static final String GET_ALL_TRANSACTIONS =
             GET_DEBIT_TRANSACTIONS + " UNION " + GET_CREDIT_TRANSACTIONS;
 
     public static final String INSERT_TRANSACTION =

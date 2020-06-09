@@ -46,17 +46,12 @@ public class UserDAOJdbcIT {
             connection = dataSource.getConnection();
 
             // Reset User_Role Table
-            ps = connection.prepareStatement(
-                    "DELETE FROM User_Role;"
-            );
+            ps = connection.prepareStatement("DELETE FROM User_Role;");
             ps.execute();
 
             // Reset User Table
-            ps = connection.prepareStatement(
-                    "DELETE FROM User;"
-            );
+            ps = connection.prepareStatement("DELETE FROM User;");
             ps.execute();
-
 
             // Insert User 'user'
             ps = connection.prepareStatement(

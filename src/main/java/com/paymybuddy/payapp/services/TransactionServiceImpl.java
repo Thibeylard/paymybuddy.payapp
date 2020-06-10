@@ -62,6 +62,9 @@ public class TransactionServiceImpl implements TransactionService {
     public void makeTransaction(final String recipientMail,
                                 final @Size(min = 5, max = 30) String description,
                                 final double amount) throws DataAccessException {
+        if (amount <= 0)
+            throw new IllegalArgumentException("Amount to send can't be negative or null.");
+
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         double total = amount - monetizationService.monetize(amount);
         transactionDAO.save(authUser.getUsername(), recipientMail, description, amount, total);

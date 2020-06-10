@@ -140,13 +140,6 @@ public class TransactionDAOSpringJdbcIT {
 
     @Test
     @WithMockUser
-    @DisplayName("getTransactions() Exceptions")
-    public void Given_inexistantUser_When_getAnyUserTransactions_Then_throwException() {
-        assertThrows(DataAccessException.class, () -> transactionDAO.getTransactionsByUserMail("user5@mail.com"));
-    }
-
-    @Test
-    @WithMockUser
     @DisplayName("makeTransaction() Success")
     public void Given_authenticatedUser_When_makeTransaction_Then_tableTransactionUpdated() {
         doReturn(transactionTimes.get("transaction7Time")).when(clockService).now();

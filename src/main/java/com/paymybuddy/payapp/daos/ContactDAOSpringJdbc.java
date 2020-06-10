@@ -4,7 +4,7 @@ import com.paymybuddy.payapp.constants.DBStatements;
 import com.paymybuddy.payapp.models.Contact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -61,7 +61,7 @@ public class ContactDAOSpringJdbc implements ContactDAO {
     public boolean delete(final String userMail,
                           final String contactMail) throws DataAccessException {
         if (jdbcTemplate.update(DBStatements.DELETE_CONTACT, getContactsIDs(userMail, contactMail)) == 0) { // If still no row affected, throw Exception
-            throw new InvalidDataAccessApiUsageException("Contact cannot be deleted because it does not exists.");
+            throw new DataRetrievalFailureException("Contact cannot be deleted because it does not exists.");
         }
         return true;
     }

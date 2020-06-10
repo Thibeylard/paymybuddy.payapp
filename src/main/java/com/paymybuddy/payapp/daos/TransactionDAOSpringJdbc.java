@@ -5,6 +5,7 @@ import com.paymybuddy.payapp.models.Transaction;
 import com.paymybuddy.payapp.services.ClockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -81,6 +82,10 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
         parameterMap.put("date", clockService.now());
         parameterMap.put("amount", amount);
         parameterMap.put("total", total);
-        return jdbcTemplate.update(DBStatements.INSERT_TRANSACTION, parameterMap) == 1;
+
+        if (jdbcTemplate.update(DBStatements.INSERT_TRANSACTION, parameterMap) == 0) {
+            throw new DataRetrievalFailureException("One of requested user does not exists.");
+        }
+        return true;
     }
 }

@@ -1,9 +1,11 @@
 package com.paymybuddy.payapp.integration;
 
 import com.paymybuddy.payapp.daos.TransactionDAO;
+import com.paymybuddy.payapp.models.Transaction;
 import com.paymybuddy.payapp.services.ClockService;
 import org.assertj.db.api.Assertions;
 import org.assertj.db.type.Table;
+import org.h2.api.TimestampWithTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,9 +19,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,19 +49,19 @@ public class TransactionDAOSpringJdbcIT {
 
         transactionTimes = new HashMap<>();
         transactionTimes.put("transaction1Time",
-                ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.systemDefault()));
+                ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, clockService.getZone()));
         transactionTimes.put("transaction2Time",
-                ZonedDateTime.of(2020, 1, 2, 0, 0, 0, 0, ZoneId.systemDefault()));
+                ZonedDateTime.of(2020, 1, 2, 0, 0, 0, 0, clockService.getZone()));
         transactionTimes.put("transaction3Time",
-                ZonedDateTime.of(2020, 1, 3, 0, 0, 0, 0, ZoneId.systemDefault()));
+                ZonedDateTime.of(2020, 1, 3, 0, 0, 0, 0, clockService.getZone()));
         transactionTimes.put("transaction4Time",
-                ZonedDateTime.of(2020, 1, 4, 0, 0, 0, 0, ZoneId.systemDefault()));
+                ZonedDateTime.of(2020, 1, 4, 0, 0, 0, 0, clockService.getZone()));
         transactionTimes.put("transaction5Time",
-                ZonedDateTime.of(2020, 1, 5, 0, 0, 0, 0, ZoneId.systemDefault()));
+                ZonedDateTime.of(2020, 1, 5, 0, 0, 0, 0, clockService.getZone()));
         transactionTimes.put("transaction6Time",
-                ZonedDateTime.of(2020, 1, 6, 0, 0, 0, 0, ZoneId.systemDefault()));
+                ZonedDateTime.of(2020, 1, 6, 0, 0, 0, 0, clockService.getZone()));
         transactionTimes.put("transaction7Time",
-                ZonedDateTime.of(2020, 1, 7, 0, 0, 0, 0, ZoneId.systemDefault()));
+                ZonedDateTime.of(2020, 1, 7, 0, 0, 0, 0, clockService.getZone()));
 
         try {
             // Reset Transaction Table
@@ -95,7 +98,7 @@ public class TransactionDAOSpringJdbcIT {
                     "(4,1)");
 
             // Insert few transactions between users
-            jdbcTemplate.update("INSERT INTO Transaction (ID, DEBTOR_ID, CREDITOR_ID, DESCRIPTION, AMOUNT, TOTAL, DATE) " +
+            jdbcTemplate.update("INSERT INTO Transaction (ID, DEBTOR_ID, CREDITOR_ID, DESCRIPTION, AMOUNT, TOTAL, ZONED_DATE_TIME) " +
                             "VALUES (1,1,2,'transaction1',10.00,9.50,:transaction1Time)," +
                             "(2,3,1,'transaction2',10.00,9.50,:transaction2Time)," +
                             "(3,2,3,'transaction3',10.00,9.50,:transaction3Time)," +
@@ -129,6 +132,10 @@ public class TransactionDAOSpringJdbcIT {
         assertThat(transactionDAO.getCreditTransactionsByUserMail("user4@mail.com"))
                 .hasSize(2);
 
+        List<Transaction> user1CreditTransactions = (List<Transaction>) transactionDAO.getCreditTransactionsByUserMail("user1@mail.com");
+        assertThat(user1CreditTransactions.get(0).getDate())
+                .isEqualTo(transactionTimes.get("transaction2Time"));
+
     }
 
     @Test
@@ -142,7 +149,7 @@ public class TransactionDAOSpringJdbcIT {
     @WithMockUser
     @DisplayName("makeTransaction() Success")
     public void Given_authenticatedUser_When_makeTransaction_Then_tableTransactionUpdated() {
-        doReturn(transactionTimes.get("transaction7time")).when(clockService).now();
+        doReturn(transactionTimes.get("transaction7Time")).when(clockService).now();
 
         Table transactionTable = new Table(jdbcTemplate.getJdbcTemplate().getDataSource(), "Transaction");
 
@@ -163,10 +170,18 @@ public class TransactionDAOSpringJdbcIT {
                 .row(6)
                 .value("debtor_id").isEqualTo(4)
                 .value("creditor_id").isEqualTo(1)
-                .value("date").isEqualTo(transactionTimes.get("transaction7time"))
                 .value("description").isEqualTo("transaction7")
                 .value("amount").isEqualTo(50.00)
                 .value("total").isEqualTo(47.50);
+
+        TimestampWithTimeZone timestampWithTimeZoneExample = (TimestampWithTimeZone) transactionTable.getRow(6).getColumnValue("zoned_date_time").getValue();
+
+        // Check that zoned_date_time in database perfectly match with passed ZonedDateTime object
+        assertThat(timestampWithTimeZoneExample.getDay()).isEqualTo(transactionTimes.get("transaction7Time").getDayOfMonth());
+        assertThat(timestampWithTimeZoneExample.getMonth()).isEqualTo(transactionTimes.get("transaction7Time").getMonthValue());
+        assertThat(timestampWithTimeZoneExample.getYear()).isEqualTo(transactionTimes.get("transaction7Time").getYear());
+        assertThat(timestampWithTimeZoneExample.getNanosSinceMidnight()).isEqualTo(transactionTimes.get("transaction7Time").getLong(ChronoField.NANO_OF_DAY));
+        assertThat(timestampWithTimeZoneExample.getTimeZoneOffsetSeconds()).isEqualTo(transactionTimes.get("transaction7Time").getOffset().get(ChronoField.OFFSET_SECONDS));
 
     }
 

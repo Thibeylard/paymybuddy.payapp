@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 @Repository
 public class TransactionDAOSpringJdbc implements TransactionDAO {
@@ -56,7 +58,7 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
                                 rs.getInt("id"),
                                 rs.getInt("debtor_id"),
                                 rs.getInt("creditor_id"),
-                                ZonedDateTime.of(rs.getTimestamp("date").toLocalDateTime(), clockService.getZone()),
+                                ZonedDateTime.of(rs.getTimestamp("zoned_date_time").toLocalDateTime(), clockService.getZone()),
                                 rs.getDouble("amount"),
                                 rs.getDouble("total"),
                                 rs.getString("description")
@@ -72,6 +74,13 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
                         final String description,
                         final double amount,
                         final double total) throws DataAccessException {
-        return false;
+        Map<String, Object> parameterMap = new HashMap<>();
+        parameterMap.put("userMail", userMail);
+        parameterMap.put("recipientMail", recipientMail);
+        parameterMap.put("description", description);
+        parameterMap.put("date", clockService.now());
+        parameterMap.put("amount", amount);
+        parameterMap.put("total", total);
+        return jdbcTemplate.update(DBStatements.INSERT_TRANSACTION, parameterMap) == 1;
     }
 }

@@ -50,22 +50,26 @@ public final class DBStatements {
             "DELETE FROM Contact WHERE (user_a_id = :userID AND user_b_id = :contactID) " +
                     "OR (user_a_id = :contactID AND user_b_id = :userID)";
 
+    public static final String INSERT_TRANSACTION =
+            "INSERT INTO TRANSACTION (debtor_id, creditor_id, amount, description, zoned_date_time, total) " +
+                    "SELECT u.id, r.id, :amount, :description, :date, :total FROM USER AS u " +
+                    "INNER JOIN USER AS r ON r.mail <> u.mail " +
+                    "WHERE u.mail = :userMail AND r.mail = :recipientMail";
     // TRANSACTION Table statements
     private static final String GET_TRANSACTIONS_MODEL =
-            "SELECT t.id, debtor_id, creditor_id, amount, description, date, total FROM TRANSACTION AS t " +
-                    "INNER JOIN USER AS u on u.mail = :userMail ";
+            "SELECT t.id, debtor_id, creditor_id, amount, description, zoned_date_time, total FROM TRANSACTION AS t ";
 
     public static final String GET_DEBIT_TRANSACTIONS =
-            GET_TRANSACTIONS_MODEL + "WHERE u.id = debtor_id";
+            GET_TRANSACTIONS_MODEL +
+                    "INNER JOIN USER AS u ON u.id = debtor_id " +
+                    "WHERE u.mail = :userMail ";
 
     public static final String GET_CREDIT_TRANSACTIONS =
-            GET_TRANSACTIONS_MODEL + "WHERE u.id = creditor_id";
+            GET_TRANSACTIONS_MODEL +
+                    "INNER JOIN USER AS u ON u.id = creditor_id " +
+                    "WHERE u.mail = :userMail ";
 
     public static final String GET_ALL_TRANSACTIONS =
             GET_DEBIT_TRANSACTIONS + " UNION " + GET_CREDIT_TRANSACTIONS;
-
-    public static final String INSERT_TRANSACTION =
-            "INSERT INTO TRANSACTION (debtor_id, creditor_id, amount, description, date, total) VALUES " +
-                    "(:userID, :contactID, :amount, :description, :date, :total)";
 
 }

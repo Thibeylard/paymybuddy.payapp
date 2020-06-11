@@ -72,7 +72,7 @@ public class UserControllerTest {
     @Test
     @WithMockUser(username = "user@mail.com")
     @DisplayName("GET on User ")
-    public void Given_authenticatedUser_When_getAppURLs_Then_returnUserSpecificInstance() throws Exception {
+    public void Given_authenticatedUser_When_getUser_Then_returnUserSpecificInstance() throws Exception {
         User user = new User("user",
                 "user@mail.com",
                 bcryptEncoder.encode("userpass"),
@@ -81,7 +81,7 @@ public class UserControllerTest {
 
         when(userService.getUserByMail())
                 .thenReturn(Optional.of(user))
-                .thenReturn(Optional.of(user));
+                .thenReturn(Optional.empty());
 
         MvcResult result;
 
@@ -91,6 +91,33 @@ public class UserControllerTest {
 
         assertThat(result.getResponse().getContentAsString())
                 .isEqualTo(userJson);
+
+        mvc.perform(get("/user"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "user@mail.com")
+    @DisplayName("GET on User Balance ")
+    public void Given_authenticatedUser_When_getUserBalance_Then_returnDoubleInstance() throws Exception {
+        Double balance = 55.00;
+        String balanceJson = objectMapper.writeValueAsString(balance);
+
+        when(userService.getUserBalance())
+                .thenReturn(Optional.of(balance))
+                .thenReturn(Optional.empty());
+
+        MvcResult result;
+
+        result = mvc.perform(get("/user/balance"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualTo(balanceJson);
+
+        mvc.perform(get("/user/balance"))
+                .andExpect(status().isInternalServerError());
     }
 
     @Test

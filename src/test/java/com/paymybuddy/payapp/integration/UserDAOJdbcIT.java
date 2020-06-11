@@ -69,6 +69,9 @@ public class UserDAOJdbcIT {
             );
             ps.execute();
 
+            // Insert transactions for 'user'
+
+
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -103,6 +106,27 @@ public class UserDAOJdbcIT {
     }
 
     @Test
+    @DisplayName("Get user balance success")
+    public void Given_validUserMail_When_calculatingUserBalance_Then_retrieveValue() {
+        Optional<Double> balance = userDAO.getBalance("user@mail.com");
+
+        assertThat(balance)
+                .isNotNull()
+                .isPresent();
+
+        assertThat(balance.get())
+                .isEqualTo(50);
+    }
+
+    @Test
+    @DisplayName("Get user balance failure")
+    public void Given_databaseError_When_calculatingUserBalance_Then_getEmptyDouble() {
+        assertThat(userDAO.getBalance("john@mail.com"))
+                .isNotNull()
+                .isNotPresent();
+    }
+
+    @Test
     @DisplayName("Save user success")
     public void Given_availableMail_When_savingUser_Then_userIsStoredInDatabase() throws SQLException {
         User user = new User("username2", "user2@mail.com", "user2pass", Collections.singletonList(Role.USER));
@@ -124,7 +148,7 @@ public class UserDAOJdbcIT {
     }
 
     @Test
-    @DisplayName("Update settings success")
+    @DisplayName("Update profile success")
     public void Given_availableMail_When_updatingUser_Then_userSuccessfullyModified() throws SQLException {
         assertThat(userDAO.update(
                 "user@mail.com",
@@ -140,7 +164,7 @@ public class UserDAOJdbcIT {
     }
 
     @Test
-    @DisplayName("Update settings failure : redundant email")
+    @DisplayName("Update profile failure : redundant email")
     public void Given_existingMail_When_updatingUser_Then_IllegalArgumentExceptionThrown() {
         assertThrows(IllegalArgumentException.class, () -> userDAO.update(
                 "otherUser@mail.com",

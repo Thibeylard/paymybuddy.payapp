@@ -28,15 +28,8 @@ public class ContactDAOSpringJdbc implements ContactDAO {
      */
     @Override
     public Collection<Contact> getContactsByUserMail(final String userMail) throws DataAccessException {
-        Integer userID = jdbcTemplate.queryForObject(DBStatements.GET_USER_BY_MAIL,
-                new MapSqlParameterSource("userMail", userMail),
-                (rs, rowNum) ->
-                        rs.getInt("id"));
-
-        assert userID != null;
-
         return jdbcTemplate.query(DBStatements.GET_CONTACTS,
-                new MapSqlParameterSource("userID", userID),
+                new MapSqlParameterSource("userMail", userMail),
                 (rs, rowNum) ->
                         new Contact(
                                 rs.getInt("id"),
@@ -51,7 +44,13 @@ public class ContactDAOSpringJdbc implements ContactDAO {
     @Override
     public boolean save(final String userMail,
                         final String contactMail) throws DataAccessException {
-        return jdbcTemplate.update(DBStatements.INSERT_CONTACT, getContactsIDs(userMail, contactMail)) == 1; // True if one row affected
+        Map<String, String> mails = new HashMap<>();
+        mails.put("userMail", userMail);
+        mails.put("contactMail", contactMail);
+        if (jdbcTemplate.update(DBStatements.INSERT_CONTACT, mails) == 0) { // If no row affected, throw Exception
+            throw new DataRetrievalFailureException("Contact cannot be added because some user does not exists.");
+        }
+        return true;
     }
 
     /**
@@ -60,38 +59,12 @@ public class ContactDAOSpringJdbc implements ContactDAO {
     @Override
     public boolean delete(final String userMail,
                           final String contactMail) throws DataAccessException {
-        if (jdbcTemplate.update(DBStatements.DELETE_CONTACT, getContactsIDs(userMail, contactMail)) == 0) { // If still no row affected, throw Exception
+        Map<String, String> mails = new HashMap<>();
+        mails.put("userMail", userMail);
+        mails.put("contactMail", contactMail);
+        if (jdbcTemplate.update(DBStatements.DELETE_CONTACT, mails) == 0) { // If no row affected, throw Exception
             throw new DataRetrievalFailureException("Contact cannot be deleted because it does not exists.");
         }
         return true;
-    }
-
-    /**
-     * Return as a map IDs of users to create contact between.
-     *
-     * @param userMail    first User
-     * @param contactMail second User as Contact
-     * @return Map of retrieved userID and contactID
-     */
-    private Map<String, Integer> getContactsIDs(final String userMail,
-                                                final String contactMail) {
-        Map<String, Integer> contactsIDs = new HashMap<>();
-        Integer userID = jdbcTemplate.queryForObject(DBStatements.GET_USER_BY_MAIL,
-                new MapSqlParameterSource("userMail", userMail),
-                (rs, rowNum) ->
-                        rs.getInt("id"));
-
-        assert userID != null;
-        contactsIDs.put("userID", userID);
-
-        Integer contactID = jdbcTemplate.queryForObject(DBStatements.GET_USER_BY_MAIL,
-                new MapSqlParameterSource("userMail", contactMail),
-                (rs, rowNum) ->
-                        rs.getInt("id"));
-
-        assert contactID != null;
-        contactsIDs.put("contactID", contactID);
-
-        return contactsIDs;
     }
 }

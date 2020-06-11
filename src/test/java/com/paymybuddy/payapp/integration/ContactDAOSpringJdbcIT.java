@@ -154,7 +154,7 @@ public class ContactDAOSpringJdbcIT {
     @DisplayName("deleteContact() Exceptions")
     public void Given_databaseError_When_deleteContact_Then_throwsDataAccessException() {
         assertThrows(DataAccessException.class, () -> contactDAO.delete("user4@mail.com", "user3@mail.com")); // Not contacts
-        assertThrows(DataAccessException.class, () -> contactDAO.save("user6@mail.com", "user2@mail.com")); // User 6 doesn't exist at all
-        assertThrows(DataAccessException.class, () -> contactDAO.save("user1@mail.com", "user8@mail.com")); // User 8 doesn't exist at all
+        assertThrows(DataAccessException.class, () -> contactDAO.delete("user6@mail.com", "user2@mail.com")); // User 6 doesn't exist at all
+        assertThrows(DataAccessException.class, () -> contactDAO.delete("user1@mail.com", "user8@mail.com")); // User 8 doesn't exist at all
     }
 }

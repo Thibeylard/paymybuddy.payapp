@@ -29,32 +29,43 @@ public final class DBStatements {
 
     //  Spring NamedParameterJDBCTemplate Statements -------------------------------------------------
 
-    public static final String GET_USER_BY_MAIL =
-            "SELECT id, username, mail, password FROM User WHERE mail = :userMail";
-
     // CONTACT Table statements
-
-    // TODO Refaire les requêtes en utilisant les mails
     public static final String GET_CONTACTS_ID =
-            "SELECT user_b_id AS contact_id FROM Contact WHERE user_a_id = :userID UNION " +
-                    "SELECT user_a_id AS contact_id FROM Contact WHERE user_b_id = :userID";
+            "SELECT user_b_id AS contact_id FROM Contact " +        // Get all contacts where user is user_a_id
+                    "INNER JOIN USER ON Contact.user_a_id = User.id " +
+                    "WHERE user.mail = :userMail " +
+                    "UNION " +
+                    "SELECT user_a_id AS contact_id FROM Contact " + // Get all contacts where user is user_b_id
+                    "INNER JOIN USER ON Contact.user_b_id = User.id " +
+                    "WHERE user.mail = :userMail ";
 
     public static final String GET_CONTACTS =
             "SELECT id, username, mail FROM User WHERE id IN (" + GET_CONTACTS_ID + ")";
 
-
     public static final String INSERT_CONTACT =
-            "INSERT INTO Contact (user_a_id, user_b_id) VALUES ( :userID, :contactID)";
+            "INSERT INTO Contact (user_a_id, user_b_id) " +
+                    "SELECT u.id, c.id FROM USER AS u " +
+                    "INNER JOIN USER AS c ON c.mail <> u.mail " +
+                    "WHERE u.mail = :userMail AND c.mail = :contactMail";
+
+    private static final String GET_CONTACT_ID_FOR_DELETE =
+            "SELECT c.id FROM USER AS c " +
+                    "WHERE c.mail = :contactMail";
+
+    private static final String GET_USER_ID_FOR_DELETE =
+            "SELECT u.id FROM USER AS u " +
+                    "WHERE u.mail = :userMail";
 
     public static final String DELETE_CONTACT =
-            "DELETE FROM Contact WHERE (user_a_id = :userID AND user_b_id = :contactID) " +
-                    "OR (user_a_id = :contactID AND user_b_id = :userID)";
+            "DELETE FROM Contact WHERE (user_a_id IN (" + GET_USER_ID_FOR_DELETE + ") AND user_b_id IN (" + GET_CONTACT_ID_FOR_DELETE + ")) " +
+                    "OR (user_a_id IN (" + GET_CONTACT_ID_FOR_DELETE + ") AND user_b_id IN (" + GET_USER_ID_FOR_DELETE + "))";
 
     public static final String INSERT_TRANSACTION =
             "INSERT INTO TRANSACTION (debtor_id, creditor_id, amount, description, zoned_date_time, total) " +
                     "SELECT u.id, r.id, :amount, :description, :date, :total FROM USER AS u " +
                     "INNER JOIN USER AS r ON r.mail <> u.mail " +
                     "WHERE u.mail = :userMail AND r.mail = :recipientMail";
+
     // TRANSACTION Table statements
     private static final String GET_TRANSACTIONS_MODEL =
             "SELECT t.id, debtor_id, creditor_id, amount, description, zoned_date_time, total FROM TRANSACTION AS t ";
@@ -71,5 +82,7 @@ public final class DBStatements {
 
     public static final String GET_ALL_TRANSACTIONS =
             GET_DEBIT_TRANSACTIONS + " UNION " + GET_CREDIT_TRANSACTIONS;
+
+    // TODO Ajouter la requête du solde utilisateur.
 
 }

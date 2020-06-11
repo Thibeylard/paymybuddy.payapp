@@ -79,7 +79,7 @@ public class UserControllerTest {
                 Collections.singleton(Role.USER));
         String userJson = objectMapper.writeValueAsString(user);
 
-        when(userService.getUserByMail(anyString()))
+        when(userService.getUserByMail())
                 .thenReturn(Optional.of(user))
                 .thenReturn(Optional.of(user));
 
@@ -97,7 +97,7 @@ public class UserControllerTest {
     @WithMockUser(username = "user@mail.com")
     @DisplayName("PUT on User profile succeed")
     public void Given_authenticatedUser_When_updateSettings_Then_returnUserID() throws Exception {
-        doNothing().when(userService).updateSettings(anyString(), anyString(), anyString(), nullable(String.class));
+        doNothing().when(userService).updateUserProfile(anyString(), anyString(), anyString(), nullable(String.class));
         mvc.perform(put("/user/profile")
                 .params(paramsPUT)
                 .with(csrf()))
@@ -109,7 +109,7 @@ public class UserControllerTest {
     @DisplayName("PUT on User profile wrong values")
     public void Given_constraintEntryViolation_When_updateSettings_Then_statusIsBadRequest() throws Exception {
         doThrow(ConstraintViolationException.class).when(userService)
-                .updateSettings(anyString(), anyString(), anyString(), nullable(String.class));
+                .updateUserProfile(anyString(), anyString(), anyString(), nullable(String.class));
 
         mvc.perform(put("/user/profile")
                 .params(paramsPUT)
@@ -123,7 +123,7 @@ public class UserControllerTest {
     public void Given_notMatchingPasswords_When_updateSettings_Then_statusIsForbidden() throws Exception {
 
         doThrow(BadCredentialsException.class).when(userService)
-                .updateSettings(anyString(), anyString(), anyString(), nullable(String.class));
+                .updateUserProfile(anyString(), anyString(), anyString(), nullable(String.class));
 
         mvc.perform(put("/user/profile")
                 .params(paramsPUT)
@@ -136,7 +136,7 @@ public class UserControllerTest {
     @DisplayName("PUT on User profile server error")
     public void Given_constraintEntryViolation_When_updateSettings_Then_statusIsInternalServerError() throws Exception {
         doThrow(SQLException.class).when(userService)
-                .updateSettings(anyString(), anyString(), anyString(), nullable(String.class));
+                .updateUserProfile(anyString(), anyString(), anyString(), nullable(String.class));
 
         mvc.perform(put("/user/profile")
                 .params(paramsPUT)

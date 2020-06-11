@@ -12,23 +12,13 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 public interface UserService {
-    /**
-     * Retrieved User base on ID
-     *
-     * @param userId User database id
-     * @return Optional empty or populated with retrieved User
-     */
-    Optional<User> getUserById(final int userId);
 
     /**
-     * Retrieved User base on mail
+     * Retrieves authenticated User based on mail
      *
-     * @param mail User mail
      * @return Optional empty or populated with retrieved User
      */
-    Optional<User> getUserByMail(final String mail);
-
-    // TODO les Service doivent-ils vraiment lancer une exception SQL ? Parait peu respectueux du principe SOLID de l'interface
+    Optional<User> getUserByMail();
 
     /**
      * Update either User username, mail and/or password, secured by additional password check.
@@ -42,9 +32,16 @@ public interface UserService {
      * @throws BadCredentialsException      if password check fails
      * @throws ConstraintViolationException if params do not match criteria
      */
-    void updateSettings(final String password,
-                        final @NotEmpty @Size(min = 5, max = 25) String usernameToSet,
-                        final @Email String mailToSet,
-                        @Nullable @Size(min = 8, max = 80) String passwordToSet)
+    void updateUserProfile(final String password,
+                           final @NotEmpty @Size(min = 5, max = 25) String usernameToSet,
+                           final @Email String mailToSet,
+                           @Nullable @Size(min = 8, max = 80) String passwordToSet)
             throws SQLException, IllegalArgumentException, BadCredentialsException, ConstraintViolationException;
+
+    /**
+     * Retrieves authenticated User balance calculated from its transactions.
+     *
+     * @return User balance as Optional<Double>, empty if error occurs
+     */
+    Optional<Double> getUserBalance();
 }

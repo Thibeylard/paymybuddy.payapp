@@ -9,13 +9,6 @@ import java.util.Optional;
 @Repository
 public interface UserDAO {
 
-    /**
-     * Retrieved User base on ID
-     *
-     * @param userId User database id
-     * @return Optional empty or populated with retrieved User
-     */
-    Optional<User> findById(final int userId);
 
     /**
      * Retrieved User base on mail
@@ -23,7 +16,7 @@ public interface UserDAO {
      * @param mail User mail
      * @return Optional empty or populated with retrieved User
      */
-    Optional<User> findByMail(final String mail);
+    Optional<User> find(final String mail);
 
     /**
      * Save new User in database
@@ -37,15 +30,23 @@ public interface UserDAO {
     /**
      * Update User where mail = principalMail with values usernameToSet, mailToSet, passwordToSet
      *
-     * @param principalMail current User.mail
+     * @param userMail      current User.mail
      * @param usernameToSet User.username
      * @param mailToSet     new User.mail
      * @param passwordToSet User.password
      * @throws SQLException             if SQL operation fails
      * @throws IllegalArgumentException if mail is unavailable
      */
-    boolean updateSettings(final String principalMail,
-                           final String usernameToSet,
-                           final String mailToSet,
-                           final String passwordToSet) throws IllegalArgumentException, SQLException;
+    boolean update(final String userMail,
+                   final String usernameToSet,
+                   final String mailToSet,
+                   final String passwordToSet) throws IllegalArgumentException, SQLException;
+
+    /**
+     * Get User balance calculated from its transactions.
+     *
+     * @param userMail Mail of User to get balance of
+     * @return User balance as Optional<Double>, empty if error occurs
+     */
+    Optional<Double> getBalance(final String userMail);
 }

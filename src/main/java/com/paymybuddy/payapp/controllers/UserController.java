@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
 
@@ -31,26 +29,27 @@ public class UserController {
     @GetMapping("/user") // Return basic view of current User (no Contacts, no Transactions)
     public ResponseEntity<User> getUser() {
         Logger.debug("Request for principal user.");
-        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<User> user = userService.getUserByMail(principal.getUsername());
+        Optional<User> user = userService.getUserByMail();
         return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/user/balance") // Return User balance
-    public ResponseEntity<Double> balance() {
-        Logger.debug("Request for user balance.");
-        return null;
+    public ResponseEntity<Double> getUserBalance() {
+        Logger.debug("Request for principal user balance.");
+        Optional<Double> balance = userService.getUserBalance();
+        return balance.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
     @PutMapping("/user/profile")
-    public ResponseEntity<String> updateSettings(@RequestParam(name = "password") final String password,
-                                                 @RequestParam(name = "username") final String usernameToSet,
-                                                 @RequestParam(name = "mail") final String mailToSet,
-                                                 @RequestParam(name = "newPassword", required = false) final String passwordToSet) {
+    public ResponseEntity<String> updateUserProfile(@RequestParam(name = "password") final String password,
+                                                    @RequestParam(name = "username") final String usernameToSet,
+                                                    @RequestParam(name = "mail") final String mailToSet,
+                                                    @RequestParam(name = "newPassword", required = false) final String passwordToSet) {
         try {
             Logger.debug("Request to update user settings.");
-            userService.updateSettings(password, usernameToSet, mailToSet, passwordToSet);
+            userService.updateUserProfile(password, usernameToSet, mailToSet, passwordToSet);
         } catch (IllegalArgumentException | ConstraintViolationException e) {
             Logger.error(e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

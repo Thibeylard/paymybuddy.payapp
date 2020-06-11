@@ -38,26 +38,19 @@ public class UserServiceImpl implements UserService {
      * @see UserService
      */
     @Override
-    public Optional<User> getUserById(int userId) {
-        return userDAO.findById(userId);
+    public Optional<User> getUserByMail() {
+        UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userDAO.find(authUser.getUsername());
     }
 
     /**
      * @see UserService
      */
     @Override
-    public Optional<User> getUserByMail(String mail) {
-        return userDAO.findByMail(mail);
-    }
-
-    /**
-     * @see UserService
-     */
-    @Override
-    public void updateSettings(final String password,
-                               final @NotEmpty @Size(min = 5, max = 25) String usernameToSet,
-                               final @Email String mailToSet,
-                               @Nullable @Size(min = 8, max = 80) String passwordToSet)
+    public void updateUserProfile(final String password,
+                                  final @NotEmpty @Size(min = 5, max = 25) String usernameToSet,
+                                  final @Email String mailToSet,
+                                  @Nullable @Size(min = 8, max = 80) String passwordToSet)
             throws SQLException, IllegalArgumentException, ConstraintViolationException, BadCredentialsException {
 
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -70,7 +63,7 @@ public class UserServiceImpl implements UserService {
                 passwordToSet = authUser.getPassword();
             }
 
-            if (userDAO.updateSettings(authUser.getUsername(), usernameToSet, mailToSet, passwordToSet)) {
+            if (userDAO.update(authUser.getUsername(), usernameToSet, mailToSet, passwordToSet)) {
                 Logger.debug("User update OK. Update authentication principal.");
                 authUser = new UserCredentials(mailToSet, passwordToSet, authUser.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(authUser, passwordToSet));
@@ -78,5 +71,14 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new BadCredentialsException("");
         }
+    }
+
+    /**
+     * @see UserService
+     */
+    @Override
+    public Optional<Double> getUserBalance() {
+        UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userDAO.getBalance(authUser.getUsername());
     }
 }

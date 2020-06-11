@@ -5,9 +5,6 @@ public final class DBStatements {
     // UserDAO Classic JDBC Statements -------------------------------------------------
 
     // USER Table statements
-    public static final String GET_USER_BY_ID_CLASSIC_JDBC =
-            "SELECT id, username, mail, password FROM User WHERE id = ?";
-
     public static final String GET_USER_BY_MAIL_CLASSIC_JDBC =
             "SELECT id, username, mail, password FROM User WHERE mail = ?";
 
@@ -19,6 +16,12 @@ public final class DBStatements {
 
     public static final String UPDATE_USER_CLASSIC_JDBC =
             "UPDATE User SET (username, mail, password) = ( ?, ?, ?) WHERE User.mail = ?";
+
+    public static final String GET_USER_BALANCE_CLASSIC_JDBC =
+            "SELECT (SUM(credit.amount) - SUM(debit.amount)) FROM USER AS user" +
+                    "INNER JOIN TRANSACTION AS credit ON credit.creditor_id = user.id " +
+                    "INNER JOIN TRANSACTION AS debit ON debit.debtor_id = user.id " +
+                    "WHERE user.mail = :userMail";
 
     // USER_ROLE Table statements
     public static final String GET_USER_ROLES_CLASSIC_JDBC =
@@ -82,7 +85,5 @@ public final class DBStatements {
 
     public static final String GET_ALL_TRANSACTIONS =
             GET_DEBIT_TRANSACTIONS + " UNION " + GET_CREDIT_TRANSACTIONS;
-
-    // TODO Ajouter la requête du solde utilisateur.
 
 }

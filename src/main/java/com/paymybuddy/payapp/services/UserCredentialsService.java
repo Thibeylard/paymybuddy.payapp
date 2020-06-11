@@ -23,7 +23,7 @@ public class UserCredentialsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
-        Optional<User> user = userDAO.findByMail(mail);
+        Optional<User> user = userDAO.find(mail);
         return new UserCredentials(user.orElseThrow(() -> new UsernameNotFoundException(mail)));
     }
 }

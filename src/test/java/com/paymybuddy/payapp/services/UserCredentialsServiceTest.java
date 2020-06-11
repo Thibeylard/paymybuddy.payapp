@@ -44,7 +44,7 @@ public class UserCredentialsServiceTest {
         UserCredentials principal = new UserCredentials(foundUser.getMail(), foundUser.getPassword(), foundUser.getRoles());
         Optional<User> daoResponse = Optional.of(foundUser);
 
-        when(userDAO.findByMail(anyString())).thenReturn(daoResponse);
+        when(userDAO.find(anyString())).thenReturn(daoResponse);
         assertThat(userCredentialsService.loadUserByUsername("user@mail.com"))
                 .isEqualToComparingFieldByField(principal);
     }
@@ -52,7 +52,7 @@ public class UserCredentialsServiceTest {
     @Test
     @DisplayName("loadUserByUsername() failure")
     public void Given_invalidMail_When_loadUserByUsername_Then_throwsUsernameNotFoundException() {
-        when(userDAO.findByMail(anyString())).thenReturn(Optional.empty());
+        when(userDAO.find(anyString())).thenReturn(Optional.empty());
         assertThrows(UsernameNotFoundException.class, () -> userCredentialsService.loadUserByUsername("user@mail.com"));
     }
 

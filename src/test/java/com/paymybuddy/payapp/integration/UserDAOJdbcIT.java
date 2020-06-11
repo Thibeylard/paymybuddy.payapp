@@ -82,7 +82,7 @@ public class UserDAOJdbcIT {
     @Test
     @DisplayName("Get user by mail success")
     public void Given_validUserMail_When_searchingForUser_Then_retrieveCorrespondingUser() {
-        Optional<User> user = userDAO.findByMail("user@mail.com");
+        Optional<User> user = userDAO.find("user@mail.com");
         assertThat(user)
                 .isNotNull()
                 .isPresent();
@@ -97,7 +97,7 @@ public class UserDAOJdbcIT {
     @Test
     @DisplayName("Get user by mail failure")
     public void Given_invalidUserMail_When_searchingForUser_Then_getEmptyUser() {
-        assertThat(userDAO.findByMail("john@mail.com"))
+        assertThat(userDAO.find("john@mail.com"))
                 .isNotNull()
                 .isNotPresent();
     }
@@ -126,7 +126,7 @@ public class UserDAOJdbcIT {
     @Test
     @DisplayName("Update settings success")
     public void Given_availableMail_When_updatingUser_Then_userSuccessfullyModified() throws SQLException {
-        assertThat(userDAO.updateSettings(
+        assertThat(userDAO.update(
                 "user@mail.com",
                 "username2",
                 "user2@mail.com",
@@ -142,7 +142,7 @@ public class UserDAOJdbcIT {
     @Test
     @DisplayName("Update settings failure : redundant email")
     public void Given_existingMail_When_updatingUser_Then_IllegalArgumentExceptionThrown() {
-        assertThrows(IllegalArgumentException.class, () -> userDAO.updateSettings(
+        assertThrows(IllegalArgumentException.class, () -> userDAO.update(
                 "otherUser@mail.com",
                 "otherUser",
                 "user@mail.com", // Existing mail

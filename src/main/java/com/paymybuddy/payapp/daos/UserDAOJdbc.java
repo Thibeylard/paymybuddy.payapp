@@ -27,41 +27,7 @@ public class UserDAOJdbc implements UserDAO {
     }
 
     @Override
-    public Optional<User> findById(final int userId) {
-        Optional<User> user = Optional.empty();
-        Connection con = databaseConfiguration.getConnection();
-        if (con != null) {
-            PreparedStatement ps = null;
-            ResultSet rs = null;
-            try {
-                ps = con.prepareStatement(DBStatements.GET_USER_BY_ID_CLASSIC_JDBC);
-                ps.setInt(1, userId);
-                rs = ps.executeQuery();
-                if (rs.next()) {
-                    user = Optional.of(new User(rs.getInt("id"),
-                            rs.getString("username"),
-                            rs.getString("mail"),
-                            rs.getString("password"),
-                            getUserRolesByID(con, userId)));
-                }
-
-                // else e.g (rs.next() == false), user remains an Optional.empty()
-
-            } catch (SQLException e) {
-                Logger.error("An error occurred : User could not be found.");
-                user = Optional.empty();
-            } finally {
-                databaseConfiguration.closeResultSet(rs);
-                databaseConfiguration.closePreparedStatement(ps);
-                databaseConfiguration.closeConnection(con);
-            }
-        }
-
-        return user;
-    }
-
-    @Override
-    public Optional<User> findByMail(final String validMail) {
+    public Optional<User> find(final String validMail) {
         Optional<User> user = Optional.empty();
         Connection con = databaseConfiguration.getConnection();
         if (con != null) {
@@ -152,7 +118,7 @@ public class UserDAOJdbc implements UserDAO {
                     throw new IllegalArgumentException("A User with this mail already exists.");
                 }
 
-                throw new SQLException("An error occurred : Could not save data.");
+                throw e;
             } finally {
                 databaseConfiguration.closeResultSet(rs);
                 databaseConfiguration.closePreparedStatement(ps);
@@ -164,10 +130,10 @@ public class UserDAOJdbc implements UserDAO {
     }
 
     @Override
-    public boolean updateSettings(final String principalMail,
-                                  final String usernameToSet,
-                                  final String mailToSet,
-                                  final String passwordToSet) throws SQLException, IllegalArgumentException {
+    public boolean update(final String userMail,
+                          final String usernameToSet,
+                          final String mailToSet,
+                          final String passwordToSet) throws SQLException, IllegalArgumentException {
 
         Connection con = databaseConfiguration.getConnection();
         PreparedStatement ps = null;
@@ -184,7 +150,7 @@ public class UserDAOJdbc implements UserDAO {
                 ps.setString(1, usernameToSet);
                 ps.setString(2, mailToSet);
                 ps.setString(3, passwordToSet);
-                ps.setString(4, principalMail);
+                ps.setString(4, userMail);
                 ps.execute();
 
                 Logger.debug("User values updated.");
@@ -202,7 +168,7 @@ public class UserDAOJdbc implements UserDAO {
                     throw new IllegalArgumentException("A User with this mail already exists.");
                 }
 
-                throw new SQLException("An error occurred : Could not update data.");
+                throw e;
             } finally {
                 databaseConfiguration.closePreparedStatement(ps);
                 databaseConfiguration.closeConnection(con);
@@ -212,6 +178,37 @@ public class UserDAOJdbc implements UserDAO {
         return result;
     }
 
+
+    /**
+     * @see UserDAO
+     */
+    @Override
+    public Optional<Double> getBalance(final String userMail) {
+        Double balance = null;
+        Connection con = databaseConfiguration.getConnection();
+        if (con != null) {
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            try {
+                ps = con.prepareStatement(DBStatements.GET_USER_BALANCE_CLASSIC_JDBC);
+                ps.setString(1, userMail);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    balance = rs.getDouble("balance");
+                }
+                // else e.g (rs.next() == false), balance remains null
+
+            } catch (SQLException e) {
+                Logger.error("An error occurred : Balance could not be calculated.");
+            } finally {
+                databaseConfiguration.closeResultSet(rs);
+                databaseConfiguration.closePreparedStatement(ps);
+                databaseConfiguration.closeConnection(con);
+            }
+        }
+
+        return Optional.ofNullable(balance);
+    }
 
     /**
      * Get roles of User that was just retrieved.

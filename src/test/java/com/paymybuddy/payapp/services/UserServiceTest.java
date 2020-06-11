@@ -38,13 +38,12 @@ public class UserServiceTest {
     private UserDAO mockUserDAO;
 
     private final String ENCODED_USERPASS_1 = "$2y$10$58Wl5KsCtAeuKkLesypM3uvGf2zgtg..TKvGCsMgnDjnsN3qGDxGK"; // userpass
-    private final String ENCODED_USERPASS_2 = "$2y$10$V3fEhtWLjKUZhLCFfGe59.nyMW5LnFb2iHmRu16P9x0vVU/BQKUby"; // hackerpass
 
 
     @Test
     @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
     @DisplayName("getUserByMail() results")
-    public void Given_idValue_When_findUserByMail_Then_returnDAOFindByMailResult() {
+    public void Given_authenticatedUser_When_getUserByMail_Then_returnDAOFindResult() {
         Optional<User> user = Optional.of(new User("username",
                 "user@mail.com",
                 "userpass",
@@ -59,15 +58,24 @@ public class UserServiceTest {
                 .isEqualTo(user);
     }
 
-    private Optional<User> userToUpdate() {
-        return Optional.of(new User("username",
-                "user@mail.com",
-                ENCODED_USERPASS_1,
-                Collections.singleton(Role.USER)));
+    @Test
+    @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
+    @DisplayName("getUserBalance() results")
+    public void Given_authenticatedUser_When_getUserBalancel_Then_returnDAOFindResult() {
+        Optional<Double> balance = Optional.of(50.00);
+
+        when(mockUserDAO.getBalance(anyString())).thenReturn(balance);
+        assertThat(userService.getUserBalance())
+                .isEqualTo(balance);
+
+        balance = Optional.empty();
+        when(mockUserDAO.getBalance(anyString())).thenReturn(balance);
+        assertThat(userService.getUserBalance())
+                .isEqualTo(balance);
     }
 
     @Test
-    @DisplayName("updateSettings() success")
+    @DisplayName("updateUserProfile() success")
     @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
     public void Given_validRequest_When_updateUserSettings_Then_doesNotThrowExceptions() throws SQLException {
         when(mockUserDAO.update(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
@@ -75,7 +83,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("updateSettings() existing mail")
+    @DisplayName("updateUserProfile() existing mail")
     @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
     public void Given_existingMail_When_updateUserSettings_Then_throwsIllegalArgumentException() throws SQLException {
 
@@ -86,7 +94,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("updateSettings() wrong password")
+    @DisplayName("updateUserProfile() wrong password")
     @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
     public void Given_invalidPassword_When_updateUserSettings_Then_throwsBadCredentialsException() {
         assertThrows(BadCredentialsException.class,
@@ -94,7 +102,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("updateSettings() wrong params")
+    @DisplayName("updateUserProfile() wrong params")
     @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
     public void Given_wrongSettings_When_updateUserSettings_Then_throwsConstraintViolationException() {
         assertThrows(ConstraintViolationException.class,
@@ -102,7 +110,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("updateSettings() server error")
+    @DisplayName("updateUserProfile() server error")
     @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
     public void Given_databaseError_When_updateUserSettings_Then_throwsSQLException() throws SQLException {
         when(mockUserDAO.update(anyString(), anyString(), anyString(), nullable(String.class))).thenThrow(SQLException.class);

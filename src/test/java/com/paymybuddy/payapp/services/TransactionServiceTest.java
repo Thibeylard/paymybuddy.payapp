@@ -1,6 +1,7 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.TransactionDAO;
+import com.paymybuddy.payapp.dtos.TransactionToSaveDTO;
 import com.paymybuddy.payapp.models.Transaction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,13 +36,15 @@ public class TransactionServiceTest {
     @MockBean
     private TransactionDAO transactionDAO;
 
+
     @Test
     @WithMockUser
     @DisplayName("getTransactions() Success")
     public void Given_authenticatedUser_When_getUserTransactions_Then_returnTransactionDAOValue() {
         ZonedDateTime transactionTime = ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneId.systemDefault());
         Collection<Transaction> transactionsEmpty = Collections.emptyList();
-        Collection<Transaction> transactions = Collections.singletonList(new Transaction(2,
+        Collection<Transaction> transactions = Collections.singletonList(new Transaction(1,
+                2,
                 4,
                 transactionTime,
                 10.00,
@@ -105,17 +108,18 @@ public class TransactionServiceTest {
     @WithMockUser
     @DisplayName("makeTransaction() Success")
     public void Given_validParams_When_makeTransaction_Then_nothingIsThrown() {
-        when(transactionDAO.save(anyString(), anyString(), anyString(), anyDouble(), anyDouble())).thenReturn(true);
+        when(transactionDAO.save(any(TransactionToSaveDTO.class))).thenReturn(true);
 
         assertDoesNotThrow(() -> transactionService.makeTransaction("someuser@mail.com", "sampleDesription", 10.00));
-        verify(transactionDAO, times(1)).save(anyString(), anyString(), anyString(), anyDouble(), anyDouble());
+        verify(transactionDAO, times(1)).save(any(TransactionToSaveDTO.class));
     }
 
     @Test
     @WithMockUser
     @DisplayName("makeTransaction() Exceptions")
     public void Given_databaseError_When_makeTransaction_Then_throwsDAOException() {
-        doThrow(DataRetrievalFailureException.class).when(transactionDAO).save(anyString(), anyString(), anyString(), anyDouble(), anyDouble());
+        doThrow(DataRetrievalFailureException.class).when(transactionDAO).save(any(TransactionToSaveDTO.class));
+
         assertThrows(DataRetrievalFailureException.class, () -> transactionService.makeTransaction("someuser@mail.com", "sampleDesription", 10.00));
     }
 }

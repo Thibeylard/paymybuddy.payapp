@@ -1,17 +1,14 @@
 package com.paymybuddy.payapp.models;
 
-import org.springframework.lang.Nullable;
-
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
 public class Transaction {
 
     /**
-     * ID in database. Null at in-app creation.
+     * ID in database.
      */
-    private final @Nullable
-    Integer id;
+    private final Integer id;
     /**
      * Database ID of User that send the money.
      */
@@ -57,27 +54,6 @@ public class Transaction {
                        Double total,
                        String description) {
         this.id = id;
-        this.debtorId = debtorId;
-        this.creditorId = creditorId;
-        this.date = date;
-        this.initialAmount = initialAmount;
-        this.total = total;
-        this.description = description;
-    }
-
-
-    /**
-     * Constructor used to create a new transaction that will be saved in database
-     *
-     * @param debtorId      ID of User instance that send money
-     * @param creditorId    ID of User instance that receives money
-     * @param date          Datetime at which debtor initiated the transaction
-     * @param initialAmount Amount of money sent
-     * @param total         Money left after amount monetized
-     * @param description   User defined description for transaction
-     */
-    public Transaction(int debtorId, int creditorId, ZonedDateTime date, Double initialAmount, Double total, String description) {
-        this.id = null;
         this.debtorId = debtorId;
         this.creditorId = creditorId;
         this.date = date;

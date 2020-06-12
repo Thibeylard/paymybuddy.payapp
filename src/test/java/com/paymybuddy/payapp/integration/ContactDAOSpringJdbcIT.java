@@ -3,7 +3,8 @@ package com.paymybuddy.payapp.integration;
 import com.paymybuddy.payapp.daos.ContactDAO;
 import org.assertj.db.api.Assertions;
 import org.assertj.db.type.Table;
-import org.junit.jupiter.api.BeforeEach;
+import org.flywaydb.test.annotation.FlywayTest;
+import org.flywaydb.test.junit5.FlywayTestExtension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
+@ExtendWith({FlywayTestExtension.class})
 @SpringBootTest
 @ActiveProfiles("test_h2")
 @DisplayName("ContactDAO tests on : ")
@@ -29,49 +31,8 @@ public class ContactDAOSpringJdbcIT {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    @BeforeEach
-    public void databaseSetup() {
-
-        try {
-            // Reset Transaction Table
-            jdbcTemplate.getJdbcTemplate().update("DELETE FROM TRANSACTION;");
-
-            // Reset Contact Table
-            jdbcTemplate.getJdbcTemplate().update("DELETE FROM CONTACT;");
-
-            // Reset User_Role Table
-            jdbcTemplate.getJdbcTemplate().update("DELETE FROM USER_ROLE;");
-
-            // Reset User Table
-            jdbcTemplate.getJdbcTemplate().update("DELETE FROM USER;");
-
-            // Insert users
-            jdbcTemplate.getJdbcTemplate().update("INSERT INTO User (id, username, mail, password) " +
-                    "VALUES (1, 'user1', 'user1@mail.com', 'user1pass')," +
-                    "(2, 'user2', 'user2@mail.com', 'user2pass')," +
-                    "(3, 'user3', 'user3@mail.com', 'user3pass')," +
-                    "(4, 'user4', 'user4@mail.com', 'user4pass')");
-
-            // Insert roles for users
-            jdbcTemplate.getJdbcTemplate().update("INSERT INTO User_Role (user_id, role_id) " +
-                    "VALUES (1,1)," +
-                    "(2,1)," +
-                    "(3,1)," +
-                    "(4,1)");
-
-            // Insert contacts between users
-            jdbcTemplate.getJdbcTemplate().update("INSERT INTO Contact (user_a_id, user_b_id) " +
-                    "VALUES (1,2)," +
-                    "(1,3)," +
-                    "(2,3)," +
-                    "(4,1)");
-
-        } catch (DataAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Test
+    @FlywayTest()
     @WithMockUser
     @DisplayName("getContacts() Success")
     public void Given_userId_When_getUserContacts_Then_returnUserContacts() {
@@ -86,6 +47,7 @@ public class ContactDAOSpringJdbcIT {
     }
 
     @Test
+    @FlywayTest
     @WithMockUser
     @DisplayName("addContact() Success")
     public void Given_userIdAndContactMail_When_addContact_Then_correspondingElementAddedToContactTable() {
@@ -106,6 +68,7 @@ public class ContactDAOSpringJdbcIT {
     }
 
     @Test
+    @FlywayTest
     @WithMockUser
     @DisplayName("addContact() Exceptions")
     public void Given_databaseError_When_addContact_Then_throwsDataAccessException() {
@@ -115,6 +78,7 @@ public class ContactDAOSpringJdbcIT {
     }
 
     @Test
+    @FlywayTest
     @WithMockUser
     @DisplayName("deleteContact() Success")
     public void Given_userIdAndContactMail_When_deleteContact_Then_correspondingElementDeletedToContactTable() {
@@ -150,6 +114,7 @@ public class ContactDAOSpringJdbcIT {
     }
 
     @Test
+    @FlywayTest
     @WithMockUser
     @DisplayName("deleteContact() Exceptions")
     public void Given_databaseError_When_deleteContact_Then_throwsDataAccessException() {

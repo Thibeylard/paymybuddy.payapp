@@ -101,7 +101,8 @@ public class TransactionControllerTest {
                 .isEqualTo(transactionsJson);
 
         // --------------------------------------------------------------------- At least one element in collection for all getTransactions methods
-        transactions = Collections.singletonList(new Transaction(2,
+        transactions = Collections.singletonList(new Transaction(1,
+                2,
                 4,
                 transactionTime,
                 10.00,

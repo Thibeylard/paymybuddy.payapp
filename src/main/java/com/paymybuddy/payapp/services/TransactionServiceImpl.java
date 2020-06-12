@@ -1,6 +1,7 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.TransactionDAO;
+import com.paymybuddy.payapp.dtos.TransactionToSaveDTO;
 import com.paymybuddy.payapp.models.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -20,11 +21,14 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionDAO transactionDAO;
     private final MonetizationService monetizationService;
+    private final ClockService clockService;
 
     @Autowired
     public TransactionServiceImpl(TransactionDAO transactionDAO, MonetizationService monetizationService) {
         this.transactionDAO = transactionDAO;
         this.monetizationService = monetizationService;
+        this.clockService = new ClockService() {
+        };
     }
 
     /**
@@ -67,7 +71,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         double total = amount - monetizationService.monetize(amount);
-        transactionDAO.save(authUser.getUsername(), recipientMail, description, amount, total);
+
+        transactionDAO.save(new TransactionToSaveDTO(authUser.getUsername(), recipientMail, clockService.now(), amount, total, description));
 
     }
 }

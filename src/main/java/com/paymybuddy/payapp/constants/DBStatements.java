@@ -18,10 +18,10 @@ public final class DBStatements {
             "UPDATE User SET (username, mail, password) = ( ?, ?, ?) WHERE User.mail = ?";
 
     public static final String GET_USER_BALANCE_CLASSIC_JDBC =
-            "SELECT (SUM(credit.amount) - SUM(debit.amount)) FROM USER AS user" +
+            "SELECT (SUM(credit.amount) - SUM(debit.amount)) FROM USER AS user " +
                     "INNER JOIN TRANSACTION AS credit ON credit.creditor_id = user.id " +
                     "INNER JOIN TRANSACTION AS debit ON debit.debtor_id = user.id " +
-                    "WHERE user.mail = :userMail";
+                    "WHERE user.mail = ?";
 
     // USER_ROLE Table statements
     public static final String GET_USER_ROLES_CLASSIC_JDBC =
@@ -65,7 +65,7 @@ public final class DBStatements {
 
     public static final String INSERT_TRANSACTION =
             "INSERT INTO TRANSACTION (debtor_id, creditor_id, amount, description, zoned_date_time, total) " +
-                    "SELECT u.id, r.id, :amount, :description, :date, :total FROM USER AS u " +
+                    "SELECT u.id, r.id, :amount, :description, :zoned_date_time, :total FROM USER AS u " +
                     "INNER JOIN USER AS r ON r.mail <> u.mail " +
                     "WHERE u.mail = :userMail AND r.mail = :recipientMail";
 

@@ -114,8 +114,8 @@ public class UserDAOJdbc implements UserDAO {
                 Logger.error(e.getMessage());
 
                 if (e.getErrorCode() == 23505) { // Check unique constraint violation
-                    Logger.debug("User mail unavailable.");
-                    throw new IllegalArgumentException("A User with this mail already exists.");
+                    Logger.debug("User mail or username unavailable.");
+                    throw new IllegalArgumentException("A User with this mail or username already exists.");
                 }
 
                 throw e;

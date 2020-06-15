@@ -47,6 +47,8 @@ public class User {
     @Nullable
     private Collection<Transaction> transactions;
 
+    //TODO Ajouter attribut Collection<BankAccount>
+
     public User(@NotNull String username,
                 @NotNull String mail,
                 @NotNull String password,

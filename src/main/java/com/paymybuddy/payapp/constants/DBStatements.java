@@ -17,11 +17,15 @@ public final class DBStatements {
     public static final String UPDATE_USER_CLASSIC_JDBC =
             "UPDATE User SET (username, mail, password) = ( ?, ?, ?) WHERE User.mail = ?";
 
-    public static final String GET_USER_BALANCE_CLASSIC_JDBC =
-            "SELECT (SUM(credit.amount) - SUM(debit.amount)) FROM USER AS user " +
-                    "INNER JOIN TRANSACTION AS credit ON credit.creditor_id = user.id " +
-                    "INNER JOIN TRANSACTION AS debit ON debit.debtor_id = user.id " +
-                    "WHERE user.mail = ?";
+    public static final String GET_USER_CREDIT_BALANCE_CLASSIC_JDBC =
+            "SELECT u.id, SUM(c.total) AS balance FROM USER AS u " +
+                    "INNER JOIN TRANSACTION AS c ON c.creditor_id = u.id " +
+                    "WHERE u.mail = ?";
+
+    public static final String GET_USER_DEBIT_BALANCE_CLASSIC_JDBC =
+            "SELECT u.id, SUM(d.amount) AS balance FROM USER AS u " +
+                    "INNER JOIN TRANSACTION AS d ON d.debtor_id = u.id " +
+                    "WHERE u.mail = ?";
 
     // USER_ROLE Table statements
     public static final String GET_USER_ROLES_CLASSIC_JDBC =

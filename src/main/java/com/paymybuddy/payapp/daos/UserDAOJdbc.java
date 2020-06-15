@@ -187,18 +187,38 @@ public class UserDAOJdbc implements UserDAO {
         Double balance = null;
         Connection con = databaseConfiguration.getConnection();
         if (con != null) {
+
             PreparedStatement ps = null;
             ResultSet rs = null;
             try {
-                ps = con.prepareStatement(DBStatements.GET_USER_BALANCE_CLASSIC_JDBC);
+                // Start transaction
+                con.setAutoCommit(false);
+                Logger.debug("Start transaction for user balance.");
+
+                // Get User credit balance
+                ps = con.prepareStatement(DBStatements.GET_USER_CREDIT_BALANCE_CLASSIC_JDBC);
                 ps.setString(1, userMail);
                 rs = ps.executeQuery();
                 if (rs.next()) {
                     balance = rs.getDouble("balance");
+
+                    // Subtract User debit balance
+                    ps = con.prepareStatement(DBStatements.GET_USER_DEBIT_BALANCE_CLASSIC_JDBC);
+                    ps.setString(1, userMail);
+                    rs = ps.executeQuery();
+                    if (rs.next()) {
+                        balance = balance - rs.getDouble("balance");
+
+                        con.commit();
+                        Logger.debug("Commit SQL transaction.");
+                        con.setAutoCommit(true); // autocommit set back to true
+                    }
                 }
+
                 // else e.g (rs.next() == false), balance remains null
 
             } catch (SQLException e) {
+                Logger.debug(e.getMessage());
                 Logger.error("An error occurred : Balance could not be calculated.");
             } finally {
                 databaseConfiguration.closeResultSet(rs);

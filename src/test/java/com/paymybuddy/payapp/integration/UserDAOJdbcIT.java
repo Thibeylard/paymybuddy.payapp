@@ -6,7 +6,6 @@ import com.paymybuddy.payapp.models.User;
 import org.assertj.db.type.Table;
 import org.flywaydb.test.annotation.FlywayTest;
 import org.flywaydb.test.junit5.FlywayTestExtension;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,80 +36,6 @@ public class UserDAOJdbcIT {
     @Autowired
     private DataSource dataSource;
 
-
-    @BeforeEach
-    public void databaseSetup() throws SQLException {
-        /*Connection connection = null;
-        PreparedStatement ps = null;
-
-        try {
-            connection = dataSource.getConnection();
-
-            // Reset Transaction Table
-            ps = connection.prepareStatement("DELETE FROM TRANSACTION;");
-            ps.execute();
-
-            // Reset Contact Table
-            ps = connection.prepareStatement("DELETE FROM CONTACT;");
-            ps.execute();
-
-            // Reset User_Role Table
-            ps = connection.prepareStatement("DELETE FROM USER_ROLE;");
-            ps.execute();
-
-            // Reset User Table
-            ps = connection.prepareStatement("DELETE FROM USER;");
-            ps.execute();
-
-            // Insert users
-            ps = connection.prepareStatement("INSERT INTO User (id, username, mail, password) " +
-                    "VALUES (1, 'user1', 'user1@mail.com', 'user1pass')," +
-                    "(2, 'user2', 'user2@mail.com', 'user2pass')," +
-                    "(3, 'user3', 'user3@mail.com', 'user3pass')," +
-                    "(4, 'user4', 'user4@mail.com', 'user4pass')"
-            );
-            ps.execute();
-
-            // Insert roles
-            ps = connection.prepareStatement(
-                    "INSERT INTO User_Role (user_id, role_id) " +
-                            "VALUES (1,1)," +
-                            "(2,1)," +
-                            "(3,1)," +
-                            "(4,1)");
-            ps.execute();
-
-            // Insert contacts
-            ps = connection.prepareStatement(
-                    "INSERT INTO User_Role (user_id, role_id) " +
-                            "VALUES (1,1)," +
-                            "(2,1)," +
-                            "(3,1)," +
-                            "(4,1)");
-            ps.execute();
-
-            // Insert transactions
-            ps = connection.prepareStatement(
-                    "INSERT INTO Transaction (ID, DEBTOR_ID, CREDITOR_ID, DESCRIPTION, AMOUNT, TOTAL, ZONED_DATE_TIME)" +
-                            "    VALUES (1,1,2,'transaction1',10.00,9.50,'2020-01-01 00:00:00+01')," +
-                            "    (2,3,1,'transaction2',10.00,9.50,'2020-01-02 00:00:00+01')," +
-                            "    (3,2,3,'transaction3',10.00,9.50,'2020-01-03 00:00:00+01')," +
-                            "    (4,3,4,'transaction4',10.00,9.50,'2020-01-04 00:00:00+01')," +
-                            "    (5,1,4,'transaction5',10.00,9.50,'2020-01-05 00:00:00+01')," +
-                            "    (6,3,2,'transaction6',10.00,9.50,'2020-01-06 00:00:00+01')"
-            );
-            ps.execute();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            assert connection != null;
-            connection.close();
-            assert ps != null;
-            ps.close();
-        }*/
-    }
-
     @Test
     @FlywayTest
     @DisplayName("Get user by mail success")
@@ -138,7 +63,7 @@ public class UserDAOJdbcIT {
 
     @Test
     @FlywayTest
-    @DisplayName("Get user balance success")
+    @DisplayName("Get user balance success") // Test based on data from migration 5.1
     public void Given_validUserMail_When_calculatingUserBalance_Then_retrieveValue() {
         Optional<Double> balance = userDAO.getBalance("user4@mail.com");
 
@@ -147,7 +72,34 @@ public class UserDAOJdbcIT {
                 .isPresent();
 
         assertThat(balance.get())
-                .isEqualTo(19);
+                .isEqualTo(19.00);
+
+        balance = userDAO.getBalance("user3@mail.com");
+
+        assertThat(balance)
+                .isNotNull()
+                .isPresent();
+
+        assertThat(balance.get())
+                .isEqualTo(-20.50);
+
+        balance = userDAO.getBalance("user2@mail.com");
+
+        assertThat(balance)
+                .isNotNull()
+                .isPresent();
+
+        assertThat(balance.get())
+                .isEqualTo(9.00);
+
+        balance = userDAO.getBalance("user1@mail.com");
+
+        assertThat(balance)
+                .isNotNull()
+                .isPresent();
+
+        assertThat(balance.get())
+                .isEqualTo(-10.50);
     }
 
     @Test

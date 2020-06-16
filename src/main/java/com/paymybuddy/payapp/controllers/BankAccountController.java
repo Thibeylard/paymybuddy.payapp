@@ -1,62 +1,125 @@
 package com.paymybuddy.payapp.controllers;
 
 import com.paymybuddy.payapp.models.BankAccount;
-import com.paymybuddy.payapp.services.ContactService;
+import com.paymybuddy.payapp.models.BankOperation;
+import com.paymybuddy.payapp.services.BankAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.tinylog.Logger;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 
 @RestController
 @RequestMapping(produces = "application/json")
 public class BankAccountController {
 
-    private final ContactService contactService;
+    private final BankAccountService bankAccountService;
 
     @Autowired
-    public BankAccountController(ContactService contactService) {
-        this.contactService = contactService;
+    public BankAccountController(BankAccountService bankAccountService) {
+        this.bankAccountService = bankAccountService;
     }
 
     @GetMapping("/bankAccounts")
     public ResponseEntity<Collection<BankAccount>> getUserBankAccounts() {
-        return null;
+        Collection<BankAccount> result;
+        Logger.debug("Requested bankAccounts of current user");
+        try {
+            result = bankAccountService.getUserBankAccounts();
+            Logger.info("BankAccounts retrieved");
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (DataAccessException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/bankAccounts")
     public ResponseEntity<String> addBankAccount(@RequestParam(name = "IBAN") final String IBAN,
                                                  @RequestParam(name = "description") final String description) {
-        return null;
+        Logger.debug("Requested bankAccount creation with IBAN {}", IBAN);
+        try {
+            bankAccountService.addBankAccount(description, IBAN);
+            Logger.info("New bankAccount created.");
+            return new ResponseEntity<>("SUCCESS", HttpStatus.CREATED);
+        } catch (DataAccessException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>("ERROR : See logs for further details.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/bankAccounts")
-    public ResponseEntity<String> updateBankAccount(@RequestParam(name = "id") final int bankAccountID,
+    public ResponseEntity<String> updateBankAccount(@RequestParam(name = "bankAccountID") final int bankAccountID,
                                                     @RequestParam(name = "IBAN") final String IBAN,
                                                     @RequestParam(name = "description") final String description) {
-        return null;
+        Logger.debug("Requested bankAccount {} to be updated with IBAN {}", bankAccountID, IBAN);
+        try {
+            bankAccountService.updateBankAccount(bankAccountID, description, IBAN);
+            Logger.info("BankAccount successfully modified.");
+            return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
+        } catch (DataAccessException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>("ERROR : See logs for further details.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DeleteMapping("/bankAccounts")
-    public ResponseEntity<String> deleteBankAccount(@RequestParam(name = "id") final int bankAccountID) {
-        return null;
+    public ResponseEntity<String> deleteBankAccount(@RequestParam(name = "bankAccountID") final int bankAccountID) {
+        Logger.debug("Requested bankAccount {} to be deleted", bankAccountID);
+        try {
+            bankAccountService.deleteBankAccount(bankAccountID);
+            Logger.info("BankAccount successfully deleted.");
+            return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
+        } catch (DataAccessException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>("ERROR : See logs for further details.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
     @GetMapping("/bankAccount/operations")
-    public ResponseEntity<Collection<BankAccount>> getUserBankOperations(@RequestParam(name = "id") final int bankAccountID) {
-        return null;
+    public ResponseEntity<Collection<BankOperation>> getUserBankOperations(@RequestParam(name = "bankAccountID") final int bankAccountID) {
+        Collection<BankOperation> result;
+        Logger.debug("Requested bankOperations of current user's specified bankAccount");
+        try {
+            result = bankAccountService.getBankAccountOperations(bankAccountID);
+            Logger.info("BankOperations retrieved");
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (DataAccessException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/bankAccount/transfer")
-    public ResponseEntity<String> transferToBank(@RequestParam(name = "id") final int bankAccountID,
+    public ResponseEntity<String> transferToBank(@RequestParam(name = "bankAccountID") final int bankAccountID,
                                                  @RequestParam(name = "amount") final double amount) {
-        return null;
+        Logger.debug("Requested to make transfer operation from bankAccount {} ", bankAccountID);
+        try {
+            bankAccountService.transferMoney(bankAccountID, new BigDecimal(amount));
+            Logger.info("Transfer succeed.");
+            return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
+        } catch (DataAccessException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>("ERROR : See logs for further details.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/bankAccount/withdraw")
-    public ResponseEntity<String> withdrawFromBank(@RequestParam(name = "id") final int bankAccountID,
+    public ResponseEntity<String> withdrawFromBank(@RequestParam(name = "bankAccountID") final int bankAccountID,
                                                    @RequestParam(name = "amount") final double amount) {
-        return null;
+        Logger.debug("Requested to make withdraw operation to bankAccount {} ", bankAccountID);
+        try {
+            bankAccountService.withdrawMoney(bankAccountID, new BigDecimal(amount));
+            Logger.info("Withdraw succeed.");
+            return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
+        } catch (DataAccessException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>("ERROR : See logs for further details.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

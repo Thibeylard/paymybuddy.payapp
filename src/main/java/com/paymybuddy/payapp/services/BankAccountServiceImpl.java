@@ -3,9 +3,12 @@ package com.paymybuddy.payapp.services;
 import com.paymybuddy.payapp.models.BankAccount;
 import com.paymybuddy.payapp.models.BankOperation;
 import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 
+@Service
 public class BankAccountServiceImpl implements BankAccountService {
     /**
      * @see BankAccountService
@@ -52,7 +55,7 @@ public class BankAccountServiceImpl implements BankAccountService {
      * @see BankAccountService
      */
     @Override
-    public void transferMoney(final int bankAccountID, final int amount) throws DataAccessException {
+    public void transferMoney(final int bankAccountID, final BigDecimal amount) throws DataAccessException {
 
     }
 
@@ -60,7 +63,7 @@ public class BankAccountServiceImpl implements BankAccountService {
      * @see BankAccountService
      */
     @Override
-    public void withdrawMoney(final int bankAccountID, final int amount) throws DataAccessException {
+    public void withdrawMoney(final int bankAccountID, final BigDecimal amount) throws DataAccessException {
 
     }
 }

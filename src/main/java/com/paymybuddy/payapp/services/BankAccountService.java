@@ -4,6 +4,7 @@ import com.paymybuddy.payapp.models.BankAccount;
 import com.paymybuddy.payapp.models.BankOperation;
 import org.springframework.dao.DataAccessException;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 
 public interface BankAccountService {
@@ -63,7 +64,7 @@ public interface BankAccountService {
      * @param bankAccountID ID of BankAccount to operate on
      * @param amount        Amount of money to transfer
      */
-    void transferMoney(final int bankAccountID, final int amount)
+    void transferMoney(final int bankAccountID, final BigDecimal amount)
             throws DataAccessException;
 
     /**
@@ -72,6 +73,6 @@ public interface BankAccountService {
      * @param bankAccountID ID of BankAccount to operate on
      * @param amount        Amount of money to withdraw
      */
-    void withdrawMoney(final int bankAccountID, final int amount)
+    void withdrawMoney(final int bankAccountID, final BigDecimal amount)
             throws DataAccessException;
 }

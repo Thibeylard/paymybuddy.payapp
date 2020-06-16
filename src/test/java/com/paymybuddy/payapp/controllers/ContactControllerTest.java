@@ -56,6 +56,8 @@ public class ContactControllerTest {
                 .build();
     }
 
+    //TODO Corriger le nom des tests
+
     @Test
     @WithMockUser
     @DisplayName("GET Contacts Success")
@@ -65,6 +67,8 @@ public class ContactControllerTest {
         when(contactService.getUserContacts()).thenReturn(contacts);
         String contactsJson = objectMapper.writeValueAsString(contacts);
         params.add("userID", "4");
+
+        //TODO Retirer l'utilisation du paramètres qui n'a plus de sens ici
 
         MvcResult result;
         result = mvc.perform(get("/contacts")
@@ -94,6 +98,7 @@ public class ContactControllerTest {
     @DisplayName("GET Contacts Exception")
     public void Given_databaseError_When_getUserContacts_Then_returnNull() throws Exception {
         // Empty collection
+        //TODO supprimer contacts non utilisé et paramètres
         Collection<Contact> contacts = Collections.emptyList();
         doThrow(DataRetrievalFailureException.class).when(contactService).getUserContacts();
         params.add("userID", "4");

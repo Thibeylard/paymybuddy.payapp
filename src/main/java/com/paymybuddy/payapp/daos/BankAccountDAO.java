@@ -4,6 +4,7 @@ import com.paymybuddy.payapp.models.BankAccount;
 import com.paymybuddy.payapp.models.BankOperation;
 import org.springframework.dao.DataAccessException;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 
 public interface BankAccountDAO {
@@ -14,7 +15,7 @@ public interface BankAccountDAO {
      * @return All User bankAccounts as BankAccount Collection
      * @throws DataAccessException if error occurs during database operation
      */
-    Collection<BankAccount> getUserBankAccounts(final String userMail)
+    Collection<BankAccount> getBankAccounts(final String userMail)
             throws DataAccessException;
 
     /**
@@ -25,7 +26,7 @@ public interface BankAccountDAO {
      * @param IBAN        IBAN number to set for BankAccount
      * @throws DataAccessException if error occurs during database operation
      */
-    boolean addBankAccount(final String userMail, final String description, final String IBAN)
+    boolean save(final String userMail, final String description, final String IBAN)
             throws DataAccessException;
 
     /**
@@ -36,7 +37,7 @@ public interface BankAccountDAO {
      * @param IBAN          new IBAN number to set for BankAccount
      * @throws DataAccessException if error occurs during database operation
      */
-    boolean updateBankAccount(final int bankAccountID, final String description, final String IBAN)
+    boolean update(final int bankAccountID, final String description, final String IBAN)
             throws DataAccessException;
 
     /**
@@ -45,7 +46,7 @@ public interface BankAccountDAO {
      * @param bankAccountID ID of BankAccount to delete
      * @throws DataAccessException if error occurs during database operation
      */
-    boolean deleteBankAccount(final int bankAccountID)
+    boolean delete(final int bankAccountID)
             throws DataAccessException;
 
     /**
@@ -55,7 +56,7 @@ public interface BankAccountDAO {
      * @return All operations as BankOperation collection
      * @throws DataAccessException if error occurs during database operation
      */
-    Collection<BankOperation> getBankAccountOperations(final int bankAccountID)
+    Collection<BankOperation> getBankOperations(final int bankAccountID)
             throws DataAccessException;
 
     /**
@@ -64,7 +65,7 @@ public interface BankAccountDAO {
      * @param bankAccountID ID of BankAccount to operate on
      * @param amount        Amount of money to transfer
      */
-    boolean transferMoney(final int bankAccountID, final int amount)
+    boolean saveTransferOperation(final int bankAccountID, final BigDecimal amount)
             throws DataAccessException;
 
     /**
@@ -73,6 +74,6 @@ public interface BankAccountDAO {
      * @param bankAccountID ID of BankAccount to operate on
      * @param amount        Amount of money to withdraw
      */
-    boolean withdrawMoney(final int bankAccountID, final int amount)
+    boolean saveWithdrawOperation(final int bankAccountID, final BigDecimal amount)
             throws DataAccessException;
 }

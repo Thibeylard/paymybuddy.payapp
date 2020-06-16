@@ -95,6 +95,8 @@ public class BankAccountController {
         }
     }
 
+    //TODO Dans le cas de transfer et withdraw, une autre exception peut avoir lieu : Celle de l'erreur liée à la banque elle même
+    // à répercuter dans Service aussi.
     @PostMapping("/bankAccount/transfer")
     public ResponseEntity<String> transferToBank(@RequestParam(name = "bankAccountID") final int bankAccountID,
                                                  @RequestParam(name = "amount") final double amount) {

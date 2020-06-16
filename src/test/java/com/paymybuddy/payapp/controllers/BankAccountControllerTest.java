@@ -60,6 +60,8 @@ public class BankAccountControllerTest {
                 .build();
     }
 
+    //TODO Ajouter les tests de catch de ConstraintViolationException en BadRequest
+
     @Test
     @WithMockUser
     @DisplayName("GET BankAccount Success")

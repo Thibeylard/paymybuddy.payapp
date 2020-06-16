@@ -77,6 +77,8 @@ public class AccountControllerTest {
                 Collections.singleton(Role.USER)));
     }
 
+    //TODO Ajouter les tests de catch de ConstraintViolationException en BadRequest sur l'inscription
+
     @Test
     @DisplayName("Anonymous user redirections")
     public void Given_anonymousUser_When_requestAppAccess_Then_redirectedToLogin() throws Exception {

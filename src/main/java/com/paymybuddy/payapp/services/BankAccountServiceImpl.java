@@ -41,10 +41,11 @@ public class BankAccountServiceImpl implements BankAccountService {
      * @see BankAccountService
      */
     @Override
-    public void addBankAccount(@Size(min = 10, max = 30) final String description,
+    public void addBankAccount(final String ownerFullName,
+                               @Size(min = 10, max = 30) final String description,
                                final String IBAN) throws DataAccessException {
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        bankAccountDAO.save(authUser.getUsername(), description, IBAN);
+        bankAccountDAO.save(authUser.getUsername(), ownerFullName, description, IBAN);
     }
 
     /**
@@ -52,9 +53,10 @@ public class BankAccountServiceImpl implements BankAccountService {
      */
     @Override
     public void updateBankAccount(final int bankAccountID,
+                                  final String ownerFullName,
                                   @Size(min = 10, max = 30) final String description,
                                   final String IBAN) throws DataAccessException {
-        bankAccountDAO.update(bankAccountID, description, IBAN);
+        bankAccountDAO.update(bankAccountID, ownerFullName, description, IBAN);
     }
 
     /**

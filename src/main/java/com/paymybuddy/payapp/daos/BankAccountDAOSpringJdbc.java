@@ -14,7 +14,7 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
      * @see BankAccountDAO
      */
     @Override
-    public Collection<BankAccount> getBankAccounts(String userMail) throws DataAccessException {
+    public Collection<BankAccount> getBankAccounts(final String userMail) throws DataAccessException {
         return null;
     }
 
@@ -22,7 +22,10 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
      * @see BankAccountDAO
      */
     @Override
-    public boolean save(String userMail, String description, String IBAN) throws DataAccessException {
+    public boolean save(final String userMail,
+                        final String ownerFullName,
+                        final String description,
+                        final String IBAN) throws DataAccessException {
         return false;
     }
 
@@ -30,7 +33,10 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
      * @see BankAccountDAO
      */
     @Override
-    public boolean update(int bankAccountID, String description, String IBAN) throws DataAccessException {
+    public boolean update(final int bankAccountID,
+                          final String ownerFullName,
+                          final String description,
+                          final String IBAN) throws DataAccessException {
         return false;
     }
 
@@ -38,7 +44,7 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
      * @see BankAccountDAO
      */
     @Override
-    public boolean delete(int bankAccountID) throws DataAccessException {
+    public boolean delete(final int bankAccountID) throws DataAccessException {
         return false;
     }
 
@@ -46,7 +52,7 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
      * @see BankAccountDAO
      */
     @Override
-    public Collection<BankOperation> getBankOperations(int bankAccountID) throws DataAccessException {
+    public Collection<BankOperation> getBankOperations(final int bankAccountID) throws DataAccessException {
         return null;
     }
 
@@ -54,7 +60,8 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
      * @see BankAccountDAO
      */
     @Override
-    public boolean saveTransferOperation(int bankAccountID, BigDecimal amount) throws DataAccessException {
+    public boolean saveTransferOperation(final int bankAccountID,
+                                         final BigDecimal amount) throws DataAccessException {
         return false;
     }
 
@@ -62,7 +69,8 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
      * @see BankAccountDAO
      */
     @Override
-    public boolean saveWithdrawOperation(int bankAccountID, BigDecimal amount) throws DataAccessException {
+    public boolean saveWithdrawOperation(final int bankAccountID,
+                                         final BigDecimal amount) throws DataAccessException {
         return false;
     }
 }

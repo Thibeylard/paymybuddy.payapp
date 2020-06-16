@@ -39,11 +39,12 @@ public class BankAccountController {
     }
 
     @PostMapping("/bankAccounts")
-    public ResponseEntity<String> addBankAccount(@RequestParam(name = "IBAN") final String IBAN,
-                                                 @RequestParam(name = "description") final String description) {
+    public ResponseEntity<String> addBankAccount(@RequestParam(name = "ownerFullName") final String ownerFullName,
+                                                 @RequestParam(name = "description") final String description,
+                                                 @RequestParam(name = "IBAN") final String IBAN) {
         Logger.debug("Requested bankAccount creation with IBAN {}", IBAN);
         try {
-            bankAccountService.addBankAccount(description, IBAN);
+            bankAccountService.addBankAccount(ownerFullName, description, IBAN);
             Logger.info("New bankAccount created.");
             return new ResponseEntity<>("SUCCESS", HttpStatus.CREATED);
         } catch (DataAccessException e) {
@@ -54,11 +55,12 @@ public class BankAccountController {
 
     @PutMapping("/bankAccounts")
     public ResponseEntity<String> updateBankAccount(@RequestParam(name = "bankAccountID") final int bankAccountID,
-                                                    @RequestParam(name = "IBAN") final String IBAN,
-                                                    @RequestParam(name = "description") final String description) {
+                                                    @RequestParam(name = "ownerFullName") final String ownerFullName,
+                                                    @RequestParam(name = "description") final String description,
+                                                    @RequestParam(name = "IBAN") final String IBAN) {
         Logger.debug("Requested bankAccount {} to be updated with IBAN {}", bankAccountID, IBAN);
         try {
-            bankAccountService.updateBankAccount(bankAccountID, description, IBAN);
+            bankAccountService.updateBankAccount(bankAccountID, ownerFullName, description, IBAN);
             Logger.info("BankAccount successfully modified.");
             return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
         } catch (DataAccessException e) {

@@ -81,7 +81,7 @@ public class BankAccountControllerTest {
                 .isEqualTo(accountsJson);
 
         // At least one element in collection
-        bankAccounts = Collections.singletonList(new BankAccount(1, 2, "some bank account", "FR76415724785412"));
+        bankAccounts = Collections.singletonList(new BankAccount(1, 2, "John SMITH", "some bank account", "FR76415724785412"));
         when(bankAccountService.getUserBankAccounts()).thenReturn(bankAccounts);
         accountsJson = objectMapper.writeValueAsString(bankAccounts);
 
@@ -113,7 +113,8 @@ public class BankAccountControllerTest {
     @WithMockUser
     @DisplayName("POST BankAccount Success")
     public void Given_validParams_When_addBankAccount_Then_statusIsCreated() throws Exception {
-        doNothing().when(bankAccountService).addBankAccount(anyString(), anyString());
+        doNothing().when(bankAccountService).addBankAccount(anyString(), anyString(), anyString());
+        params.add("ownerFullName", "John SMITH");
         params.add("IBAN", "FR76415724785412");
         params.add("description", "some bank account");
 
@@ -133,7 +134,8 @@ public class BankAccountControllerTest {
     @WithMockUser
     @DisplayName("POST BankAccount Exception")
     public void Given_databaseError_When_addBankAccount_Then_statusIsServerError() throws Exception {
-        doThrow(DataRetrievalFailureException.class).when(bankAccountService).addBankAccount(anyString(), anyString());
+        doThrow(DataRetrievalFailureException.class).when(bankAccountService).addBankAccount(anyString(), anyString(), anyString());
+        params.add("ownerFullName", "John SMITH");
         params.add("IBAN", "FR76415724785412");
         params.add("description", "some bank account");
 
@@ -153,8 +155,9 @@ public class BankAccountControllerTest {
     @WithMockUser
     @DisplayName("PUT BankAccount Success")
     public void Given_validParams_When_updateBankAccount_Then_statusIsOK() throws Exception {
-        doNothing().when(bankAccountService).updateBankAccount(anyInt(), anyString(), anyString());
+        doNothing().when(bankAccountService).updateBankAccount(anyInt(), anyString(), anyString(), anyString());
         params.add("bankAccountID", "4");
+        params.add("ownerFullName", "John SMITH");
         params.add("IBAN", "FR76415724785412");
         params.add("description", "some bank account");
 
@@ -174,8 +177,9 @@ public class BankAccountControllerTest {
     @WithMockUser
     @DisplayName("PUT BankAccount Exception")
     public void Given_databaseError_When_updateBankAccount_Then_statusIsServerError() throws Exception {
-        doThrow(DataRetrievalFailureException.class).when(bankAccountService).updateBankAccount(anyInt(), anyString(), anyString());
+        doThrow(DataRetrievalFailureException.class).when(bankAccountService).updateBankAccount(anyInt(), anyString(), anyString(), anyString());
         params.add("bankAccountID", "4");
+        params.add("ownerFullName", "John SMITH");
         params.add("IBAN", "FR76415724785412");
         params.add("description", "some bank account");
 

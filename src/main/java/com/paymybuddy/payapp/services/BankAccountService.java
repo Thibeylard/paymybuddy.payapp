@@ -4,6 +4,7 @@ import com.paymybuddy.payapp.models.BankAccount;
 import com.paymybuddy.payapp.models.BankOperation;
 import org.springframework.dao.DataAccessException;
 
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Collection;
 
@@ -21,22 +22,29 @@ public interface BankAccountService {
     /**
      * Add new BankAccount to authenticated User.
      *
-     * @param description description to set for BankAccount
-     * @param IBAN        IBAN number to set for BankAccount
+     * @param description   description to set for BankAccount
+     * @param ownerFullName new ownerFullName to set for BankAccount
+     * @param IBAN          IBAN number to set for BankAccount
      * @throws DataAccessException if error occurs during database operation
      */
-    void addBankAccount(final String description, final String IBAN)
+    void addBankAccount(final String ownerFullName,
+                        @Size(min = 10, max = 30) final String description,
+                        final String IBAN)
             throws DataAccessException;
 
     /**
      * Update description or IBAN of BankAccount with ID bankAccountID
      *
      * @param bankAccountID ID of BankAccount to update
+     * @param ownerFullName new ownerFullName to set for BankAccount
      * @param description   new description to set for BankAccount
      * @param IBAN          new IBAN number to set for BankAccount
      * @throws DataAccessException if error occurs during database operation
      */
-    void updateBankAccount(final int bankAccountID, final String description, final String IBAN)
+    void updateBankAccount(final int bankAccountID,
+                           final String ownerFullName,
+                           @Size(min = 10, max = 30) final String description,
+                           final String IBAN)
             throws DataAccessException;
 
     /**

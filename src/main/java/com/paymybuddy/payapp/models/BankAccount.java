@@ -13,6 +13,10 @@ public class BankAccount {
      */
     private final int ownerID;
     /**
+     * Real bank account owner name.
+     */
+    private final String ownerFullName;
+    /**
      * All operations made on this bank account
      */
     private final Collection<BankOperation> operations;
@@ -25,17 +29,19 @@ public class BankAccount {
      */
     private String IBAN;
 
-    public BankAccount(int id, int ownerID, String description, String IBAN) {
+    public BankAccount(int id, int ownerID, String ownerFullName, String description, String IBAN) {
         this.id = id;
         this.ownerID = ownerID;
+        this.ownerFullName = ownerFullName;
         this.description = description;
         this.IBAN = IBAN;
         this.operations = new ArrayList<>();
     }
 
-    public BankAccount(int id, int ownerID, String description, String IBAN, Collection<BankOperation> operations) {
+    public BankAccount(int id, int ownerID, String ownerFullName, String description, String IBAN, Collection<BankOperation> operations) {
         this.id = id;
         this.ownerID = ownerID;
+        this.ownerFullName = ownerFullName;
         this.description = description;
         this.IBAN = IBAN;
         this.operations = operations;
@@ -47,6 +53,10 @@ public class BankAccount {
 
     public int getOwnerID() {
         return ownerID;
+    }
+
+    public String getOwnerFullName() {
+        return ownerFullName;
     }
 
     public String getDescription() {

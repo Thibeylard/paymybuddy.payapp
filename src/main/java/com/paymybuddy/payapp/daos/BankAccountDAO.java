@@ -21,23 +21,31 @@ public interface BankAccountDAO {
     /**
      * Add new row to BankAccount table.
      *
-     * @param userMail    mail of User to add bankAccount to
-     * @param description description to set for BankAccount
-     * @param IBAN        IBAN number to set for BankAccount
+     * @param userMail      mail of User to add bankAccount to
+     * @param ownerFullName new ownerFullName to set for BankAccount
+     * @param description   description to set for BankAccount
+     * @param IBAN          IBAN number to set for BankAccount
      * @throws DataAccessException if error occurs during database operation
      */
-    boolean save(final String userMail, final String description, final String IBAN)
+    boolean save(final String userMail,
+                 final String ownerFullName,
+                 final String description,
+                 final String IBAN)
             throws DataAccessException;
 
     /**
      * Update description or IBAN of BankAccount with ID bankAccountID in BankAccount table.
      *
      * @param bankAccountID ID of BankAccount to update
+     * @param ownerFullName new ownerFullName to set for BankAccount
      * @param description   new description to set for BankAccount
      * @param IBAN          new IBAN number to set for BankAccount
      * @throws DataAccessException if error occurs during database operation
      */
-    boolean update(final int bankAccountID, final String description, final String IBAN)
+    boolean update(final int bankAccountID,
+                   final String ownerFullName,
+                   final String description,
+                   final String IBAN)
             throws DataAccessException;
 
     /**

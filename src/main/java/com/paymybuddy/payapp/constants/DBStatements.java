@@ -67,12 +67,6 @@ public final class DBStatements {
             "DELETE FROM Contact WHERE (user_a_id IN (" + GET_USER_ID_FOR_DELETE + ") AND user_b_id IN (" + GET_CONTACT_ID_FOR_DELETE + ")) " +
                     "OR (user_a_id IN (" + GET_CONTACT_ID_FOR_DELETE + ") AND user_b_id IN (" + GET_USER_ID_FOR_DELETE + "))";
 
-    public static final String INSERT_TRANSACTION =
-            "INSERT INTO TRANSACTION (debtor_id, creditor_id, amount, description, zoned_date_time, total) " +
-                    "SELECT u.id, r.id, :amount, :description, :zoned_date_time, :total FROM USER AS u " +
-                    "INNER JOIN USER AS r ON r.mail <> u.mail " +
-                    "WHERE u.mail = :userMail AND r.mail = :recipientMail";
-
     // TRANSACTION Table statements
     private static final String GET_TRANSACTIONS_MODEL =
             "SELECT t.id, debtor_id, creditor_id, amount, description, zoned_date_time, total FROM TRANSACTION AS t ";
@@ -89,5 +83,36 @@ public final class DBStatements {
 
     public static final String GET_ALL_TRANSACTIONS =
             GET_DEBIT_TRANSACTIONS + " UNION " + GET_CREDIT_TRANSACTIONS;
+
+    public static final String INSERT_TRANSACTION =
+            "INSERT INTO TRANSACTION (debtor_id, creditor_id, amount, description, zoned_date_time, total) " +
+                    "SELECT u.id, r.id, :amount, :description, :zoned_date_time, :total FROM USER AS u " +
+                    "INNER JOIN USER AS r ON r.mail <> u.mail " +
+                    "WHERE u.mail = :userMail AND r.mail = :recipientMail";
+
+    // BANK_ACCOUNT Table statements
+    public static final String GET_BANK_ACCOUNTS =
+            "SELECT id, user_id, owner_fullname, description, IBAN FROM BANK_ACCOUNT " +
+                    "INNER JOIN USER ON user_id = user.id " +
+                    "WHERE user.mail = :userMail";
+
+    public static final String INSERT_BANK_ACCOUNT =
+            "INSERT INTO BANK_ACCOUNT (user_id, owner_fullname, description, IBAN) " +
+                    "SELECT u.id, :ownerFullName, :description, :IBAN, FROM USER AS u " +
+                    "WHERE u.mail = :userMail";
+
+    public static final String UPDATE_BANK_ACCOUNT =
+            "UPDATE BANK_ACCOUNT SET (owner_fullname, description, IBAN) = ( :ownerFullName, :description, :IBAN) WHERE id = :bankAccountID";
+
+    public static final String DELETE_BANK_ACCOUNT =
+            "DELETE FROM BANK_ACCOUNT WHERE id = :bankAccountID";
+
+    // BANK_OPERATION Table statements
+    public static final String GET_BANK_OPERATIONS =
+            "SELECT id, bank_account_id, date, amount FROM BANK_OPERATION " +
+                    "WHERE bank_account_id = :bankAccountID";
+
+    public static final String INSERT_BANK_OPERATION =
+            "INSERT INTO BANK_OPERATION (bank_account_id, date, amount) VALUES(:bankAccountID, :date, :amount)";
 
 }

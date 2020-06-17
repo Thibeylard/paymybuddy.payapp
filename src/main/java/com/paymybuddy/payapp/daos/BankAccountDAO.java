@@ -5,6 +5,7 @@ import com.paymybuddy.payapp.models.BankOperation;
 import org.springframework.dao.DataAccessException;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 
 public interface BankAccountDAO {
@@ -71,17 +72,19 @@ public interface BankAccountDAO {
      * Add new row in BankOperation table (amount with negative value).
      *
      * @param bankAccountID ID of BankAccount to operate on
+     * @param date          datetime of operation
      * @param amount        Amount of money to transfer
      */
-    boolean saveTransferOperation(final int bankAccountID, final BigDecimal amount)
+    boolean saveTransferOperation(final int bankAccountID, final ZonedDateTime date, final BigDecimal amount)
             throws DataAccessException;
 
     /**
      * Add new row in BankOperation table (amount with positive value).
      *
      * @param bankAccountID ID of BankAccount to operate on
+     * @param date          datetime of operation
      * @param amount        Amount of money to withdraw
      */
-    boolean saveWithdrawOperation(final int bankAccountID, final BigDecimal amount)
+    boolean saveWithdrawOperation(final int bankAccountID, final ZonedDateTime date, final BigDecimal amount)
             throws DataAccessException;
 }

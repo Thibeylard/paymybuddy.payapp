@@ -21,10 +21,13 @@ import java.util.Collection;
 public class BankAccountServiceImpl implements BankAccountService {
 
     private final BankAccountDAO bankAccountDAO;
+    private final ClockService clockService;
 
     @Autowired
     public BankAccountServiceImpl(BankAccountDAO bankAccountDAO) {
         this.bankAccountDAO = bankAccountDAO;
+        this.clockService = new ClockService() {
+        };
     }
 
     /**
@@ -84,7 +87,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     public void transferMoney(final int bankAccountID,
                               final BigDecimal amount) throws DataAccessException {
         // TODO Ajouter la méthode de relation à la banque (via une interface)
-        bankAccountDAO.saveTransferOperation(bankAccountID, amount);
+        bankAccountDAO.saveTransferOperation(bankAccountID, clockService.now(), amount);
     }
 
     /**
@@ -94,6 +97,6 @@ public class BankAccountServiceImpl implements BankAccountService {
     public void withdrawMoney(final int bankAccountID,
                               final BigDecimal amount) throws DataAccessException {
         // TODO Ajouter la méthode de relation à la banque (via une interface)
-        bankAccountDAO.saveWithdrawOperation(bankAccountID, amount);
+        bankAccountDAO.saveWithdrawOperation(bankAccountID, clockService.now(), amount);
     }
 }

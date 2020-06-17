@@ -162,17 +162,17 @@ public class BankAccountServiceTest {
     @WithMockUser
     @DisplayName("transferMoney() Success")
     public void Given_validParams_When_transferMoney_Then_nothingIsThrown() {
-        when(bankAccountDAO.saveTransferOperation(anyInt(), any(BigDecimal.class))).thenReturn(true);
+        when(bankAccountDAO.saveTransferOperation(anyInt(), any(ZonedDateTime.class), any(BigDecimal.class))).thenReturn(true);
 
         assertDoesNotThrow(() -> bankAccountService.transferMoney(6, new BigDecimal(45)));
-        verify(bankAccountDAO, times(1)).saveTransferOperation(anyInt(), any(BigDecimal.class));
+        verify(bankAccountDAO, times(1)).saveTransferOperation(anyInt(), any(ZonedDateTime.class), any(BigDecimal.class));
     }
 
     @Test
     @WithMockUser
     @DisplayName("transferMoney() Exception")
     public void Given_databaseError_When_transferMoney_Then_throwsDAOException() {
-        doThrow(DataRetrievalFailureException.class).when(bankAccountDAO).saveTransferOperation(anyInt(), any(BigDecimal.class));
+        doThrow(DataRetrievalFailureException.class).when(bankAccountDAO).saveTransferOperation(anyInt(), any(ZonedDateTime.class), any(BigDecimal.class));
 
         assertThrows(DataRetrievalFailureException.class, () -> bankAccountService.transferMoney(6, new BigDecimal(45)));
     }
@@ -181,17 +181,17 @@ public class BankAccountServiceTest {
     @WithMockUser
     @DisplayName("withdrawMoney() Success")
     public void Given_validParams_When_withdrawMoney_Then_nothingIsThrown() {
-        when(bankAccountDAO.saveWithdrawOperation(anyInt(), any(BigDecimal.class))).thenReturn(true);
+        when(bankAccountDAO.saveWithdrawOperation(anyInt(), any(ZonedDateTime.class), any(BigDecimal.class))).thenReturn(true);
 
         assertDoesNotThrow(() -> bankAccountService.withdrawMoney(6, new BigDecimal(45)));
-        verify(bankAccountDAO, times(1)).saveWithdrawOperation(anyInt(), any(BigDecimal.class));
+        verify(bankAccountDAO, times(1)).saveWithdrawOperation(anyInt(), any(ZonedDateTime.class), any(BigDecimal.class));
     }
 
     @Test
     @WithMockUser
     @DisplayName("withdrawMoney() Exception")
     public void Given_databaseError_When_withdrawMoney_Then_throwsDAOException() {
-        doThrow(DataRetrievalFailureException.class).when(bankAccountDAO).saveWithdrawOperation(anyInt(), any(BigDecimal.class));
+        doThrow(DataRetrievalFailureException.class).when(bankAccountDAO).saveWithdrawOperation(anyInt(), any(ZonedDateTime.class), any(BigDecimal.class));
 
         assertThrows(DataRetrievalFailureException.class, () -> bankAccountService.withdrawMoney(6, new BigDecimal(45)));
     }

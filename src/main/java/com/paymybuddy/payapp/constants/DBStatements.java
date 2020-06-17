@@ -92,9 +92,9 @@ public final class DBStatements {
 
     // BANK_ACCOUNT Table statements
     public static final String GET_BANK_ACCOUNTS =
-            "SELECT id, user_id, owner_fullname, description, IBAN FROM BANK_ACCOUNT " +
-                    "INNER JOIN USER ON user_id = user.id " +
-                    "WHERE user.mail = :userMail";
+            "SELECT ba.id, user_id, owner_fullname, description, IBAN FROM BANK_ACCOUNT AS ba " +
+                    "INNER JOIN USER AS u ON user_id = u.id " +
+                    "WHERE u.mail = :userMail";
 
     public static final String INSERT_BANK_ACCOUNT =
             "INSERT INTO BANK_ACCOUNT (user_id, owner_fullname, description, IBAN) " +
@@ -105,7 +105,8 @@ public final class DBStatements {
             "UPDATE BANK_ACCOUNT SET (owner_fullname, description, IBAN) = ( :ownerFullName, :description, :IBAN) WHERE id = :bankAccountID";
 
     public static final String DELETE_BANK_ACCOUNT =
-            "DELETE FROM BANK_ACCOUNT WHERE id = :bankAccountID";
+            "DELETE FROM BANK_OPERATION WHERE bank_account_id = :bankAccountID; " +
+                    "DELETE FROM BANK_ACCOUNT WHERE id = :bankAccountID";
 
     // BANK_OPERATION Table statements
     public static final String GET_BANK_OPERATIONS =

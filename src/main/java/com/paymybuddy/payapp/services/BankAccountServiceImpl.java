@@ -87,6 +87,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     public void transferMoney(final int bankAccountID,
                               final BigDecimal amount) throws DataAccessException {
         // TODO Ajouter la méthode de relation à la banque (via une interface)
+        //TODO interdire les valeurs négatives
         bankAccountDAO.saveTransferOperation(bankAccountID, clockService.now(), amount);
     }
 
@@ -97,6 +98,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     public void withdrawMoney(final int bankAccountID,
                               final BigDecimal amount) throws DataAccessException {
         // TODO Ajouter la méthode de relation à la banque (via une interface)
+        //TODO interdire les valeurs négatives
         bankAccountDAO.saveWithdrawOperation(bankAccountID, clockService.now(), amount);
     }
 }

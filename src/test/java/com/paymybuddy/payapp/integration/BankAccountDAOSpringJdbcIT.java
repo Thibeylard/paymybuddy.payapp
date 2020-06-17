@@ -1,12 +1,14 @@
 package com.paymybuddy.payapp.integration;
 
 import com.paymybuddy.payapp.daos.BankAccountDAO;
+import com.paymybuddy.payapp.models.BankAccount;
 import com.paymybuddy.payapp.models.BankOperation;
 import com.paymybuddy.payapp.services.ClockService;
 import org.assertj.db.api.Assertions;
 import org.assertj.db.type.Table;
 import org.flywaydb.test.annotation.FlywayTest;
 import org.flywaydb.test.junit5.FlywayTestExtension;
+import org.h2.api.TimestampWithTimeZone;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,14 +49,21 @@ public class BankAccountDAOSpringJdbcIT {
     @DisplayName("getBankAccounts() Successes")
     public void Given_userMail_When_getBankAccounts_Then_returnBankAccounts() {
         // Thorough test on most "complex" case
-        assertThat(bankAccountDAO.getBankAccounts("user1@mail.com"))
+        Collection<BankAccount> result = bankAccountDAO.getBankAccounts("user1@mail.com");
+        assertThat(result)
                 .hasSize(2)
-                .extracting("id").containsExactly(1, 2)
-                .extracting("ownerID").contains(1)
-                .extracting("ownerFullName").contains("user1 NAME")
+                .extracting("id").containsExactly(1, 2);
+        assertThat(result)
+                .extracting("ownerID").containsExactly(1, 1);
+        assertThat(result)
+                .extracting("ownerFullName").containsExactly(
+                "user1 NAME",
+                "user1 NAME");
+        assertThat(result)
                 .extracting("description").containsExactly(
                 "main bank account",
-                "second bank account")
+                "second bank account");
+        assertThat(result)
                 .extracting("IBAN").containsExactly(
                 "FR784356918887DW0BS628ARY69",
                 "FR58664306261240R1H3658AT90");
@@ -200,16 +210,18 @@ public class BankAccountDAOSpringJdbcIT {
     @DisplayName("getBankOperations() Successes")
     public void Given_bankAccountID_When_getBankOperations_Then_returnBankOperations() {
         // Thorough test on most "complex" case
-        ZonedDateTime firstOpDate = ZonedDateTime.of(2020, 4, 9, 0, 0, 0, 0, ZoneId.of("Europe/Paris"));
-        ZonedDateTime secondOpDate = ZonedDateTime.of(2020, 10, 17, 0, 0, 0, 0, ZoneId.of("Europe/Paris"));
+        ZonedDateTime firstOpDate = ZonedDateTime.of(2020, 4, 9, 0, 0, 0, 0, ZoneId.of(ClockService.ZONE_ID));
+        ZonedDateTime secondOpDate = ZonedDateTime.of(2020, 10, 17, 0, 0, 0, 0, ZoneId.of(ClockService.ZONE_ID));
         Collection<BankOperation> result = bankAccountDAO.getBankOperations(3);
         assertThat(result)
                 .hasSize(2)
-                .extracting("id").containsExactly(3, 6)
-                .extracting("bank_account_id").contains(3)
+                .extracting("id").containsExactly(3, 6);
+        assertThat(result)
+                .extracting("bankAccountID").containsExactly(3, 3);
+        assertThat(result)
                 .extracting("amount").containsExactly(
-                new BigDecimal(30),
-                new BigDecimal(-50));
+                BigDecimal.valueOf(30.0),
+                BigDecimal.valueOf(-50.0));
         assertThat(result).extracting("date")
                 .element(0).usingRecursiveComparison().isEqualTo(firstOpDate);
         assertThat(result).extracting("date")
@@ -244,8 +256,17 @@ public class BankAccountDAOSpringJdbcIT {
                 .row(6)
                 .value("id").isEqualTo(7)
                 .value("bank_account_id").isEqualTo(1)
-                .value("date").isEqualTo("2020-12-25 00:00:00+01")
                 .value("amount").isEqualTo(-50);
+
+        TimestampWithTimeZone timestampWithTimeZoneExample =
+                (TimestampWithTimeZone) bankOperationTable.getRow(6).getColumnValue("date").getValue();
+
+        // Check that zoned_date_time in database perfectly match with passed ZonedDateTime object
+        assertThat(timestampWithTimeZoneExample.getDay()).isEqualTo(25);
+        assertThat(timestampWithTimeZoneExample.getMonth()).isEqualTo(12);
+        assertThat(timestampWithTimeZoneExample.getYear()).isEqualTo(2020);
+        assertThat(timestampWithTimeZoneExample.getNanosSinceMidnight()).isEqualTo(0);
+        assertThat(timestampWithTimeZoneExample.getTimeZoneOffsetSeconds()).isEqualTo(operationDate.getOffset().get(ChronoField.OFFSET_SECONDS));
     }
 
     @Test
@@ -256,10 +277,6 @@ public class BankAccountDAOSpringJdbcIT {
         assertThrows(DataAccessException.class, () -> bankAccountDAO.saveTransferOperation(6,
                 operationDate,
                 new BigDecimal(40)));
-        // Value is negative
-        assertThrows(DataAccessException.class, () -> bankAccountDAO.saveTransferOperation(2,
-                operationDate,
-                new BigDecimal(-30)));
     }
 
 
@@ -283,8 +300,17 @@ public class BankAccountDAOSpringJdbcIT {
                 .row(6)
                 .value("id").isEqualTo(7)
                 .value("bank_account_id").isEqualTo(2)
-                .value("date").isEqualTo("2020-12-25 00:00:00+01")
                 .value("amount").isEqualTo(60);
+
+        TimestampWithTimeZone timestampWithTimeZoneExample =
+                (TimestampWithTimeZone) bankOperationTable.getRow(6).getColumnValue("date").getValue();
+
+        // Check that zoned_date_time in database perfectly match with passed ZonedDateTime object
+        assertThat(timestampWithTimeZoneExample.getDay()).isEqualTo(25);
+        assertThat(timestampWithTimeZoneExample.getMonth()).isEqualTo(12);
+        assertThat(timestampWithTimeZoneExample.getYear()).isEqualTo(2020);
+        assertThat(timestampWithTimeZoneExample.getNanosSinceMidnight()).isEqualTo(0);
+        assertThat(timestampWithTimeZoneExample.getTimeZoneOffsetSeconds()).isEqualTo(operationDate.getOffset().get(ChronoField.OFFSET_SECONDS));
     }
 
     @Test
@@ -295,9 +321,5 @@ public class BankAccountDAOSpringJdbcIT {
         assertThrows(DataAccessException.class, () -> bankAccountDAO.saveWithdrawOperation(6,
                 operationDate,
                 new BigDecimal(40)));
-        // Value is negative
-        assertThrows(DataAccessException.class, () -> bankAccountDAO.saveWithdrawOperation(2,
-                operationDate,
-                new BigDecimal(-30)));
     }
 }

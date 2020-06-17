@@ -72,6 +72,7 @@ public class TransactionDAOSpringJdbcIT {
                 .value("amount").isEqualTo(10.00)
                 .value("total").isEqualTo(9.50);
 
+        //TODO Modifier ce test pour vérifier non pas la table, mais la valeur obtenue.
         TimestampWithTimeZone timestampWithTimeZoneExample =
                 (TimestampWithTimeZone) transactionTable.getRow(1).getColumnValue("zoned_date_time").getValue();
 

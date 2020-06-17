@@ -1,14 +1,21 @@
 package com.paymybuddy.payapp.daos;
 
+import com.paymybuddy.payapp.constants.DBStatements;
 import com.paymybuddy.payapp.models.BankAccount;
 import com.paymybuddy.payapp.models.BankOperation;
+import com.paymybuddy.payapp.services.ClockService;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 @Repository
 public class BankAccountDAOSpringJdbc implements BankAccountDAO {
@@ -24,7 +31,16 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
      */
     @Override
     public Collection<BankAccount> getBankAccounts(final String userMail) throws DataAccessException {
-        return null;
+        return jdbcTemplate.query(DBStatements.GET_BANK_ACCOUNTS,
+                new MapSqlParameterSource("userMail", userMail),
+                (rs, rowNum) ->
+                        new BankAccount(
+                                rs.getInt("id"),
+                                rs.getInt("user_id"),
+                                rs.getString("owner_fullname"),
+                                rs.getString("description"),
+                                rs.getString("IBAN")
+                        ));
     }
 
     /**
@@ -35,7 +51,16 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
                         final String ownerFullName,
                         final String description,
                         final String IBAN) throws DataAccessException {
-        return false;
+        Map<String, Object> parameterMap = new HashMap<>();
+        parameterMap.put("userMail", userMail);
+        parameterMap.put("ownerFullName", ownerFullName);
+        parameterMap.put("description", description);
+        parameterMap.put("IBAN", IBAN);
+
+        if (jdbcTemplate.update(DBStatements.INSERT_BANK_ACCOUNT, parameterMap) == 0) {
+            throw new DataRetrievalFailureException("Requested user does not exists.");
+        }
+        return true;
     }
 
     /**
@@ -46,7 +71,16 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
                           final String ownerFullName,
                           final String description,
                           final String IBAN) throws DataAccessException {
-        return false;
+        Map<String, Object> parameterMap = new HashMap<>();
+        parameterMap.put("bankAccountID", bankAccountID);
+        parameterMap.put("ownerFullName", ownerFullName);
+        parameterMap.put("description", description);
+        parameterMap.put("IBAN", IBAN);
+
+        if (jdbcTemplate.update(DBStatements.UPDATE_BANK_ACCOUNT, parameterMap) == 0) {
+            throw new DataRetrievalFailureException("Requested Bank Account does not exists.");
+        }
+        return true;
     }
 
     /**
@@ -54,7 +88,13 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
      */
     @Override
     public boolean delete(final int bankAccountID) throws DataAccessException {
-        return false;
+        Map<String, Object> parameterMap = new HashMap<>();
+        parameterMap.put("bankAccountID", bankAccountID);
+
+        if (jdbcTemplate.update(DBStatements.DELETE_BANK_ACCOUNT, parameterMap) == 0) {
+            throw new DataRetrievalFailureException("Requested Bank Account does not exists.");
+        }
+        return true;
     }
 
     /**
@@ -62,7 +102,16 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
      */
     @Override
     public Collection<BankOperation> getBankOperations(final int bankAccountID) throws DataAccessException {
-        return null;
+        return jdbcTemplate.query(DBStatements.GET_BANK_OPERATIONS,
+                new MapSqlParameterSource("bankAccountID", bankAccountID),
+                (rs, rowNum) ->
+                        new BankOperation(
+                                rs.getInt("id"),
+                                rs.getInt("bank_account_id"),
+                                ZonedDateTime.of(rs.getTimestamp("date").toLocalDateTime(),
+                                        ZoneId.of(ClockService.ZONE_ID)),
+                                BigDecimal.valueOf(rs.getDouble("amount"))
+                        ));
     }
 
     /**
@@ -72,7 +121,7 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
     public boolean saveTransferOperation(final int bankAccountID,
                                          final ZonedDateTime date,
                                          final BigDecimal amount) throws DataAccessException {
-        return false;
+        return saveOperation(bankAccountID, date, amount.negate());
     }
 
     /**
@@ -82,6 +131,18 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
     public boolean saveWithdrawOperation(final int bankAccountID,
                                          final ZonedDateTime date,
                                          final BigDecimal amount) throws DataAccessException {
-        return false;
+        return saveOperation(bankAccountID, date, amount);
+    }
+
+    private boolean saveOperation(int bankAccountID, ZonedDateTime date, BigDecimal amount) {
+        Map<String, Object> parameterMap = new HashMap<>();
+        parameterMap.put("bankAccountID", bankAccountID);
+        parameterMap.put("date", date);
+        parameterMap.put("amount", amount);
+
+        if (jdbcTemplate.update(DBStatements.INSERT_BANK_OPERATION, parameterMap) == 0) {
+            throw new DataRetrievalFailureException("Requested bank account does not exists.");
+        }
+        return true;
     }
 }

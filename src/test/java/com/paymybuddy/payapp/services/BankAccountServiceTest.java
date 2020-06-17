@@ -43,7 +43,7 @@ public class BankAccountServiceTest {
     public void Given_authenticatedUser_When_getUserBankAccounts_Then_returnBankAccountDAOValue() {
 
         Collection<BankAccount> accountsEmpty = Collections.emptyList();
-        Collection<BankAccount> accounts = Collections.singletonList(new BankAccount(1, 2, "John SMITH", "some bank account", "FR76415724785412"));
+        Collection<BankAccount> accounts = Collections.singletonList(new BankAccount(1, 2, "John SMITH", "some bank account", "GB90RJCM65823550244646"));
         when(bankAccountDAO.getBankAccounts(anyString()))
                 .thenReturn(accountsEmpty)
                 .thenReturn(accounts);
@@ -73,7 +73,7 @@ public class BankAccountServiceTest {
     public void Given_validParams_When_addBankAccount_Then_nothingIsThrown() {
         when(bankAccountDAO.save(anyString(), anyString(), anyString(), anyString())).thenReturn(true);
 
-        assertDoesNotThrow(() -> bankAccountService.addBankAccount("John SMITH", "some description", "FR76415724785412"));
+        assertDoesNotThrow(() -> bankAccountService.addBankAccount("John SMITH", "some description", "GB90RJCM65823550244646"));
         verify(bankAccountDAO, times(1)).save(anyString(), anyString(), anyString(), anyString());
     }
 
@@ -83,7 +83,7 @@ public class BankAccountServiceTest {
     public void Given_databaseError_When_addBankAccount_Then_throwsDAOException() {
         doThrow(DataRetrievalFailureException.class).when(bankAccountDAO).save(anyString(), anyString(), anyString(), anyString());
 
-        assertThrows(DataRetrievalFailureException.class, () -> bankAccountService.addBankAccount("John SMITH", "some description", "FR76415724785412"));
+        assertThrows(DataRetrievalFailureException.class, () -> bankAccountService.addBankAccount("John SMITH", "some description", "GB90RJCM65823550244646"));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class BankAccountServiceTest {
     public void Given_validParams_When_updateBankAccount_Then_nothingIsThrown() {
         when(bankAccountDAO.update(anyInt(), anyString(), anyString(), anyString())).thenReturn(true);
 
-        assertDoesNotThrow(() -> bankAccountService.updateBankAccount(6, "John SMITH", "some description", "FR76415724785412"));
+        assertDoesNotThrow(() -> bankAccountService.updateBankAccount(6, "John SMITH", "some description", "GB90RJCM65823550244646"));
         verify(bankAccountDAO, times(1)).update(anyInt(), anyString(), anyString(), anyString());
     }
 
@@ -102,7 +102,7 @@ public class BankAccountServiceTest {
     public void Given_databaseError_When_updateBankAccount_Then_throwsDAOException() {
         doThrow(DataRetrievalFailureException.class).when(bankAccountDAO).update(anyInt(), anyString(), anyString(), anyString());
 
-        assertThrows(DataRetrievalFailureException.class, () -> bankAccountService.updateBankAccount(6, "John SMITH", "some description", "FR76415724785412"));
+        assertThrows(DataRetrievalFailureException.class, () -> bankAccountService.updateBankAccount(6, "John SMITH", "some description", "GB90RJCM65823550244646"));
     }
 
     @Test

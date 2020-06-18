@@ -1,5 +1,6 @@
 package com.paymybuddy.payapp.controllers;
 
+import com.paymybuddy.payapp.exceptions.UnauthorizedBankOperationException;
 import com.paymybuddy.payapp.models.BankAccount;
 import com.paymybuddy.payapp.models.BankOperation;
 import com.paymybuddy.payapp.services.BankAccountService;
@@ -104,8 +105,6 @@ public class BankAccountController {
         }
     }
 
-    //TODO Dans le cas de transfer et withdraw, une autre exception peut avoir lieu : Celle de l'erreur liée à la banque elle même
-    // à répercuter dans Service aussi.
     @PostMapping("/bankAccount/transfer")
     public ResponseEntity<String> transferToBank(@RequestParam(name = "bankAccountID") final int bankAccountID,
                                                  @RequestParam(name = "amount") final double amount) {
@@ -120,6 +119,9 @@ public class BankAccountController {
         } catch (ConstraintViolationException e) {
             Logger.error(e.getMessage());
             return new ResponseEntity<>("ERROR : " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (UnauthorizedBankOperationException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>("ERROR : " + e.getMessage(), HttpStatus.FORBIDDEN);
         }
     }
 
@@ -137,6 +139,9 @@ public class BankAccountController {
         } catch (ConstraintViolationException e) {
             Logger.error(e.getMessage());
             return new ResponseEntity<>("ERROR : " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (UnauthorizedBankOperationException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>("ERROR : " + e.getMessage(), HttpStatus.FORBIDDEN);
         }
     }
 }

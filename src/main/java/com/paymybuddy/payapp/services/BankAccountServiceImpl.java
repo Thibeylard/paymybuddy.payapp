@@ -1,6 +1,7 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.BankAccountDAO;
+import com.paymybuddy.payapp.exceptions.UnauthorizedBankOperationException;
 import com.paymybuddy.payapp.models.BankAccount;
 import com.paymybuddy.payapp.models.BankOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +23,23 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     private final BankAccountDAO bankAccountDAO;
     private final ClockService clockService;
+    private final BankService bankService;
 
     @Autowired
     public BankAccountServiceImpl(BankAccountDAO bankAccountDAO) {
         this.bankAccountDAO = bankAccountDAO;
         this.clockService = new ClockService() {
+        };
+        this.bankService = new BankService() {
+            @Override
+            public boolean askBankForWithdrawal(String ownerFullName, String IBAN, BigDecimal amount) throws UnauthorizedBankOperationException {
+                return true;
+            }
+
+            @Override
+            public boolean askBankForTransfer(String ownerFullName, String IBAN, BigDecimal amount) throws UnauthorizedBankOperationException {
+                return true;
+            }
         };
     }
 
@@ -88,9 +101,12 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Override
     @Validated
     public void transferMoney(final int bankAccountID,
-                              @Min(value = 0, message = "Bank operation can't be negative.") final BigDecimal amount) throws DataAccessException {
-        // TODO Ajouter la méthode de relation à la banque (via une interface)
-        bankAccountDAO.saveTransferOperation(bankAccountID, clockService.now(), amount);
+                              @Min(value = 0, message = "Bank operation can't be negative.") final BigDecimal amount)
+            throws UnauthorizedBankOperationException, DataAccessException {
+        BankAccount bankAccount = bankAccountDAO.getBankAccount(bankAccountID);
+        if (bankService.askBankForTransfer(bankAccount.getOwnerFullName(), bankAccount.getIBAN(), amount)) {
+            bankAccountDAO.saveTransferOperation(bankAccountID, clockService.now(), amount);
+        }
     }
 
     /**
@@ -99,8 +115,11 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Override
     @Validated
     public void withdrawMoney(final int bankAccountID,
-                              @Min(value = 0, message = "Bank operation can't be negative.") final BigDecimal amount) throws DataAccessException {
-        // TODO Ajouter la méthode de relation à la banque (via une interface)
-        bankAccountDAO.saveWithdrawOperation(bankAccountID, clockService.now(), amount);
+                              @Min(value = 0, message = "Bank operation can't be negative.") final BigDecimal amount)
+            throws UnauthorizedBankOperationException, DataAccessException {
+        BankAccount bankAccount = bankAccountDAO.getBankAccount(bankAccountID);
+        if (bankService.askBankForWithdrawal(bankAccount.getOwnerFullName(), bankAccount.getIBAN(), amount)) {
+            bankAccountDAO.saveWithdrawOperation(bankAccountID, clockService.now(), amount);
+        }
     }
 }

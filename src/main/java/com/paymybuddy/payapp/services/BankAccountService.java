@@ -1,5 +1,6 @@
 package com.paymybuddy.payapp.services;
 
+import com.paymybuddy.payapp.exceptions.UnauthorizedBankOperationException;
 import com.paymybuddy.payapp.models.BankAccount;
 import com.paymybuddy.payapp.models.BankOperation;
 import org.springframework.dao.DataAccessException;
@@ -75,7 +76,7 @@ public interface BankAccountService {
      */
     void transferMoney(final int bankAccountID,
                        @Min(value = 0, message = "Bank operation can't be negative.") final BigDecimal amount)
-            throws DataAccessException;
+            throws DataAccessException, UnauthorizedBankOperationException;
 
     /**
      * Withdraw money from real bank account to application.
@@ -85,5 +86,5 @@ public interface BankAccountService {
      */
     void withdrawMoney(final int bankAccountID,
                        @Min(value = 0, message = "Bank operation can't be negative.") final BigDecimal amount)
-            throws DataAccessException;
+            throws DataAccessException, UnauthorizedBankOperationException;
 }

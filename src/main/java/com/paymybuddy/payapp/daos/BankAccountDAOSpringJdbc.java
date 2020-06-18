@@ -47,6 +47,23 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
      * @see BankAccountDAO
      */
     @Override
+    public BankAccount getBankAccount(final int bankAccountID) throws DataAccessException {
+        return jdbcTemplate.queryForObject(DBStatements.GET_BANK_ACCOUNT,
+                new MapSqlParameterSource("bankAccountID", bankAccountID),
+                (rs, rowNum) ->
+                        new BankAccount(
+                                rs.getInt("id"),
+                                rs.getInt("user_id"),
+                                rs.getString("owner_fullname"),
+                                rs.getString("description"),
+                                rs.getString("IBAN")
+                        ));
+    }
+
+    /**
+     * @see BankAccountDAO
+     */
+    @Override
     public boolean save(final String userMail,
                         final String ownerFullName,
                         final String description,

@@ -96,6 +96,10 @@ public final class DBStatements {
                     "INNER JOIN USER AS u ON user_id = u.id " +
                     "WHERE u.mail = :userMail";
 
+    public static final String GET_BANK_ACCOUNT =
+            "SELECT id, user_id, owner_fullname, description, IBAN FROM BANK_ACCOUNT " +
+                    "WHERE id = :bankAccountID";
+
     public static final String INSERT_BANK_ACCOUNT =
             "INSERT INTO BANK_ACCOUNT (user_id, owner_fullname, description, IBAN) " +
                     "SELECT u.id, :ownerFullName, :description, :IBAN, FROM USER AS u " +

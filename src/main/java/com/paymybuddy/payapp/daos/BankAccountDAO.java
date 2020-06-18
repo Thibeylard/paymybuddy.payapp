@@ -20,6 +20,15 @@ public interface BankAccountDAO {
             throws DataAccessException;
 
     /**
+     * Get bankAccounts with bankAccountID from BankAccount table
+     *
+     * @return BankAccount object
+     * @throws DataAccessException if error occurs during database operation
+     */
+    BankAccount getBankAccount(final int bankAccountID)
+            throws DataAccessException;
+
+    /**
      * Add new row to BankAccount table.
      *
      * @param userMail      mail of User to add bankAccount to

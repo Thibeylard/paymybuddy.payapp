@@ -22,6 +22,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.validation.ConstraintViolationException;
 import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -39,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("test")
-@DisplayName("Contact Controller tests on : ")
+@DisplayName("BankAccount Controller tests on : ")
 public class BankAccountControllerTest {
     private final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     // Beans
@@ -59,8 +60,6 @@ public class BankAccountControllerTest {
                 .apply(springSecurity()) // Integrate SpringSecurity to SpringMVC
                 .build();
     }
-
-    //TODO Ajouter les tests de catch de ConstraintViolationException en BadRequest
 
     @Test
     @WithMockUser
@@ -149,6 +148,19 @@ public class BankAccountControllerTest {
         // Check that a String was passed to give some information
         assertThat(result.getResponse().getContentAsString().isBlank())
                 .isFalse();
+
+        doThrow(ConstraintViolationException.class).when(bankAccountService).addBankAccount(anyString(), anyString(), anyString());
+
+        params.set("description", "account");
+        result = mvc.perform(post("/bankAccounts")
+                .params(params)
+                .with(csrf()))
+                .andExpect(status().isBadRequest())// Status BAD REQUEST
+                .andReturn();
+
+        // Check that a String was passed to give some information
+        assertThat(result.getResponse().getContentAsString().isBlank())
+                .isFalse();
     }
 
     @Test
@@ -188,6 +200,19 @@ public class BankAccountControllerTest {
                 .params(params)
                 .with(csrf()))
                 .andExpect(status().isInternalServerError())// Status is INTERNAL_SERVER_ERROR
+                .andReturn();
+
+        // Check that a String was passed to give some information
+        assertThat(result.getResponse().getContentAsString().isBlank())
+                .isFalse();
+
+        doThrow(ConstraintViolationException.class).when(bankAccountService).updateBankAccount(anyInt(), anyString(), anyString(), anyString());
+
+        params.set("description", "account");
+        result = mvc.perform(put("/bankAccounts")
+                .params(params)
+                .with(csrf()))
+                .andExpect(status().isBadRequest())// Status BAD REQUEST
                 .andReturn();
 
         // Check that a String was passed to give some information
@@ -325,6 +350,19 @@ public class BankAccountControllerTest {
         // Check that a String was passed to give some information
         assertThat(result.getResponse().getContentAsString().isBlank())
                 .isFalse();
+
+        doThrow(ConstraintViolationException.class).when(bankAccountService).transferMoney(anyInt(), any(BigDecimal.class));
+
+        params.set("amount", "-45");
+        result = mvc.perform(post("/bankAccount/transfer")
+                .params(params)
+                .with(csrf()))
+                .andExpect(status().isBadRequest())// Status BAD REQUEST
+                .andReturn();
+
+        // Check that a String was passed to give some information
+        assertThat(result.getResponse().getContentAsString().isBlank())
+                .isFalse();
     }
 
     @Test
@@ -360,6 +398,19 @@ public class BankAccountControllerTest {
                 .params(params)
                 .with(csrf()))
                 .andExpect(status().isInternalServerError())// Status INTERNAL_SERVER_ERROR
+                .andReturn();
+
+        // Check that a String was passed to give some information
+        assertThat(result.getResponse().getContentAsString().isBlank())
+                .isFalse();
+
+        doThrow(ConstraintViolationException.class).when(bankAccountService).withdrawMoney(anyInt(), any(BigDecimal.class));
+
+        params.set("amount", "-45");
+        result = mvc.perform(post("/bankAccount/withdraw")
+                .params(params)
+                .with(csrf()))
+                .andExpect(status().isBadRequest())// Status BAD REQUEST
                 .andReturn();
 
         // Check that a String was passed to give some information

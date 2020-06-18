@@ -36,9 +36,9 @@ public class AccountServiceImpl implements AccountService {
      * @see AccountService
      */
     @Override
-    public void registrateUser(final @NotEmpty @Size(min = 5, max = 25) String username,
-                               final @Email String mail,
-                               @Size(min = 8, max = 80) String password) throws SQLException, IllegalArgumentException, ConstraintViolationException {
+    public void registrateUser(final @NotEmpty @Size(min = 5, max = 25, message = "Username must contain between 5 and 25 characters.") String username,
+                               final @Email(message = "Email has invalid format.") String mail,
+                               @Size(min = 8, max = 80, message = "Password must contain between 8 and 80 characters.") String password) throws SQLException, IllegalArgumentException, ConstraintViolationException {
         Logger.debug("Encode user password.");
         password = passwordEncoder.encode(password);
         userDAO.save(new User(username, mail, password, Collections.singletonList(Role.USER)));

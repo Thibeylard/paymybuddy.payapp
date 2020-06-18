@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
 
+import javax.validation.ConstraintViolationException;
 import java.math.BigDecimal;
 import java.util.Collection;
 
@@ -50,6 +51,9 @@ public class BankAccountController {
         } catch (DataAccessException e) {
             Logger.error(e.getMessage());
             return new ResponseEntity<>("ERROR : See logs for further details.", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (ConstraintViolationException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>("ERROR : " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -66,6 +70,9 @@ public class BankAccountController {
         } catch (DataAccessException e) {
             Logger.error(e.getMessage());
             return new ResponseEntity<>("ERROR : See logs for further details.", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (ConstraintViolationException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>("ERROR : " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -110,6 +117,9 @@ public class BankAccountController {
         } catch (DataAccessException e) {
             Logger.error(e.getMessage());
             return new ResponseEntity<>("ERROR : See logs for further details.", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (ConstraintViolationException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>("ERROR : " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -124,6 +134,9 @@ public class BankAccountController {
         } catch (DataAccessException e) {
             Logger.error(e.getMessage());
             return new ResponseEntity<>("ERROR : See logs for further details.", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (ConstraintViolationException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>("ERROR : " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -45,7 +46,7 @@ public class BankAccountServiceImpl implements BankAccountService {
      */
     @Override
     public void addBankAccount(final String ownerFullName,
-                               @Size(min = 10, max = 30) final String description,
+                               @Size(min = 10, max = 30, message = "Description must be between 10 and 30 characters.") final String description,
                                final String IBAN) throws DataAccessException {
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         bankAccountDAO.save(authUser.getUsername(), ownerFullName, description, IBAN);
@@ -57,7 +58,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     @Override
     public void updateBankAccount(final int bankAccountID,
                                   final String ownerFullName,
-                                  @Size(min = 10, max = 30) final String description,
+                                  @Size(min = 10, max = 30, message = "Description must be between 10 and 30 characters.") final String description,
                                   final String IBAN) throws DataAccessException {
         bankAccountDAO.update(bankAccountID, ownerFullName, description, IBAN);
     }
@@ -85,9 +86,8 @@ public class BankAccountServiceImpl implements BankAccountService {
      */
     @Override
     public void transferMoney(final int bankAccountID,
-                              final BigDecimal amount) throws DataAccessException {
+                              @Min(value = 0, message = "Bank operation can't be negative.") final BigDecimal amount) throws DataAccessException {
         // TODO Ajouter la méthode de relation à la banque (via une interface)
-        //TODO interdire les valeurs négatives
         bankAccountDAO.saveTransferOperation(bankAccountID, clockService.now(), amount);
     }
 
@@ -96,9 +96,8 @@ public class BankAccountServiceImpl implements BankAccountService {
      */
     @Override
     public void withdrawMoney(final int bankAccountID,
-                              final BigDecimal amount) throws DataAccessException {
+                              @Min(value = 0, message = "Bank operation can't be negative.") final BigDecimal amount) throws DataAccessException {
         // TODO Ajouter la méthode de relation à la banque (via une interface)
-        //TODO interdire les valeurs négatives
         bankAccountDAO.saveWithdrawOperation(bankAccountID, clockService.now(), amount);
     }
 }

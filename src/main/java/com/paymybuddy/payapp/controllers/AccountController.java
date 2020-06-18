@@ -33,7 +33,7 @@ public class AccountController {
             accountService.registrateUser(username, mail, password);
         } catch (IllegalArgumentException | ConstraintViolationException e) {
             Logger.error(e.getMessage());
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<String>("ERROR  : " + e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (SQLException e) {
             Logger.error(e.getMessage());
             return new ResponseEntity<String>("Sorry, an error occurred", HttpStatus.INTERNAL_SERVER_ERROR);

@@ -24,6 +24,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
 import java.util.Collections;
 
@@ -77,8 +78,6 @@ public class AccountControllerTest {
                 Collections.singleton(Role.USER)));
     }
 
-    //TODO Ajouter les tests de catch de ConstraintViolationException en BadRequest sur l'inscription
-
     @Test
     @DisplayName("Anonymous user redirections")
     public void Given_anonymousUser_When_requestAppAccess_Then_redirectedToLogin() throws Exception {
@@ -97,11 +96,19 @@ public class AccountControllerTest {
 
     @Test
     @DisplayName("User registration failed on 404")
-    public void Given_anonymousUser_When_registratesWithUnavailableMail_Then_statusIsBadRequest() throws Exception {
-        params.add("username", "user");
+    public void Given_wrongParams_When_registrates_Then_statusIsBadRequest() throws Exception {
+        params.add("username", "username");
         params.add("mail", "user@mail.com");
-        params.add("password", "pass");
+        params.add("password", "password");
         doThrow(IllegalArgumentException.class).when(mockAccountService).registrateUser(anyString(), anyString(), anyString());
+        mvc.perform(post("/registration")
+                .params(params)
+                .with(csrf())
+                .with(anonymous()))
+                .andExpect(status().isBadRequest());
+
+        params.set("username", "user");
+        doThrow(ConstraintViolationException.class).when(mockAccountService).registrateUser(anyString(), anyString(), anyString());
         mvc.perform(post("/registration")
                 .params(params)
                 .with(csrf())
@@ -112,9 +119,9 @@ public class AccountControllerTest {
     @Test
     @DisplayName("User registration failed on 405")
     public void Given_databaseError_When_userRegistrates_Then_statusIsInternalServerError() throws Exception {
-        params.add("username", "user");
+        params.add("username", "username");
         params.add("mail", "user@mail.com");
-        params.add("password", "pass");
+        params.add("password", "password");
         doThrow(SQLException.class).when(mockAccountService).registrateUser(anyString(), anyString(), anyString());
         mvc.perform(post("/registration")
                 .params(params)
@@ -126,9 +133,9 @@ public class AccountControllerTest {
     @Test
     @DisplayName("User registration succeed")
     public void Given_anonymousUser_When_registratesWithAvailableMail_Then_userRedirectedToLogin() throws Exception {
-        params.add("username", "user");
+        params.add("username", "username");
         params.add("mail", "user@mail.com");
-        params.add("password", "pass");
+        params.add("password", "password");
         doNothing().when(mockAccountService).registrateUser(anyString(), anyString(), anyString());
         mvc.perform(post("/registration")
                 .params(params)

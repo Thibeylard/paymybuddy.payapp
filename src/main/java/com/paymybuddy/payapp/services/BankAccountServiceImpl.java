@@ -18,7 +18,6 @@ import java.util.Collection;
 
 @Service
 @Transactional
-@Validated
 public class BankAccountServiceImpl implements BankAccountService {
 
     private final BankAccountDAO bankAccountDAO;
@@ -45,6 +44,7 @@ public class BankAccountServiceImpl implements BankAccountService {
      * @see BankAccountService
      */
     @Override
+    @Validated
     public void addBankAccount(final String ownerFullName,
                                @Size(min = 10, max = 30, message = "Description must be between 10 and 30 characters.") final String description,
                                final String IBAN) throws DataAccessException {
@@ -56,6 +56,7 @@ public class BankAccountServiceImpl implements BankAccountService {
      * @see BankAccountService
      */
     @Override
+    @Validated
     public void updateBankAccount(final int bankAccountID,
                                   final String ownerFullName,
                                   @Size(min = 10, max = 30, message = "Description must be between 10 and 30 characters.") final String description,
@@ -85,6 +86,7 @@ public class BankAccountServiceImpl implements BankAccountService {
      * @see BankAccountService
      */
     @Override
+    @Validated
     public void transferMoney(final int bankAccountID,
                               @Min(value = 0, message = "Bank operation can't be negative.") final BigDecimal amount) throws DataAccessException {
         // TODO Ajouter la méthode de relation à la banque (via une interface)
@@ -95,6 +97,7 @@ public class BankAccountServiceImpl implements BankAccountService {
      * @see BankAccountService
      */
     @Override
+    @Validated
     public void withdrawMoney(final int bankAccountID,
                               @Min(value = 0, message = "Bank operation can't be negative.") final BigDecimal amount) throws DataAccessException {
         // TODO Ajouter la méthode de relation à la banque (via une interface)

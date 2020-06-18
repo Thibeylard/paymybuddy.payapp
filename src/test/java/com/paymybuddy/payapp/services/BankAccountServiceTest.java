@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("test")
-@DisplayName("ContactService tests on : ")
+@DisplayName("BankAccountService tests on : ")
 public class BankAccountServiceTest {
     // Beans
     @Autowired

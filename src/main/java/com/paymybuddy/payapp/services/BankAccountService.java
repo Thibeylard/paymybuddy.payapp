@@ -4,6 +4,7 @@ import com.paymybuddy.payapp.models.BankAccount;
 import com.paymybuddy.payapp.models.BankOperation;
 import org.springframework.dao.DataAccessException;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -28,7 +29,7 @@ public interface BankAccountService {
      * @throws DataAccessException if error occurs during database operation
      */
     void addBankAccount(final String ownerFullName,
-                        @Size(min = 10, max = 30) final String description,
+                        @Size(min = 10, max = 30, message = "Description must be between 10 and 30 characters.") final String description,
                         final String IBAN)
             throws DataAccessException;
 
@@ -43,7 +44,7 @@ public interface BankAccountService {
      */
     void updateBankAccount(final int bankAccountID,
                            final String ownerFullName,
-                           @Size(min = 10, max = 30) final String description,
+                           @Size(min = 10, max = 30, message = "Description must be between 10 and 30 characters.") final String description,
                            final String IBAN)
             throws DataAccessException;
 
@@ -72,7 +73,8 @@ public interface BankAccountService {
      * @param bankAccountID ID of BankAccount to operate on
      * @param amount        Amount of money to transfer
      */
-    void transferMoney(final int bankAccountID, final BigDecimal amount)
+    void transferMoney(final int bankAccountID,
+                       @Min(value = 0, message = "Bank operation can't be negative.") final BigDecimal amount)
             throws DataAccessException;
 
     /**
@@ -81,6 +83,7 @@ public interface BankAccountService {
      * @param bankAccountID ID of BankAccount to operate on
      * @param amount        Amount of money to withdraw
      */
-    void withdrawMoney(final int bankAccountID, final BigDecimal amount)
+    void withdrawMoney(final int bankAccountID,
+                       @Min(value = 0, message = "Bank operation can't be negative.") final BigDecimal amount)
             throws DataAccessException;
 }

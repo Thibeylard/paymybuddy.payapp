@@ -3,7 +3,6 @@ package com.paymybuddy.payapp.integration;
 import com.paymybuddy.payapp.daos.TransactionDAO;
 import com.paymybuddy.payapp.dtos.TransactionToSaveDTO;
 import com.paymybuddy.payapp.models.Transaction;
-import com.paymybuddy.payapp.services.ClockService;
 import org.assertj.db.api.Assertions;
 import org.assertj.db.type.Table;
 import org.flywaydb.test.annotation.FlywayTest;
@@ -13,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -41,8 +41,15 @@ public class TransactionDAOSpringJdbcIT {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    private final ZonedDateTime newTransactionTime =
-            ZonedDateTime.of(2020, 1, 7, 0, 0, 0, 0, ZoneId.of(ClockService.ZONE_ID));
+    private final String ZONE_ID;
+
+    private final ZonedDateTime newTransactionTime;
+
+    public TransactionDAOSpringJdbcIT(@Value("${default.zoneID}") String ZONE_ID) {
+        this.ZONE_ID = ZONE_ID;
+        newTransactionTime = ZonedDateTime.of(2020, 1, 7, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
+    }
+
 
     @Test
     @FlywayTest
@@ -51,9 +58,9 @@ public class TransactionDAOSpringJdbcIT {
     public void Given_authenticatedUser_When_getAnyUserTransactions_Then_returnUserTransactions() {
         // All types of Transactions for user2
         // Thorough tests on all values retrieved
-        ZonedDateTime firstDate = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of(ClockService.ZONE_ID));
-        ZonedDateTime secondDate = ZonedDateTime.of(2020, 1, 3, 0, 0, 0, 0, ZoneId.of(ClockService.ZONE_ID));
-        ZonedDateTime thirdDate = ZonedDateTime.of(2020, 1, 6, 0, 0, 0, 0, ZoneId.of(ClockService.ZONE_ID));
+        ZonedDateTime firstDate = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
+        ZonedDateTime secondDate = ZonedDateTime.of(2020, 1, 3, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
+        ZonedDateTime thirdDate = ZonedDateTime.of(2020, 1, 6, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
         Collection<Transaction> result = transactionDAO.getTransactionsByUserMail("user2@mail.com");
         assertThat(result)
                 .hasSize(3)

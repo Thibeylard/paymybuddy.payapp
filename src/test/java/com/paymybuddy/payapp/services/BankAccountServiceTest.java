@@ -1,6 +1,7 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.BankAccountDAO;
+import com.paymybuddy.payapp.exceptions.UnauthorizedBankOperationException;
 import com.paymybuddy.payapp.models.BankAccount;
 import com.paymybuddy.payapp.models.BankOperation;
 import org.junit.jupiter.api.DisplayName;
@@ -36,6 +37,8 @@ public class BankAccountServiceTest {
     private BankAccountService bankAccountService;
     @MockBean
     private BankAccountDAO bankAccountDAO;
+    @MockBean
+    private BankService bankService;
 
     @Test
     @WithMockUser
@@ -161,8 +164,10 @@ public class BankAccountServiceTest {
     @Test
     @WithMockUser
     @DisplayName("transferMoney() Success")
-    public void Given_validParams_When_transferMoney_Then_nothingIsThrown() {
+    public void Given_validParams_When_transferMoney_Then_nothingIsThrown() throws UnauthorizedBankOperationException {
         when(bankAccountDAO.saveTransferOperation(anyInt(), any(ZonedDateTime.class), any(BigDecimal.class))).thenReturn(true);
+        when(bankAccountDAO.getBankAccount(anyInt())).thenReturn(new BankAccount(1, 2, "John SMITH", "some bank account", "GB90RJCM65823550244646"));
+        when(bankService.askBankForTransfer(anyString(), anyString(), any(BigDecimal.class))).thenReturn(true);
 
         assertDoesNotThrow(() -> bankAccountService.transferMoney(6, new BigDecimal(45)));
         verify(bankAccountDAO, times(1)).saveTransferOperation(anyInt(), any(ZonedDateTime.class), any(BigDecimal.class));
@@ -170,18 +175,35 @@ public class BankAccountServiceTest {
 
     @Test
     @WithMockUser
-    @DisplayName("transferMoney() Exception")
-    public void Given_databaseError_When_transferMoney_Then_throwsDAOException() {
-        doThrow(DataRetrievalFailureException.class).when(bankAccountDAO).saveTransferOperation(anyInt(), any(ZonedDateTime.class), any(BigDecimal.class));
-
+    @DisplayName("transferMoney() Exceptions")
+    public void Given_databaseError_When_transferMoney_Then_throwsDAOException() throws UnauthorizedBankOperationException {
+        // BankAccount not found
+        doThrow(DataRetrievalFailureException.class).when(bankAccountDAO).getBankAccount(anyInt());
         assertThrows(DataRetrievalFailureException.class, () -> bankAccountService.transferMoney(6, new BigDecimal(45)));
+        reset(bankAccountDAO);
+
+        // Unauthorized Bank Operation
+        when(bankAccountDAO.getBankAccount(anyInt())).thenReturn(new BankAccount(1, 2, "John SMITH", "some bank account", "GB90RJCM65823550244646"));
+        doThrow(UnauthorizedBankOperationException.class).when(bankService).askBankForTransfer(anyString(), anyString(), any(BigDecimal.class));
+        assertThrows(UnauthorizedBankOperationException.class, () -> bankAccountService.transferMoney(3, new BigDecimal(45)));
+        reset(bankService);
+
+        // BankOperation could not be saved
+        when(bankAccountDAO.getBankAccount(anyInt())).thenReturn(new BankAccount(1, 2, "John SMITH", "some bank account", "GB90RJCM65823550244646"));
+        when(bankService.askBankForTransfer(anyString(), anyString(), any(BigDecimal.class))).thenReturn(true);
+        doThrow(DataRetrievalFailureException.class).when(bankAccountDAO).saveTransferOperation(anyInt(), any(ZonedDateTime.class), any(BigDecimal.class));
+        assertThrows(DataRetrievalFailureException.class, () -> bankAccountService.transferMoney(3, new BigDecimal(45)));
+
+
     }
 
     @Test
     @WithMockUser
     @DisplayName("withdrawMoney() Success")
-    public void Given_validParams_When_withdrawMoney_Then_nothingIsThrown() {
+    public void Given_validParams_When_withdrawMoney_Then_nothingIsThrown() throws UnauthorizedBankOperationException {
         when(bankAccountDAO.saveWithdrawOperation(anyInt(), any(ZonedDateTime.class), any(BigDecimal.class))).thenReturn(true);
+        when(bankAccountDAO.getBankAccount(anyInt())).thenReturn(new BankAccount(1, 2, "John SMITH", "some bank account", "GB90RJCM65823550244646"));
+        when(bankService.askBankForWithdrawal(anyString(), anyString(), any(BigDecimal.class))).thenReturn(true);
 
         assertDoesNotThrow(() -> bankAccountService.withdrawMoney(6, new BigDecimal(45)));
         verify(bankAccountDAO, times(1)).saveWithdrawOperation(anyInt(), any(ZonedDateTime.class), any(BigDecimal.class));
@@ -189,10 +211,23 @@ public class BankAccountServiceTest {
 
     @Test
     @WithMockUser
-    @DisplayName("withdrawMoney() Exception")
-    public void Given_databaseError_When_withdrawMoney_Then_throwsDAOException() {
-        doThrow(DataRetrievalFailureException.class).when(bankAccountDAO).saveWithdrawOperation(anyInt(), any(ZonedDateTime.class), any(BigDecimal.class));
-
+    @DisplayName("withdrawMoney() Exceptions")
+    public void Given_databaseError_When_withdrawMoney_Then_throwsDAOException() throws UnauthorizedBankOperationException {
+        // BankAccount not found
+        doThrow(DataRetrievalFailureException.class).when(bankAccountDAO).getBankAccount(anyInt());
         assertThrows(DataRetrievalFailureException.class, () -> bankAccountService.withdrawMoney(6, new BigDecimal(45)));
+        reset(bankAccountDAO);
+
+        // Unauthorized Bank Operation
+        when(bankAccountDAO.getBankAccount(anyInt())).thenReturn(new BankAccount(1, 2, "John SMITH", "some bank account", "GB90RJCM65823550244646"));
+        doThrow(UnauthorizedBankOperationException.class).when(bankService).askBankForWithdrawal(anyString(), anyString(), any(BigDecimal.class));
+        assertThrows(UnauthorizedBankOperationException.class, () -> bankAccountService.withdrawMoney(3, new BigDecimal(45)));
+        reset(bankService);
+
+        // BankOperation could not be saved
+        when(bankAccountDAO.getBankAccount(anyInt())).thenReturn(new BankAccount(1, 2, "John SMITH", "some bank account", "GB90RJCM65823550244646"));
+        when(bankService.askBankForWithdrawal(anyString(), anyString(), any(BigDecimal.class))).thenReturn(true);
+        doThrow(DataRetrievalFailureException.class).when(bankAccountDAO).saveWithdrawOperation(anyInt(), any(ZonedDateTime.class), any(BigDecimal.class));
+        assertThrows(DataRetrievalFailureException.class, () -> bankAccountService.withdrawMoney(3, new BigDecimal(45)));
     }
 }

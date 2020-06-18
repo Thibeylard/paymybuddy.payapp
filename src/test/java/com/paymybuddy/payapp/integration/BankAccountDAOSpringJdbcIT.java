@@ -3,7 +3,6 @@ package com.paymybuddy.payapp.integration;
 import com.paymybuddy.payapp.daos.BankAccountDAO;
 import com.paymybuddy.payapp.models.BankAccount;
 import com.paymybuddy.payapp.models.BankOperation;
-import com.paymybuddy.payapp.services.ClockService;
 import org.assertj.db.api.Assertions;
 import org.assertj.db.type.Table;
 import org.flywaydb.test.annotation.FlywayTest;
@@ -13,8 +12,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -40,9 +41,14 @@ public class BankAccountDAOSpringJdbcIT {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    private final ZonedDateTime operationDate =
-            ZonedDateTime.of(2020, 12, 25, 0, 0, 0, 0, ZoneId.of(ClockService.ZONE_ID));
+    private final String ZONE_ID;
 
+    private final ZonedDateTime operationDate;
+
+    public BankAccountDAOSpringJdbcIT(@Value("${default.zoneID}") String ZONE_ID) {
+        this.ZONE_ID = ZONE_ID;
+        operationDate = ZonedDateTime.of(2020, 12, 25, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
+    }
 
     @Test
     @FlywayTest
@@ -75,6 +81,22 @@ public class BankAccountDAOSpringJdbcIT {
                 .hasSize(1);
         assertThat(bankAccountDAO.getBankAccounts("user4@mail.com"))
                 .hasSize(1);
+    }
+
+    @Test
+    @FlywayTest
+    @DisplayName("getBankAccount() Success")
+    public void Given_bankAccountID_When_getBankAccount_Then_returnAccordingBankAccount() {
+        BankAccount result = bankAccountDAO.getBankAccount(5);
+        BankAccount bankAccount5 = new BankAccount(5, 4, "user4 NAME", "my main bank account", "FR3522190814281GZ6G972RO306");
+        assertThat(result).isEqualToComparingFieldByField(bankAccount5);
+    }
+
+    @Test
+    @FlywayTest
+    @DisplayName("getBankAccount() Exception")
+    public void Given_inexistantBankAccountID_When_getBankAccount_Then_throwDataRetrievalException() {
+        assertThrows(DataRetrievalFailureException.class, () -> bankAccountDAO.getBankAccount(7));
     }
 
     @Test
@@ -210,8 +232,8 @@ public class BankAccountDAOSpringJdbcIT {
     @DisplayName("getBankOperations() Successes")
     public void Given_bankAccountID_When_getBankOperations_Then_returnBankOperations() {
         // Thorough test on most "complex" case
-        ZonedDateTime firstOpDate = ZonedDateTime.of(2020, 4, 9, 0, 0, 0, 0, ZoneId.of(ClockService.ZONE_ID));
-        ZonedDateTime secondOpDate = ZonedDateTime.of(2020, 10, 17, 0, 0, 0, 0, ZoneId.of(ClockService.ZONE_ID));
+        ZonedDateTime firstOpDate = ZonedDateTime.of(2020, 4, 9, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
+        ZonedDateTime secondOpDate = ZonedDateTime.of(2020, 10, 17, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
         Collection<BankOperation> result = bankAccountDAO.getBankOperations(3);
         assertThat(result)
                 .hasSize(2)

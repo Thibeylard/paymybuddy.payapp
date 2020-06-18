@@ -26,21 +26,10 @@ public class BankAccountServiceImpl implements BankAccountService {
     private final BankService bankService;
 
     @Autowired
-    public BankAccountServiceImpl(BankAccountDAO bankAccountDAO) {
+    public BankAccountServiceImpl(BankAccountDAO bankAccountDAO, ClockService clockService, BankService bankService) {
         this.bankAccountDAO = bankAccountDAO;
-        this.clockService = new ClockService() {
-        };
-        this.bankService = new BankService() {
-            @Override
-            public boolean askBankForWithdrawal(String ownerFullName, String IBAN, BigDecimal amount) throws UnauthorizedBankOperationException {
-                return true;
-            }
-
-            @Override
-            public boolean askBankForTransfer(String ownerFullName, String IBAN, BigDecimal amount) throws UnauthorizedBankOperationException {
-                return true;
-            }
-        };
+        this.clockService = clockService;
+        this.bankService = bankService;
     }
 
     /**

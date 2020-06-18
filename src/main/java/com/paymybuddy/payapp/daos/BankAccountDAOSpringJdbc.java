@@ -3,7 +3,7 @@ package com.paymybuddy.payapp.daos;
 import com.paymybuddy.payapp.constants.DBStatements;
 import com.paymybuddy.payapp.models.BankAccount;
 import com.paymybuddy.payapp.models.BankOperation;
-import com.paymybuddy.payapp.services.ClockService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -21,9 +21,12 @@ import java.util.Map;
 public class BankAccountDAOSpringJdbc implements BankAccountDAO {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final String ZONE_ID;
 
-    public BankAccountDAOSpringJdbc(NamedParameterJdbcTemplate jdbcTemplate) {
+    public BankAccountDAOSpringJdbc(NamedParameterJdbcTemplate jdbcTemplate,
+                                    @Value("${default.zoneID}") String zoneID) {
         this.jdbcTemplate = jdbcTemplate;
+        this.ZONE_ID = zoneID;
     }
 
     /**
@@ -48,7 +51,7 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
      */
     @Override
     public BankAccount getBankAccount(final int bankAccountID) throws DataAccessException {
-        return jdbcTemplate.queryForObject(DBStatements.GET_BANK_ACCOUNT,
+        BankAccount bankAccount = jdbcTemplate.queryForObject(DBStatements.GET_BANK_ACCOUNT,
                 new MapSqlParameterSource("bankAccountID", bankAccountID),
                 (rs, rowNum) ->
                         new BankAccount(
@@ -58,6 +61,11 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
                                 rs.getString("description"),
                                 rs.getString("IBAN")
                         ));
+        if (bankAccount == null) {
+            throw new DataRetrievalFailureException("There is no bank account with bankAccountID");
+        }
+
+        return bankAccount;
     }
 
     /**
@@ -126,7 +134,7 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
                                 rs.getInt("id"),
                                 rs.getInt("bank_account_id"),
                                 ZonedDateTime.of(rs.getTimestamp("date").toLocalDateTime(),
-                                        ZoneId.of(ClockService.ZONE_ID)),
+                                        ZoneId.of(this.ZONE_ID)),
                                 BigDecimal.valueOf(rs.getDouble("amount"))
                         ));
     }

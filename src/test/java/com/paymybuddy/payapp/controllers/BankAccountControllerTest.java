@@ -1,6 +1,7 @@
 package com.paymybuddy.payapp.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.paymybuddy.payapp.exceptions.UnauthorizedBankOperationException;
 import com.paymybuddy.payapp.models.BankAccount;
 import com.paymybuddy.payapp.models.BankOperation;
 import com.paymybuddy.payapp.services.BankAccountService;
@@ -335,7 +336,7 @@ public class BankAccountControllerTest {
     @Test
     @WithMockUser
     @DisplayName("POST Transfer Exception")
-    public void Given_databaseError_When_makeTransfer_Then_statusIsServerError() throws Exception {
+    public void Given_anyError_When_makeTransfer_Then_statusIsNotOK() throws Exception {
         doThrow(DataRetrievalFailureException.class).when(bankAccountService).transferMoney(anyInt(), any(BigDecimal.class));
         params.add("bankAccountID", "1");
         params.add("amount", "150");
@@ -345,6 +346,19 @@ public class BankAccountControllerTest {
                 .params(params)
                 .with(csrf()))
                 .andExpect(status().isInternalServerError())// Status INTERNAL_SERVER_ERROR
+                .andReturn();
+
+        // Check that a String was passed to give some information
+        assertThat(result.getResponse().getContentAsString().isBlank())
+                .isFalse();
+
+
+        doThrow(UnauthorizedBankOperationException.class).when(bankAccountService).transferMoney(anyInt(), any(BigDecimal.class));
+
+        result = mvc.perform(post("/bankAccount/transfer")
+                .params(params)
+                .with(csrf()))
+                .andExpect(status().isForbidden())// Status FORBIDDEN
                 .andReturn();
 
         // Check that a String was passed to give some information
@@ -388,7 +402,7 @@ public class BankAccountControllerTest {
     @Test
     @WithMockUser
     @DisplayName("POST Withdraw Exception")
-    public void Given_databaseError_When_makeWithdraw_Then_statusIsServerError() throws Exception {
+    public void Given_anyError_When_makeWithdraw_Then_statusIsNotOK() throws Exception {
         doThrow(DataRetrievalFailureException.class).when(bankAccountService).withdrawMoney(anyInt(), any(BigDecimal.class));
         params.add("bankAccountID", "1");
         params.add("amount", "150");
@@ -398,6 +412,18 @@ public class BankAccountControllerTest {
                 .params(params)
                 .with(csrf()))
                 .andExpect(status().isInternalServerError())// Status INTERNAL_SERVER_ERROR
+                .andReturn();
+
+        // Check that a String was passed to give some information
+        assertThat(result.getResponse().getContentAsString().isBlank())
+                .isFalse();
+
+        doThrow(UnauthorizedBankOperationException.class).when(bankAccountService).withdrawMoney(anyInt(), any(BigDecimal.class));
+
+        result = mvc.perform(post("/bankAccount/withdraw")
+                .params(params)
+                .with(csrf()))
+                .andExpect(status().isForbidden())// Status FORBIDDEN
                 .andReturn();
 
         // Check that a String was passed to give some information

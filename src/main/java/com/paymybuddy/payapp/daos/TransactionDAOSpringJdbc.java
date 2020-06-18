@@ -3,8 +3,8 @@ package com.paymybuddy.payapp.daos;
 import com.paymybuddy.payapp.constants.DBStatements;
 import com.paymybuddy.payapp.dtos.TransactionToSaveDTO;
 import com.paymybuddy.payapp.models.Transaction;
-import com.paymybuddy.payapp.services.ClockService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -21,10 +21,13 @@ import java.util.Map;
 public class TransactionDAOSpringJdbc implements TransactionDAO {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final String ZONE_ID;
 
     @Autowired
-    public TransactionDAOSpringJdbc(NamedParameterJdbcTemplate jdbcTemplate) {
+    public TransactionDAOSpringJdbc(NamedParameterJdbcTemplate jdbcTemplate,
+                                    @Value("${default.zoneID}") String zoneID) {
         this.jdbcTemplate = jdbcTemplate;
+        this.ZONE_ID = zoneID;
     }
 
     /**
@@ -59,7 +62,7 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
                                 rs.getInt("id"),
                                 rs.getInt("debtor_id"),
                                 rs.getInt("creditor_id"),
-                                ZonedDateTime.of(rs.getTimestamp("zoned_date_time").toLocalDateTime(), ZoneId.of(ClockService.ZONE_ID)),
+                                ZonedDateTime.of(rs.getTimestamp("zoned_date_time").toLocalDateTime(), ZoneId.of(this.ZONE_ID)),
                                 rs.getDouble("amount"),
                                 rs.getDouble("total"),
                                 rs.getString("description")

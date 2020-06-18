@@ -24,11 +24,10 @@ public class TransactionServiceImpl implements TransactionService {
     private final ClockService clockService;
 
     @Autowired
-    public TransactionServiceImpl(TransactionDAO transactionDAO, MonetizationService monetizationService) {
+    public TransactionServiceImpl(TransactionDAO transactionDAO, MonetizationService monetizationService, ClockService clockService) {
         this.transactionDAO = transactionDAO;
         this.monetizationService = monetizationService;
-        this.clockService = new ClockService() {
-        };
+        this.clockService = clockService;
     }
 
     /**

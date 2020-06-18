@@ -56,23 +56,18 @@ public class ContactControllerTest {
                 .build();
     }
 
-    //TODO Corriger le nom des tests
-
     @Test
     @WithMockUser
     @DisplayName("GET Contacts Success")
-    public void Given_userId_When_getUserContacts_Then_returnContactServiceValue() throws Exception {
+    public void Given_authenticatedUser_When_getUserContacts_Then_returnContactServiceValue() throws Exception {
         // Empty collection
         Collection<Contact> contacts = Collections.emptyList();
         when(contactService.getUserContacts()).thenReturn(contacts);
         String contactsJson = objectMapper.writeValueAsString(contacts);
-        params.add("userID", "4");
 
-        //TODO Retirer l'utilisation du paramètres qui n'a plus de sens ici
 
         MvcResult result;
-        result = mvc.perform(get("/contacts")
-                .params(params))
+        result = mvc.perform(get("/contacts"))
                 .andExpect(status().isOk())// Status OK
                 .andReturn();
 
@@ -84,8 +79,7 @@ public class ContactControllerTest {
         when(contactService.getUserContacts()).thenReturn(contacts);
         contactsJson = objectMapper.writeValueAsString(contacts);
 
-        result = mvc.perform(get("/contacts")
-                .params(params))
+        result = mvc.perform(get("/contacts"))
                 .andExpect(status().isOk())// Status OK
                 .andReturn();
 
@@ -98,14 +92,10 @@ public class ContactControllerTest {
     @DisplayName("GET Contacts Exception")
     public void Given_databaseError_When_getUserContacts_Then_returnNull() throws Exception {
         // Empty collection
-        //TODO supprimer contacts non utilisé et paramètres
-        Collection<Contact> contacts = Collections.emptyList();
         doThrow(DataRetrievalFailureException.class).when(contactService).getUserContacts();
-        params.add("userID", "4");
 
         MvcResult result;
-        result = mvc.perform(get("/contacts")
-                .params(params))
+        result = mvc.perform(get("/contacts"))
                 .andExpect(status().isInternalServerError())// Status INTERNAL SERVER ERROR
                 .andReturn();
 
@@ -117,9 +107,8 @@ public class ContactControllerTest {
     @Test
     @WithMockUser
     @DisplayName("POST Contact Success")
-    public void Given_userIdAndContactMail_When_addContact_Then_statusIsCreated() throws Exception {
+    public void Given_contactMail_When_addContact_Then_statusIsCreated() throws Exception {
         doNothing().when(contactService).addContact(anyString());
-        params.add("userID", "4");
         params.add("contactMail", "contact@mail.com");
 
         MvcResult result;
@@ -139,7 +128,6 @@ public class ContactControllerTest {
     @DisplayName("POST Contact Exception")
     public void Given_databaseError_When_addContact_Then_statusIsServerError() throws Exception {
         doThrow(DataRetrievalFailureException.class).when(contactService).addContact(anyString());
-        params.add("userID", "4");
         params.add("contactMail", "contact@mail.com");
 
         MvcResult result;
@@ -157,9 +145,8 @@ public class ContactControllerTest {
     @Test
     @WithMockUser
     @DisplayName("DELETE Contact Success")
-    public void Given_userIdAndContactMail_When_deleteContact_Then_statusIsOK() throws Exception {
+    public void Given_contactMail_When_deleteContact_Then_statusIsOK() throws Exception {
         doNothing().when(contactService).deleteContact(anyString());
-        params.add("userID", "4");
         params.add("contactMail", "contact@mail.com");
 
         MvcResult result;
@@ -179,7 +166,6 @@ public class ContactControllerTest {
     @DisplayName("DELETE Contact Exception")
     public void Given_databaseError_When_deleteContact_Then_statusIsServerError() throws Exception {
         doThrow(DataRetrievalFailureException.class).when(contactService).deleteContact(anyString());
-        params.add("userID", "4");
         params.add("contactMail", "contact@mail.com");
 
         MvcResult result;

@@ -2,6 +2,7 @@ package com.paymybuddy.payapp.integration;
 
 import com.paymybuddy.payapp.daos.TransactionDAO;
 import com.paymybuddy.payapp.dtos.TransactionToSaveDTO;
+import com.paymybuddy.payapp.models.Transaction;
 import com.paymybuddy.payapp.services.ClockService;
 import org.assertj.db.api.Assertions;
 import org.assertj.db.type.Table;
@@ -22,6 +23,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
+import java.util.Collection;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -47,8 +50,33 @@ public class TransactionDAOSpringJdbcIT {
     @DisplayName("getTransactions() Successes")
     public void Given_authenticatedUser_When_getAnyUserTransactions_Then_returnUserTransactions() {
         // All types of Transactions for user2
-        assertThat(transactionDAO.getTransactionsByUserMail("user2@mail.com"))
-                .hasSize(3);
+        // Thorough tests on all values retrieved
+        ZonedDateTime firstDate = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of(ClockService.ZONE_ID));
+        ZonedDateTime secondDate = ZonedDateTime.of(2020, 1, 3, 0, 0, 0, 0, ZoneId.of(ClockService.ZONE_ID));
+        ZonedDateTime thirdDate = ZonedDateTime.of(2020, 1, 6, 0, 0, 0, 0, ZoneId.of(ClockService.ZONE_ID));
+        Collection<Transaction> result = transactionDAO.getTransactionsByUserMail("user2@mail.com");
+        assertThat(result)
+                .hasSize(3)
+                .extracting("id").containsExactly(Optional.of(1), Optional.of(3), Optional.of(6));
+        assertThat(result)
+                .extracting("debtorID").containsExactly(1, 2, 3);
+        assertThat(result)
+                .extracting("creditorID").containsExactly(2, 3, 2);
+        assertThat(result)
+                .extracting("initialAmount").containsExactly(10.00, 10.0, 10.0);
+        assertThat(result)
+                .extracting("total").containsExactly(9.5, 9.5, 9.5);
+        assertThat(result)
+                .extracting("description").containsExactly("transaction1", "transaction3", "transaction6");
+
+        assertThat(result)
+                .extracting("date").element(0).usingRecursiveComparison().isEqualTo(firstDate);
+        assertThat(result)
+                .extracting("date").element(1).usingRecursiveComparison().isEqualTo(secondDate);
+        assertThat(result)
+                .extracting("date").element(2).usingRecursiveComparison().isEqualTo(thirdDate);
+
+        // Basic tests
         assertThat(transactionDAO.getDebitTransactionsByUserMail("user2@mail.com"))
                 .hasSize(1);
         assertThat(transactionDAO.getCreditTransactionsByUserMail("user2@mail.com"))
@@ -61,28 +89,6 @@ public class TransactionDAOSpringJdbcIT {
                 .hasSize(0);
         assertThat(transactionDAO.getCreditTransactionsByUserMail("user4@mail.com"))
                 .hasSize(2);
-
-        Table transactionTable = new Table(jdbcTemplate.getJdbcTemplate().getDataSource(), "Transaction");
-
-        Assertions.assertThat(transactionTable)
-                .row(1)
-                .value("debtor_id").isEqualTo(3)
-                .value("creditor_id").isEqualTo(1)
-                .value("description").isEqualTo("transaction2")
-                .value("amount").isEqualTo(10.00)
-                .value("total").isEqualTo(9.50);
-
-        //TODO Modifier ce test pour vérifier non pas la table, mais la valeur obtenue.
-        TimestampWithTimeZone timestampWithTimeZoneExample =
-                (TimestampWithTimeZone) transactionTable.getRow(1).getColumnValue("zoned_date_time").getValue();
-
-        // Check that zoned_date_time in database perfectly match with passed ZonedDateTime object
-        assertThat(timestampWithTimeZoneExample.getDay()).isEqualTo(2);
-        assertThat(timestampWithTimeZoneExample.getMonth()).isEqualTo(1);
-        assertThat(timestampWithTimeZoneExample.getYear()).isEqualTo(2020);
-        assertThat(timestampWithTimeZoneExample.getNanosSinceMidnight()).isEqualTo(0);
-        assertThat(timestampWithTimeZoneExample.getTimeZoneOffsetSeconds()).isEqualTo(newTransactionTime.getOffset().get(ChronoField.OFFSET_SECONDS));
-
     }
 
     @Test

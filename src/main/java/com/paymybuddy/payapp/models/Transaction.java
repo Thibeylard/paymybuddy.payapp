@@ -12,11 +12,11 @@ public class Transaction {
     /**
      * Database ID of User that send the money.
      */
-    private final int debtorId;
+    private final int debtorID;
     /**
      * Database ID of User that received the money.
      */
-    private final int creditorId;
+    private final int creditorID;
 
     /**
      * Datetime of transaction
@@ -39,23 +39,23 @@ public class Transaction {
      * Constructor used to retrieve a transaction from database
      *
      * @param id            from Transaction.id
-     * @param debtorId      from Transaction.debtor_id
-     * @param creditorId    from Transaction.creditor_id
+     * @param debtorID      from Transaction.debtor_id
+     * @param creditorID    from Transaction.creditor_id
      * @param date          from Transaction.date
      * @param initialAmount from Transaction.initialTotal
      * @param total         from Transaction.monetizedTotal
      * @param description   from Transaction.description
      */
     public Transaction(int id,
-                       int debtorId,
-                       int creditorId,
+                       int debtorID,
+                       int creditorID,
                        ZonedDateTime date,
                        Double initialAmount,
                        Double total,
                        String description) {
         this.id = id;
-        this.debtorId = debtorId;
-        this.creditorId = creditorId;
+        this.debtorID = debtorID;
+        this.creditorID = creditorID;
         this.date = date;
         this.initialAmount = initialAmount;
         this.total = total;
@@ -69,12 +69,12 @@ public class Transaction {
         return Optional.ofNullable(this.id);
     }
 
-    public int getDebtorId() {
-        return debtorId;
+    public int getDebtorID() {
+        return debtorID;
     }
 
-    public int getCreditorId() {
-        return creditorId;
+    public int getCreditorID() {
+        return creditorID;
     }
 
     public ZonedDateTime getDate() {

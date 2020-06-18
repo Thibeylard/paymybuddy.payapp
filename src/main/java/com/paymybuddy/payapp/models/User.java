@@ -46,8 +46,11 @@ public class User {
      */
     @Nullable
     private Collection<Transaction> transactions;
-
-    //TODO Ajouter attribut Collection<BankAccount>
+    /**
+     * User bank accounts.  Null if User partially retrieved.
+     */
+    @Nullable
+    private Collection<BankAccount> bankAccounts;
 
     public User(@NotNull String username,
                 @NotNull String mail,
@@ -86,6 +89,11 @@ public class User {
         return this;
     }
 
+    public User withBankAccounts(Collection<BankAccount> bankAccounts) {
+        this.bankAccounts = bankAccounts;
+        return this;
+    }
+
 
     // ----------------------------------- Attribute Getters and Setters
 
@@ -115,5 +123,9 @@ public class User {
 
     public Optional<Collection<Transaction>> getTransactions() {
         return Optional.ofNullable(transactions);
+    }
+
+    public Optional<Collection<BankAccount>> getBankAccounts() {
+        return Optional.ofNullable(bankAccounts);
     }
 }

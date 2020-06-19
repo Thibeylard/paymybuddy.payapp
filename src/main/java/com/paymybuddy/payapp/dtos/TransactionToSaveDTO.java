@@ -1,5 +1,6 @@
 package com.paymybuddy.payapp.dtos;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 public class TransactionToSaveDTO {
@@ -18,24 +19,29 @@ public class TransactionToSaveDTO {
      */
     private final ZonedDateTime date;
     /**
-     * Initial transaction amount.
+     * Transaction amount.
      */
-    private final Double amount;
+    private final BigDecimal amount;
     /**
-     * 5% app monetized total.
+     * Commission on transaction amount.
      */
-    private final Double total;
+    private final BigDecimal commission;
     /**
      * Basic description of transaction
      */
     private final String description;
 
-    public TransactionToSaveDTO(String userMail, String recipientMail, ZonedDateTime date, Double initialAmount, Double total, String description) {
+    public TransactionToSaveDTO(String userMail,
+                                String recipientMail,
+                                ZonedDateTime date,
+                                BigDecimal initialAmount,
+                                BigDecimal commission,
+                                String description) {
         this.userMail = userMail;
         this.recipientMail = recipientMail;
         this.date = date;
         this.amount = initialAmount;
-        this.total = total;
+        this.commission = commission;
         this.description = description;
     }
 
@@ -51,12 +57,12 @@ public class TransactionToSaveDTO {
         return date;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public Double getTotal() {
-        return total;
+    public BigDecimal getCommission() {
+        return commission;
     }
 
     public String getDescription() {

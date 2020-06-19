@@ -2,17 +2,19 @@ package com.paymybuddy.payapp.services;
 
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 public class MonetizationServiceImpl implements MonetizationService {
 
-    private final double percentage;
+    private final BigDecimal percentage;
 
     public MonetizationServiceImpl() {
-        this.percentage = 0.05;
+        this.percentage = BigDecimal.valueOf(0.05);
     }
 
     @Override
-    public double monetize(final double amount) {
-        return amount * percentage;
+    public BigDecimal monetize(final BigDecimal amount) {
+        return amount.multiply(percentage);
     }
 }

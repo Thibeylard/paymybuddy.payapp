@@ -1,5 +1,6 @@
 package com.paymybuddy.payapp.models;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
@@ -23,13 +24,13 @@ public class Transaction {
      */
     private final ZonedDateTime date;
     /**
-     * Initial transaction amount.
+     * Transaction amount.
      */
-    private final Double initialAmount;
+    private final BigDecimal amount;
     /**
-     * 5% app monetized total.
+     * Commission on transaction amount.
      */
-    private final Double total;
+    private final BigDecimal commission;
     /**
      * Basic description of transaction
      */
@@ -38,27 +39,27 @@ public class Transaction {
     /**
      * Constructor used to retrieve a transaction from database
      *
-     * @param id            from Transaction.id
-     * @param debtorID      from Transaction.debtor_id
-     * @param creditorID    from Transaction.creditor_id
-     * @param date          from Transaction.date
-     * @param initialAmount from Transaction.initialTotal
-     * @param total         from Transaction.monetizedTotal
-     * @param description   from Transaction.description
+     * @param id          from Transaction.id
+     * @param debtorID    from Transaction.debtor_id
+     * @param creditorID  from Transaction.creditor_id
+     * @param date        from Transaction.date
+     * @param amount      from Transaction.initialTotal
+     * @param commission  from Transaction.monetizedTotal
+     * @param description from Transaction.description
      */
     public Transaction(int id,
                        int debtorID,
                        int creditorID,
                        ZonedDateTime date,
-                       Double initialAmount,
-                       Double total,
+                       BigDecimal amount,
+                       BigDecimal commission,
                        String description) {
         this.id = id;
         this.debtorID = debtorID;
         this.creditorID = creditorID;
         this.date = date;
-        this.initialAmount = initialAmount;
-        this.total = total;
+        this.amount = amount;
+        this.commission = commission;
         this.description = description;
     }
 
@@ -81,12 +82,12 @@ public class Transaction {
         return date;
     }
 
-    public Double getInitialAmount() {
-        return initialAmount;
+    public BigDecimal getAmount() {
+        return amount;
     }
 
-    public Double getTotal() {
-        return total;
+    public BigDecimal getTotal() {
+        return commission;
     }
 
     public String getDescription() {

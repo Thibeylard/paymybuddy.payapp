@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.tinylog.Logger;
 
 import javax.validation.ConstraintViolationException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -35,9 +36,9 @@ public class UserController {
     }
 
     @GetMapping("/user/balance") // Return User balance
-    public ResponseEntity<Double> getUserBalance() {
+    public ResponseEntity<BigDecimal> getUserBalance() {
         Logger.debug("Request for principal user balance.");
-        Optional<Double> balance = userService.getUserBalance();
+        Optional<BigDecimal> balance = userService.getUserBalance();
         return balance.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR));
     }

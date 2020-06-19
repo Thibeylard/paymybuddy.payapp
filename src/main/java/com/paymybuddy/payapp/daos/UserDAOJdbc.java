@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.tinylog.Logger;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -183,8 +184,8 @@ public class UserDAOJdbc implements UserDAO {
      * @see UserDAO
      */
     @Override
-    public Optional<Double> getBalance(final String userMail) {
-        Double balance = null;
+    public Optional<BigDecimal> getBalance(final String userMail) {
+        BigDecimal balance = null;
         Connection con = databaseConfiguration.getConnection();
         if (con != null) {
 
@@ -200,14 +201,14 @@ public class UserDAOJdbc implements UserDAO {
                 ps.setString(1, userMail);
                 rs = ps.executeQuery();
                 if (rs.next()) {
-                    balance = rs.getDouble("balance");
+                    balance = BigDecimal.valueOf(rs.getDouble("balance"));
 
                     // Subtract User debit balance
                     ps = con.prepareStatement(DBStatements.GET_USER_DEBIT_BALANCE_CLASSIC_JDBC);
                     ps.setString(1, userMail);
                     rs = ps.executeQuery();
                     if (rs.next()) {
-                        balance = balance - rs.getDouble("balance");
+                        balance = balance.subtract(BigDecimal.valueOf(rs.getDouble("balance")));
 
                         con.commit();
                         Logger.debug("Commit SQL transaction.");

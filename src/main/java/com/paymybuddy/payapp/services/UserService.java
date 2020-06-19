@@ -8,6 +8,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -43,5 +44,5 @@ public interface UserService {
      *
      * @return User balance as Optional<Double>, empty if error occurs
      */
-    Optional<Double> getUserBalance();
+    Optional<BigDecimal> getUserBalance();
 }

@@ -18,6 +18,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -77,7 +78,7 @@ public class UserServiceImpl implements UserService {
      * @see UserService
      */
     @Override
-    public Optional<Double> getUserBalance() {
+    public Optional<BigDecimal> getUserBalance() {
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userDAO.getBalance(authUser.getUsername());
     }

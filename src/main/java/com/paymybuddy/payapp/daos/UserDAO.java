@@ -3,6 +3,7 @@ package com.paymybuddy.payapp.daos;
 import com.paymybuddy.payapp.models.User;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -48,5 +49,5 @@ public interface UserDAO {
      * @param userMail Mail of User to get balance of
      * @return User balance as Optional<Double>, empty if error occurs
      */
-    Optional<Double> getBalance(final String userMail);
+    Optional<BigDecimal> getBalance(final String userMail);
 }

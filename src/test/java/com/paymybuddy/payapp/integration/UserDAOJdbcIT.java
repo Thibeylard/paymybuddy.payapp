@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Optional;
@@ -63,16 +64,16 @@ public class UserDAOJdbcIT {
 
     @Test
     @FlywayTest
-    @DisplayName("Get user balance success") // Test based on data from migration 5.1
+    @DisplayName("Get user balance success") // Test based on data from migration 6.1
     public void Given_validUserMail_When_calculatingUserBalance_Then_retrieveValue() {
-        Optional<Double> balance = userDAO.getBalance("user4@mail.com");
+        Optional<BigDecimal> balance = userDAO.getBalance("user4@mail.com");
 
         assertThat(balance)
                 .isNotNull()
                 .isPresent();
 
         assertThat(balance.get())
-                .isEqualTo(19.00);
+                .isEqualTo(BigDecimal.valueOf(19.00));
 
         balance = userDAO.getBalance("user3@mail.com");
 
@@ -81,7 +82,7 @@ public class UserDAOJdbcIT {
                 .isPresent();
 
         assertThat(balance.get())
-                .isEqualTo(-20.50);
+                .isEqualTo(BigDecimal.valueOf(-20.50));
 
         balance = userDAO.getBalance("user2@mail.com");
 
@@ -90,7 +91,7 @@ public class UserDAOJdbcIT {
                 .isPresent();
 
         assertThat(balance.get())
-                .isEqualTo(9.00);
+                .isEqualTo(BigDecimal.valueOf(9.00));
 
         balance = userDAO.getBalance("user1@mail.com");
 
@@ -99,7 +100,7 @@ public class UserDAOJdbcIT {
                 .isPresent();
 
         assertThat(balance.get())
-                .isEqualTo(-10.50);
+                .isEqualTo(BigDecimal.valueOf(-10.50));
     }
 
     @Test

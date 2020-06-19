@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.validation.ConstraintViolationException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Optional;
@@ -62,7 +63,7 @@ public class UserServiceTest {
     @WithMockUser(username = "user@mail.com", password = ENCODED_USERPASS_1)
     @DisplayName("getUserBalance() results")
     public void Given_authenticatedUser_When_getUserBalancel_Then_returnDAOFindResult() {
-        Optional<Double> balance = Optional.of(50.00);
+        Optional<BigDecimal> balance = Optional.of(BigDecimal.valueOf(50.00));
 
         when(mockUserDAO.getBalance(anyString())).thenReturn(balance);
         assertThat(userService.getUserBalance())

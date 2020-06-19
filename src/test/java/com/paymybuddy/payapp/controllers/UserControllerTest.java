@@ -24,6 +24,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.validation.ConstraintViolationException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Optional;
@@ -100,7 +101,7 @@ public class UserControllerTest {
     @WithMockUser(username = "user@mail.com")
     @DisplayName("GET on User Balance ")
     public void Given_authenticatedUser_When_getUserBalance_Then_returnDoubleInstance() throws Exception {
-        Double balance = 55.00;
+        BigDecimal balance = BigDecimal.valueOf(55.00);
         String balanceJson = objectMapper.writeValueAsString(balance);
 
         when(userService.getUserBalance())

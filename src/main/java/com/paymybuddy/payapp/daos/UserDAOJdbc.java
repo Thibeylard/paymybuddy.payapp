@@ -185,7 +185,7 @@ public class UserDAOJdbc implements UserDAO {
      */
     @Override
     public Optional<BigDecimal> getBalance(final String userMail) {
-        BigDecimal balance = null;
+        BigDecimal balance = BigDecimal.ZERO;
         Connection con = databaseConfiguration.getConnection();
         if (con != null) {
 
@@ -196,29 +196,37 @@ public class UserDAOJdbc implements UserDAO {
                 con.setAutoCommit(false);
                 Logger.debug("Start transaction for user balance.");
 
-                // Get User credit balance
+                // Add User credit balance
                 ps = con.prepareStatement(DBStatements.GET_USER_CREDIT_BALANCE_CLASSIC_JDBC);
                 ps.setString(1, userMail);
                 rs = ps.executeQuery();
                 if (rs.next()) {
-                    balance = BigDecimal.valueOf(rs.getDouble("balance"));
-
-                    // Subtract User debit balance
-                    ps = con.prepareStatement(DBStatements.GET_USER_DEBIT_BALANCE_CLASSIC_JDBC);
-                    ps.setString(1, userMail);
-                    rs = ps.executeQuery();
-                    if (rs.next()) {
-                        balance = balance.subtract(BigDecimal.valueOf(rs.getDouble("balance")));
-
-                        con.commit();
-                        Logger.debug("Commit SQL transaction.");
-                        con.setAutoCommit(true); // autocommit set back to true
-                    }
+                    balance = balance.add(BigDecimal.valueOf(rs.getDouble("balance")));
                 }
 
+                // Subtract User debit balance
+                ps = con.prepareStatement(DBStatements.GET_USER_DEBIT_BALANCE_CLASSIC_JDBC);
+                ps.setString(1, userMail);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    balance = balance.subtract(BigDecimal.valueOf(rs.getDouble("balance")));
+                }
+
+                // Add User overall bank balance
+                ps = con.prepareStatement(DBStatements.GET_USER_BANK_BALANCE_CLASSIC_JDBC);
+                ps.setString(1, userMail);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    balance = balance.add(BigDecimal.valueOf(rs.getDouble("balance")));
+                }
+
+                con.commit();
+                Logger.debug("Commit SQL transaction.");
+                con.setAutoCommit(true); // autocommit set back to true
                 // else e.g (rs.next() == false), balance remains null
 
             } catch (SQLException e) {
+                balance = null;
                 Logger.debug(e.getMessage());
                 Logger.error("An error occurred : Balance could not be calculated.");
             } finally {

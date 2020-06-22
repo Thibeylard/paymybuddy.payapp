@@ -27,6 +27,12 @@ public final class DBStatements {
                     "INNER JOIN TRANSACTION AS d ON d.debtor_id = u.id " +
                     "WHERE u.mail = ?";
 
+    public static final String GET_USER_BANK_BALANCE_CLASSIC_JDBC =
+            "SELECT u.id, SUM(op.amount) AS balance FROM USER AS u " +
+                    "INNER JOIN BANK_ACCOUNT AS acc ON acc.user_id = u.id " +
+                    "INNER JOIN BANK_OPERATION AS op ON op.bank_account_id = acc.id " +
+                    "WHERE u.mail = ?";
+
     // USER_ROLE Table statements
     public static final String GET_USER_ROLES_CLASSIC_JDBC =
             "SELECT role_id FROM User_Role WHERE user_id = ?";

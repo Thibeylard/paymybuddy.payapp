@@ -73,7 +73,7 @@ public class UserDAOJdbcIT {
                 .isPresent();
 
         assertThat(balance.get())
-                .isEqualTo(BigDecimal.valueOf(19.00));
+                .isEqualTo(BigDecimal.valueOf(99.00));
 
         balance = userDAO.getBalance("user3@mail.com");
 
@@ -82,7 +82,7 @@ public class UserDAOJdbcIT {
                 .isPresent();
 
         assertThat(balance.get())
-                .isEqualTo(BigDecimal.valueOf(-20.50));
+                .isEqualTo(BigDecimal.valueOf(154.50));
 
         balance = userDAO.getBalance("user2@mail.com");
 
@@ -91,7 +91,7 @@ public class UserDAOJdbcIT {
                 .isPresent();
 
         assertThat(balance.get())
-                .isEqualTo(BigDecimal.valueOf(9.00));
+                .isEqualTo(BigDecimal.valueOf(-11.00));
 
         balance = userDAO.getBalance("user1@mail.com");
 
@@ -100,7 +100,7 @@ public class UserDAOJdbcIT {
                 .isPresent();
 
         assertThat(balance.get())
-                .isEqualTo(BigDecimal.valueOf(-10.50));
+                .isEqualTo(BigDecimal.valueOf(9.50));
     }
 
     @Test

@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith({FlywayTestExtension.class})
 @SpringBootTest
 @ActiveProfiles("test_h2")
-@DisplayName("TransactionDAO tests on : ")
+@DisplayName("BankAccountDAO tests on : ")
 public class BankAccountDAOSpringJdbcIT {
     @Autowired
     private BankAccountDAO bankAccountDAO;
@@ -264,7 +264,7 @@ public class BankAccountDAOSpringJdbcIT {
     public void Given_validData_When_saveTransfer_Then_tableTransactionUpdated() {
         Table bankOperationTable = new Table(jdbcTemplate.getJdbcTemplate().getDataSource(), "Bank_Operation");
 
-        Assertions.assertThat(bankOperationTable).hasNumberOfRows(6);
+        Assertions.assertThat(bankOperationTable).hasNumberOfRows(8);
 
         assertThat(bankAccountDAO.saveTransferOperation(1,
                 operationDate,
@@ -274,14 +274,14 @@ public class BankAccountDAOSpringJdbcIT {
         bankOperationTable = new Table(jdbcTemplate.getJdbcTemplate().getDataSource(), "Bank_Operation");
 
         Assertions.assertThat(bankOperationTable)
-                .hasNumberOfRows(7)
-                .row(6)
-                .value("id").isEqualTo(7)
+                .hasNumberOfRows(9)
+                .row(8)
+                .value("id").isEqualTo(9)
                 .value("bank_account_id").isEqualTo(1)
                 .value("amount").isEqualTo(-50);
 
         TimestampWithTimeZone timestampWithTimeZoneExample =
-                (TimestampWithTimeZone) bankOperationTable.getRow(6).getColumnValue("date").getValue();
+                (TimestampWithTimeZone) bankOperationTable.getRow(8).getColumnValue("date").getValue();
 
         // Check that zoned_date_time in database perfectly match with passed ZonedDateTime object
         assertThat(timestampWithTimeZoneExample.getDay()).isEqualTo(25);
@@ -308,7 +308,7 @@ public class BankAccountDAOSpringJdbcIT {
     public void Given_authenticatedUser_When_saveWithdraw_Then_tableTransactionUpdated() {
         Table bankOperationTable = new Table(jdbcTemplate.getJdbcTemplate().getDataSource(), "Bank_Operation");
 
-        Assertions.assertThat(bankOperationTable).hasNumberOfRows(6);
+        Assertions.assertThat(bankOperationTable).hasNumberOfRows(8);
 
         assertThat(bankAccountDAO.saveWithdrawOperation(2,
                 operationDate,
@@ -318,14 +318,14 @@ public class BankAccountDAOSpringJdbcIT {
         bankOperationTable = new Table(jdbcTemplate.getJdbcTemplate().getDataSource(), "Bank_Operation");
 
         Assertions.assertThat(bankOperationTable)
-                .hasNumberOfRows(7)
-                .row(6)
-                .value("id").isEqualTo(7)
+                .hasNumberOfRows(9)
+                .row(8)
+                .value("id").isEqualTo(9)
                 .value("bank_account_id").isEqualTo(2)
                 .value("amount").isEqualTo(60);
 
         TimestampWithTimeZone timestampWithTimeZoneExample =
-                (TimestampWithTimeZone) bankOperationTable.getRow(6).getColumnValue("date").getValue();
+                (TimestampWithTimeZone) bankOperationTable.getRow(8).getColumnValue("date").getValue();
 
         // Check that zoned_date_time in database perfectly match with passed ZonedDateTime object
         assertThat(timestampWithTimeZoneExample.getDay()).isEqualTo(25);

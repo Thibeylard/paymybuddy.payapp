@@ -18,12 +18,12 @@ public final class DBStatements {
             "UPDATE User SET (username, mail, password) = ( ?, ?, ?) WHERE User.mail = ?";
 
     public static final String GET_USER_CREDIT_BALANCE_CLASSIC_JDBC =
-            "SELECT u.id, SUM(c.total) AS balance FROM USER AS u " +
+            "SELECT u.id, SUM(c.amount) AS balance FROM USER AS u " +
                     "INNER JOIN TRANSACTION AS c ON c.creditor_id = u.id " +
                     "WHERE u.mail = ?";
 
     public static final String GET_USER_DEBIT_BALANCE_CLASSIC_JDBC =
-            "SELECT u.id, SUM(d.amount) AS balance FROM USER AS u " +
+            "SELECT u.id, SUM(d.amount) + SUM(d.commission) AS balance FROM USER AS u " +
                     "INNER JOIN TRANSACTION AS d ON d.debtor_id = u.id " +
                     "WHERE u.mail = ?";
 
@@ -69,26 +69,25 @@ public final class DBStatements {
 
     // TRANSACTION Table statements
     private static final String GET_TRANSACTIONS_MODEL =
-            "SELECT t.id, debtor_id, creditor_id, amount, description, zoned_date_time, total FROM TRANSACTION AS t ";
+            "SELECT t.id, debtor_id, creditor_id, amount, description, zoned_date_time, commission FROM TRANSACTION AS t ";
 
     public static final String GET_DEBIT_TRANSACTIONS =
             GET_TRANSACTIONS_MODEL +
                     "INNER JOIN USER AS u ON u.id = debtor_id " +
                     "WHERE u.mail = :userMail ";
-
     public static final String GET_CREDIT_TRANSACTIONS =
             GET_TRANSACTIONS_MODEL +
                     "INNER JOIN USER AS u ON u.id = creditor_id " +
                     "WHERE u.mail = :userMail ";
 
-    public static final String GET_ALL_TRANSACTIONS =
-            GET_DEBIT_TRANSACTIONS + " UNION " + GET_CREDIT_TRANSACTIONS;
-
     public static final String INSERT_TRANSACTION =
-            "INSERT INTO TRANSACTION (debtor_id, creditor_id, amount, description, zoned_date_time, total) " +
-                    "SELECT u.id, r.id, :amount, :description, :zoned_date_time, :total FROM USER AS u " +
+            "INSERT INTO TRANSACTION (debtor_id, creditor_id, amount, description, zoned_date_time, commission) " +
+                    "SELECT u.id, r.id, :amount, :description, :zoned_date_time, :commission FROM USER AS u " +
                     "INNER JOIN USER AS r ON r.mail <> u.mail " +
                     "WHERE u.mail = :userMail AND r.mail = :recipientMail";
+
+    public static final String GET_ALL_TRANSACTIONS =
+            GET_DEBIT_TRANSACTIONS + " UNION " + GET_CREDIT_TRANSACTIONS;
 
     // BANK_ACCOUNT Table statements
     public static final String GET_BANK_ACCOUNTS =

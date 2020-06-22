@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith({FlywayTestExtension.class})
 @SpringBootTest
 @ActiveProfiles("test_h2")
-@DisplayName("TransactionDAO tests on : ")
+@DisplayName("BankAccountDAO tests on : ")
 public class BankAccountDAOSpringJdbcIT {
     @Autowired
     private BankAccountDAO bankAccountDAO;

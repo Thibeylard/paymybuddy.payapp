@@ -21,6 +21,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -105,8 +106,8 @@ public class TransactionControllerTest {
                 2,
                 4,
                 transactionTime,
-                10.00,
-                9.50,
+                BigDecimal.valueOf(10.00),
+                BigDecimal.valueOf(9.5),
                 "sample"));
         transactionsJson = objectMapper.writeValueAsString(transactions);
 
@@ -184,7 +185,7 @@ public class TransactionControllerTest {
     @DisplayName("POST Transaction")
     @WithMockUser
     public void Given_validParams_When_addContact_Then_statusIsCreated() throws Exception {
-        doNothing().when(transactionService).makeTransaction(anyString(), anyString(), anyDouble());
+        doNothing().when(transactionService).makeTransaction(anyString(), anyString(), any(BigDecimal.class));
         params.add("recipientMail", "recipient@mail.com");
         params.add("description", "sample description");
         params.add("amount", "10.00");
@@ -205,7 +206,7 @@ public class TransactionControllerTest {
     @DisplayName("POST Transaction Exceptions")
     @WithMockUser
     public void Given_databaseError_When_addContact_Then_statusIsServerError() throws Exception {
-        doThrow(DataRetrievalFailureException.class).when(transactionService).makeTransaction(anyString(), anyString(), anyDouble());
+        doThrow(DataRetrievalFailureException.class).when(transactionService).makeTransaction(anyString(), anyString(), any(BigDecimal.class));
         params.add("recipientMail", "recipient@mail.com");
         params.add("description", "sample description");
         params.add("amount", "10.00");

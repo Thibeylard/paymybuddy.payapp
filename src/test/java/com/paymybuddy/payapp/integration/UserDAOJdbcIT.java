@@ -72,7 +72,7 @@ public class UserDAOJdbcIT {
                 .isPresent();
 
         assertThat(balance.get())
-                .isEqualTo(19.00);
+                .isEqualTo(20.00);
 
         balance = userDAO.getBalance("user3@mail.com");
 
@@ -81,7 +81,7 @@ public class UserDAOJdbcIT {
                 .isPresent();
 
         assertThat(balance.get())
-                .isEqualTo(-20.50);
+                .isEqualTo(-20.15);
 
         balance = userDAO.getBalance("user2@mail.com");
 
@@ -90,7 +90,7 @@ public class UserDAOJdbcIT {
                 .isPresent();
 
         assertThat(balance.get())
-                .isEqualTo(9.00);
+                .isEqualTo(9.95);
 
         balance = userDAO.getBalance("user1@mail.com");
 
@@ -99,7 +99,7 @@ public class UserDAOJdbcIT {
                 .isPresent();
 
         assertThat(balance.get())
-                .isEqualTo(-10.50);
+                .isEqualTo(-10.10);
     }
 
     @Test

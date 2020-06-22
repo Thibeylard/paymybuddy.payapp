@@ -10,7 +10,7 @@ public class MonetizationServiceImpl implements MonetizationService {
     private final BigDecimal percentage;
 
     public MonetizationServiceImpl() {
-        this.percentage = BigDecimal.valueOf(0.05);
+        this.percentage = BigDecimal.valueOf(0.005);
     }
 
     @Override

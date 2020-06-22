@@ -65,7 +65,7 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
                                 rs.getInt("creditor_id"),
                                 ZonedDateTime.of(rs.getTimestamp("zoned_date_time").toLocalDateTime(), ZoneId.of(this.ZONE_ID)),
                                 BigDecimal.valueOf(rs.getDouble("amount")),
-                                BigDecimal.valueOf(rs.getDouble("total")),
+                                BigDecimal.valueOf(rs.getDouble("commission")),
                                 rs.getString("description")
                         ));
     }
@@ -81,7 +81,7 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
         parameterMap.put("description", transactionToSaveDTO.getDescription());
         parameterMap.put("zoned_date_time", transactionToSaveDTO.getDate());
         parameterMap.put("amount", transactionToSaveDTO.getAmount());
-        parameterMap.put("total", transactionToSaveDTO.getCommission());
+        parameterMap.put("commission", transactionToSaveDTO.getCommission());
 
         if (jdbcTemplate.update(DBStatements.INSERT_TRANSACTION, parameterMap) == 0) {
             throw new DataRetrievalFailureException("One of requested user does not exists.");

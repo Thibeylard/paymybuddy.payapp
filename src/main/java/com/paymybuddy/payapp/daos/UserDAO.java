@@ -1,9 +1,11 @@
 package com.paymybuddy.payapp.daos;
 
+import com.paymybuddy.payapp.dtos.BillDTO;
 import com.paymybuddy.payapp.models.User;
 import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Optional;
 
 @Repository
@@ -49,4 +51,20 @@ public interface UserDAO {
      * @return User balance as Optional<Double>, empty if error occurs
      */
     Optional<Double> getBalance(final String userMail);
+
+    /**
+     * Get User bills.
+     *
+     * @param userMail Mail of User to get bills of
+     * @return Collection of BillDTO, empty if no Bills, null if no user.
+     */
+    Collection<BillDTO> getBills(final String userMail);
+
+    /**
+     * Create new bill for User.
+     *
+     * @param bill BillDTO object to save
+     * @return BillDTO object just saved
+     */
+    BillDTO saveBill(final BillDTO bill) throws Exception;
 }

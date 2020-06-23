@@ -1,7 +1,10 @@
 package com.paymybuddy.payapp.dtos;
 
+import org.springframework.lang.Nullable;
+
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 public class BillDTO {
     /**
@@ -26,17 +29,17 @@ public class BillDTO {
     private final ZonedDateTime endDate;
 
     /**
-     * Total of all transactions commission between startDate and endDate
+     * Total of all transactions commission between startDate and endDate. Null at creation.
      */
-    private final BigDecimal total;
+    @Nullable
+    private BigDecimal total;
 
-    public BillDTO(int id, int userID, ZonedDateTime creationDate, ZonedDateTime startDate, ZonedDateTime endDate, BigDecimal total) {
+    public BillDTO(int id, int userID, ZonedDateTime creationDate, ZonedDateTime startDate, ZonedDateTime endDate) {
         this.id = id;
         this.userID = userID;
         this.creationDate = creationDate;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.total = total;
     }
 
     public int getId() {
@@ -59,7 +62,11 @@ public class BillDTO {
         return endDate;
     }
 
-    public BigDecimal getTotal() {
-        return total;
+    public Optional<BigDecimal> getTotal() {
+        return Optional.ofNullable(total);
+    }
+
+    public void setTotal(@Nullable BigDecimal total) {
+        this.total = total;
     }
 }

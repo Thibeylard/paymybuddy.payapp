@@ -2,6 +2,7 @@ package com.paymybuddy.payapp.daos;
 
 import com.paymybuddy.payapp.config.DatabaseConfiguration;
 import com.paymybuddy.payapp.constants.DBStatements;
+import com.paymybuddy.payapp.dtos.BillDTO;
 import com.paymybuddy.payapp.enums.Role;
 import com.paymybuddy.payapp.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,28 @@ public class UserDAOJdbc implements UserDAO {
         }
 
         return user;
+    }
+
+    /**
+     * Get roles of User that was just retrieved.
+     *
+     * @param con    Database connection
+     * @param userId Id of retrieved User
+     * @return Roles as Collection
+     * @throws SQLException if database exception occurs
+     */
+    private Collection<Role> getUserRolesByID(Connection con, int userId) throws SQLException {
+        ArrayList<Role> roles = new ArrayList<>();
+        PreparedStatement ps = con.prepareStatement(DBStatements.GET_USER_ROLES_CLASSIC_JDBC);
+        ps.setInt(1, userId);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            roles.add(Role.getRoleFromDatabaseId(rs.getInt("role_id")));
+            Logger.debug("User roles have been retrieved");
+        }
+
+        return roles;
     }
 
     @Override
@@ -231,24 +254,18 @@ public class UserDAOJdbc implements UserDAO {
     }
 
     /**
-     * Get roles of User that was just retrieved.
-     *
-     * @param con    Database connection
-     * @param userId Id of retrieved User
-     * @return Roles as Collection
-     * @throws SQLException if database exception occurs
+     * @see UserDAO
      */
-    private Collection<Role> getUserRolesByID(Connection con, int userId) throws SQLException {
-        ArrayList<Role> roles = new ArrayList<>();
-        PreparedStatement ps = con.prepareStatement(DBStatements.GET_USER_ROLES_CLASSIC_JDBC);
-        ps.setInt(1, userId);
-        ResultSet rs = ps.executeQuery();
+    @Override
+    public Collection<BillDTO> getBills(String userMail) {
+        return null;
+    }
 
-        while (rs.next()) {
-            roles.add(Role.getRoleFromDatabaseId(rs.getInt("role_id")));
-            Logger.debug("User roles have been retrieved");
-        }
-
-        return roles;
+    /**
+     * @see UserDAO
+     */
+    @Override
+    public BillDTO saveBill(BillDTO bill) throws Exception {
+        return null;
     }
 }

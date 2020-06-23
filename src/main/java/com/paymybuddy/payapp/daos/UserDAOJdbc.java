@@ -197,27 +197,13 @@ public class UserDAOJdbc implements UserDAO {
                 Logger.debug("Start transaction for user balance.");
 
                 // Add User credit balance
-                ps = con.prepareStatement(DBStatements.GET_USER_CREDIT_BALANCE_CLASSIC_JDBC);
+                ps = con.prepareStatement(DBStatements.GET_USER_BALANCE_CLASSIC_JDBC);
                 ps.setString(1, userMail);
+                ps.setString(2, userMail);
+                ps.setString(3, userMail);
                 rs = ps.executeQuery();
                 if (rs.next()) {
-                    balance = balance.add(BigDecimal.valueOf(rs.getDouble("balance")));
-                }
-
-                // Subtract User debit balance
-                ps = con.prepareStatement(DBStatements.GET_USER_DEBIT_BALANCE_CLASSIC_JDBC);
-                ps.setString(1, userMail);
-                rs = ps.executeQuery();
-                if (rs.next()) {
-                    balance = balance.subtract(BigDecimal.valueOf(rs.getDouble("balance")));
-                }
-
-                // Add User overall bank balance
-                ps = con.prepareStatement(DBStatements.GET_USER_BANK_BALANCE_CLASSIC_JDBC);
-                ps.setString(1, userMail);
-                rs = ps.executeQuery();
-                if (rs.next()) {
-                    balance = balance.add(BigDecimal.valueOf(rs.getDouble("balance")));
+                    balance = BigDecimal.valueOf(rs.getDouble("balance"));
                 }
 
                 con.commit();

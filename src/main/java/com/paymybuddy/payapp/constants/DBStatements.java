@@ -17,21 +17,21 @@ public final class DBStatements {
     public static final String UPDATE_USER_CLASSIC_JDBC =
             "UPDATE User SET (username, mail, password) = ( ?, ?, ?) WHERE User.mail = ?";
 
-    public static final String GET_USER_CREDIT_BALANCE_CLASSIC_JDBC =
-            "SELECT u.id, SUM(c.total) AS balance FROM USER AS u " +
+    public static final String GET_USER_BALANCE_CLASSIC_JDBC =
+            "SELECT userID, SUM(balance) AS balance FROM (" +
+                    "SELECT u.id AS userID, SUM(c.total) AS balance FROM USER AS u " +
                     "INNER JOIN TRANSACTION AS c ON c.creditor_id = u.id " +
-                    "WHERE u.mail = ?";
-
-    public static final String GET_USER_DEBIT_BALANCE_CLASSIC_JDBC =
-            "SELECT u.id, SUM(d.amount) AS balance FROM USER AS u " +
+                    "WHERE u.mail = ?" +
+                    "UNION " +
+                    "SELECT u.id AS userID, SUM(-d.amount) AS balance FROM USER AS u " +
                     "INNER JOIN TRANSACTION AS d ON d.debtor_id = u.id " +
-                    "WHERE u.mail = ?";
-
-    public static final String GET_USER_BANK_BALANCE_CLASSIC_JDBC =
-            "SELECT u.id, SUM(op.amount) AS balance FROM USER AS u " +
+                    "WHERE u.mail = ?" +
+                    "UNION " +
+                    "SELECT u.id AS userID, SUM(op.amount) AS balance FROM USER AS u " +
                     "INNER JOIN BANK_ACCOUNT AS acc ON acc.user_id = u.id " +
                     "INNER JOIN BANK_OPERATION AS op ON op.bank_account_id = acc.id " +
-                    "WHERE u.mail = ?";
+                    "WHERE u.mail = ?" +
+                    ") ";
 
     // USER_ROLE Table statements
     public static final String GET_USER_ROLES_CLASSIC_JDBC =

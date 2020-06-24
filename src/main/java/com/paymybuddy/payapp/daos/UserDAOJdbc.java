@@ -6,13 +6,17 @@ import com.paymybuddy.payapp.dtos.BillDTO;
 import com.paymybuddy.payapp.enums.Role;
 import com.paymybuddy.payapp.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.tinylog.Logger;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -21,10 +25,13 @@ import java.util.Optional;
 public class UserDAOJdbc implements UserDAO {
 
     private final DatabaseConfiguration databaseConfiguration;
+    private final String ZONE_ID;
 
     @Autowired
-    public UserDAOJdbc(DatabaseConfiguration databaseConfiguration) {
+    public UserDAOJdbc(DatabaseConfiguration databaseConfiguration,
+                       @Value("${default.zoneID}") String zoneID) {
         this.databaseConfiguration = databaseConfiguration;
+        this.ZONE_ID = zoneID;
     }
 
     @Override
@@ -258,7 +265,38 @@ public class UserDAOJdbc implements UserDAO {
      */
     @Override
     public Collection<BillDTO> getBills(String userMail) {
-        return null;
+        Collection<BillDTO> bills = new ArrayList<>();
+        Connection con = databaseConfiguration.getConnection();
+        if (con != null) {
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            try {
+                ps = con.prepareStatement(DBStatements.GET_USER_BILLS_CLASSIC_JDBC);
+                ps.setString(1, userMail);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    bills.add(new BillDTO(rs.getInt("id"),
+                            rs.getInt("user_id"),
+                            ZonedDateTime.of(rs.getTimestamp("creation_date").toLocalDateTime(), ZoneId.of(this.ZONE_ID)),
+                            ZonedDateTime.of(rs.getTimestamp("start_date").toLocalDateTime(), ZoneId.of(this.ZONE_ID)),
+                            ZonedDateTime.of(rs.getTimestamp("end_date").toLocalDateTime(), ZoneId.of(this.ZONE_ID)),
+                            BigDecimal.valueOf(rs.getDouble("total"))));
+                }
+
+                // else e.g (rs.next() == false), user remains an Optional.empty()
+
+            } catch (SQLException e) {
+                Logger.error(e.getMessage());
+                Logger.debug("An error occurred. Returning null.");
+                bills = null;
+            } finally {
+                databaseConfiguration.closeResultSet(rs);
+                databaseConfiguration.closePreparedStatement(ps);
+                databaseConfiguration.closeConnection(con);
+            }
+        }
+
+        return bills;
     }
 
     /**
@@ -266,6 +304,56 @@ public class UserDAOJdbc implements UserDAO {
      */
     @Override
     public BillDTO saveBill(BillDTO bill) throws Exception {
-        return null;
+
+        Connection con = databaseConfiguration.getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        if (con != null) {
+            try {
+                int userId;
+                // Start transaction
+                con.setAutoCommit(false);
+                Logger.debug("Start transaction.");
+
+                // Bill total is calculated with all concerned transactions commissions
+                ps = con.prepareStatement(DBStatements.GET_BILL_TOTAL_CLASSIC_JDBC);
+                ps.setString(1, bill.getStartDateAsTimestampWithTimeZoneString());
+                ps.setString(2, bill.getEndDateAsTimestampWithTimeZoneString());
+                ps.setInt(3, bill.getUserID());
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    bill.setTotal(BigDecimal.valueOf(rs.getDouble("commission")));
+                    Logger.debug("Bill total calculated");
+                } else {
+                    throw new SQLException("Total could not be calculated");
+                }
+
+                // New Bill is inserted in database
+                ps = con.prepareStatement(DBStatements.INSERT_BILL_CLASSIC_JDBC);
+                ps.setInt(1, bill.getUserID());
+                ps.setString(2, bill.getCreationDateAsTimestampWithTimeZoneString());
+                ps.setString(3, bill.getStartDateAsTimestampWithTimeZoneString());
+                ps.setString(4, bill.getEndDateAsTimestampWithTimeZoneString());
+                ps.setDouble(5, bill.getTotal().get().doubleValue());
+                ps.execute();
+                Logger.debug("New Bill inserted in Bill table.");
+
+                // Transaction is over
+                con.commit();
+                Logger.debug("Commit SQL transaction.");
+                con.setAutoCommit(true); // autocommit set back to true
+
+            } catch (SQLException e) {
+                Logger.error(e.getMessage());
+                throw e;
+            } finally {
+                databaseConfiguration.closeResultSet(rs);
+                databaseConfiguration.closePreparedStatement(ps);
+                databaseConfiguration.closeConnection(con);
+            }
+        }
+
+        return bill;
     }
 }

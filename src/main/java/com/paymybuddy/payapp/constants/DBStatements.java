@@ -27,6 +27,19 @@ public final class DBStatements {
                     "INNER JOIN TRANSACTION AS d ON d.debtor_id = u.id " +
                     "WHERE u.mail = ?";
 
+    public static final String GET_USER_BILLS_CLASSIC_JDBC =
+            "SELECT  b.id, u.id AS user_id, creation_date, start_date, end_date, total FROM USER AS u " +
+                    "INNER JOIN BILL AS b ON b.user_id = u.id " +
+                    "WHERE u.mail = ?";
+
+    public static final String INSERT_BILL_CLASSIC_JDBC =
+            "INSERT INTO Bill (user_id, creation_date, start_date, end_date, total) VALUES ( ?, ?, ?, ?, ?)";
+
+    public static final String GET_BILL_TOTAL_CLASSIC_JDBC =
+            "SELECT SUM(t.commission) AS commission FROM TRANSACTION as t " +
+                    "INNER JOIN User AS u ON u.id = t.debtor_id " +
+                    "WHERE t.zoned_date_time >= ? AND t.zoned_date_time <= ? AND u.id = ?";
+
     // USER_ROLE Table statements
     public static final String GET_USER_ROLES_CLASSIC_JDBC =
             "SELECT role_id FROM User_Role WHERE user_id = ?";

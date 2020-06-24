@@ -4,7 +4,6 @@ import com.paymybuddy.payapp.daos.UserDAO;
 import com.paymybuddy.payapp.dtos.BillDTO;
 import com.paymybuddy.payapp.enums.Role;
 import com.paymybuddy.payapp.models.User;
-import org.assertj.db.type.Row;
 import org.assertj.db.type.Table;
 import org.flywaydb.test.annotation.FlywayTest;
 import org.flywaydb.test.junit5.FlywayTestExtension;
@@ -199,7 +198,9 @@ public class UserDAOJdbcIT {
                 (TimestampWithTimeZone) billTable.getRow(0).getColumnValue("end_date").getValue();
 
         // Check BillDTO IDs
-        assertThat(bills.get(0).getId()).isEqualTo(1);
+        assertThat(bills.get(0).getId())
+                .isPresent()
+                .get().isEqualTo(1);
         assertThat(bills.get(0).getUserID()).isEqualTo(1);
 
         // Compare BillDTO ZonedDateTime "creationDate" to Bill table creation_date value
@@ -224,7 +225,9 @@ public class UserDAOJdbcIT {
         assertThat(endDateTs.getTimeZoneOffsetSeconds()).isEqualTo(bills.get(0).getEndDate().getOffset().get(ChronoField.OFFSET_SECONDS));
 
         // Check BillDTO Total
-        assertThat(bills.get(0).getTotal()).isEqualTo(BigDecimal.valueOf(0.25));
+        assertThat(bills.get(0).getTotal())
+                .isPresent()
+                .get().isEqualTo(BigDecimal.valueOf(0.25));
 
 
         // User 2 has no bills : Must return empty collection
@@ -232,9 +235,10 @@ public class UserDAOJdbcIT {
                 .isNotNull()
                 .hasSize(0);
 
-        // User 7 doesn't exist : Must return null
+        // User 7 doesn't exist : Return empty
         assertThat(userDAO.getBills("user7@mail.com"))
-                .isNull();
+                .isNotNull()
+                .hasSize(0);
 
     }
 
@@ -243,9 +247,9 @@ public class UserDAOJdbcIT {
     @DisplayName("Create user bill success")
     public void Given_validParams_When_createUserBill_Then_saveAndReturnBill() throws Exception {
         ZonedDateTime startDate = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
-        ZonedDateTime endDate = ZonedDateTime.of(2020, 1, 28, 23, 59, 59, 999999999, ZoneId.of(ZONE_ID));
-        ZonedDateTime creationDate = ZonedDateTime.of(2020, 2, 1, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
-        BillDTO billToSave = new BillDTO(2, 1, creationDate, startDate, endDate);
+        ZonedDateTime endDate = ZonedDateTime.of(2020, 2, 1, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
+        ZonedDateTime creationDate = ZonedDateTime.of(2020, 2, 10, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
+        BillDTO billToSave = new BillDTO(1, creationDate, startDate, endDate);
 
         BillDTO result = userDAO.saveBill(billToSave);
 
@@ -255,18 +259,23 @@ public class UserDAOJdbcIT {
 
         assertThat(billTable).hasNumberOfRows(2);
 
-        Row newBillRow = billTable.getRow(0);
-
         TimestampWithTimeZone creationDateTs =
-                (TimestampWithTimeZone) newBillRow.getColumnValue("creation_date").getValue();
+                (TimestampWithTimeZone) billTable.getRow(1).getColumnValue("creation_date").getValue();
         TimestampWithTimeZone startDateTs =
-                (TimestampWithTimeZone) newBillRow.getColumnValue("start_date").getValue();
+                (TimestampWithTimeZone) billTable.getRow(1).getColumnValue("start_date").getValue();
         TimestampWithTimeZone endDateTs =
-                (TimestampWithTimeZone) newBillRow.getColumnValue("end_date").getValue();
+                (TimestampWithTimeZone) billTable.getRow(1).getColumnValue("end_date").getValue();
 
         // Check BillDTO IDs
-        assertThat(newBillRow.getColumnValue("id")).isEqualTo(2);
-        assertThat(newBillRow.getColumnValue("user_id")).isEqualTo(2);
+        assertThat(billTable)
+                .row(1)
+                .value("id")
+                .isEqualTo(2);
+
+        assertThat(billTable)
+                .row(1)
+                .value("user_id")
+                .isEqualTo(1);
 
         // Compare BillDTO ZonedDateTime "creationDate" to Bill table creation_date value
         assertThat(creationDateTs.getDay()).isEqualTo(creationDate.getDayOfMonth());
@@ -290,7 +299,10 @@ public class UserDAOJdbcIT {
         assertThat(endDateTs.getTimeZoneOffsetSeconds()).isEqualTo(endDate.getOffset().get(ChronoField.OFFSET_SECONDS));
 
         // Check BillDTO Total
-        assertThat(newBillRow.getColumnValue("total")).isEqualTo(BigDecimal.valueOf(0.10));
+        assertThat(billTable)
+                .row(1)
+                .value("total")
+                .isEqualTo(BigDecimal.valueOf(0.10));
     }
 
 }

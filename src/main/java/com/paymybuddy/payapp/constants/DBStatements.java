@@ -19,7 +19,7 @@ public final class DBStatements {
 
     public static final String GET_USER_BALANCE_CLASSIC_JDBC =
             "SELECT userID, SUM(balance) AS balance FROM (" +
-                    "SELECT u.id AS userID, SUM(c.total) AS balance FROM USER AS u " +
+                    "SELECT u.id AS userID, SUM(c.amount) AS balance FROM USER AS u " +
                     "INNER JOIN TRANSACTION AS c ON c.creditor_id = u.id " +
                     "WHERE u.mail = ?" +
                     "UNION " +
@@ -88,7 +88,7 @@ public final class DBStatements {
 
     // TRANSACTION Table statements
     private static final String GET_TRANSACTIONS_MODEL =
-            "SELECT t.id, debtor_id, creditor_id, amount, description, zoned_date_time, total FROM TRANSACTION AS t ";
+            "SELECT t.id, debtor_id, creditor_id, amount, description, zoned_date_time, commission FROM TRANSACTION AS t ";
 
     public static final String GET_DEBIT_TRANSACTIONS =
             GET_TRANSACTIONS_MODEL +

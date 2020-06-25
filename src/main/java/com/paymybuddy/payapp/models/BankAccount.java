@@ -1,6 +1,5 @@
 package com.paymybuddy.payapp.models;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class BankAccount {
@@ -17,10 +16,6 @@ public class BankAccount {
      */
     private final String ownerFullName;
     /**
-     * All operations made on this bank account
-     */
-    private final Collection<BankOperation> operations;
-    /**
      * Basic description of Bank Account.
      */
     private String description;
@@ -35,7 +30,6 @@ public class BankAccount {
         this.ownerFullName = ownerFullName;
         this.description = description;
         this.IBAN = IBAN;
-        this.operations = new ArrayList<>();
     }
 
     public BankAccount(int id, int ownerID, String ownerFullName, String description, String IBAN, Collection<BankOperation> operations) {
@@ -44,7 +38,6 @@ public class BankAccount {
         this.ownerFullName = ownerFullName;
         this.description = description;
         this.IBAN = IBAN;
-        this.operations = operations;
     }
 
     public int getId() {
@@ -73,9 +66,5 @@ public class BankAccount {
 
     public void setIBAN(String IBAN) {
         this.IBAN = IBAN;
-    }
-
-    public Collection<BankOperation> getOperations() {
-        return operations;
     }
 }

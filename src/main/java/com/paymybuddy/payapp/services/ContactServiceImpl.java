@@ -1,7 +1,7 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.ContactDAO;
-import com.paymybuddy.payapp.models.Contact;
+import com.paymybuddy.payapp.dtos.ContactUserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,7 +27,7 @@ public class ContactServiceImpl implements ContactService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Collection<Contact> getUserContacts() throws DataAccessException {
+    public Collection<ContactUserDTO> getUserContacts() throws DataAccessException {
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return contactDAO.getContactsByUserMail(authUser.getUsername());
     }

@@ -1,7 +1,7 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.ContactDAO;
-import com.paymybuddy.payapp.models.Contact;
+import com.paymybuddy.payapp.dtos.ContactUserDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("ContactService tests on : ")
-public class ContactServiceTest {
+public class ContactUserDTOServiceTest {
     // Beans
     @Autowired
     private ContactService contactService;
@@ -38,11 +38,11 @@ public class ContactServiceTest {
     @DisplayName("getContacts() Success")
     public void Given_authenticatedUser_When_getUserContacts_Then_returnContactDAOValue() {
 
-        Collection<Contact> contactsEmpty = Collections.emptyList();
-        Collection<Contact> contacts = Collections.singletonList(new Contact(2, "username2", "username2@mail.com"));
+        Collection<ContactUserDTO> contactsEmpty = Collections.emptyList();
+        Collection<ContactUserDTO> contactUserDTOS = Collections.singletonList(new ContactUserDTO(2, "username2", "username2@mail.com"));
         when(contactDAO.getContactsByUserMail(anyString()))
                 .thenReturn(contactsEmpty)
-                .thenReturn(contacts);
+                .thenReturn(contactUserDTOS);
 
         // Empty collection
         assertThat(contactService.getUserContacts())
@@ -50,7 +50,7 @@ public class ContactServiceTest {
 
         // At least singleton list
         assertThat(contactService.getUserContacts())
-                .isEqualTo(contacts);
+                .isEqualTo(contactUserDTOS);
     }
 
     @Test

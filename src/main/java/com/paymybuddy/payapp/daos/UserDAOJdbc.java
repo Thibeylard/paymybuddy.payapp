@@ -2,8 +2,8 @@ package com.paymybuddy.payapp.daos;
 
 import com.paymybuddy.payapp.config.DatabaseConfiguration;
 import com.paymybuddy.payapp.constants.DBStatements;
-import com.paymybuddy.payapp.dtos.BillDTO;
 import com.paymybuddy.payapp.enums.Role;
+import com.paymybuddy.payapp.models.Bill;
 import com.paymybuddy.payapp.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -258,8 +258,8 @@ public class UserDAOJdbc implements UserDAO {
      * @see UserDAO
      */
     @Override
-    public Collection<BillDTO> getBills(String userMail) {
-        Collection<BillDTO> bills = new ArrayList<>();
+    public Collection<Bill> getBills(String userMail) {
+        Collection<Bill> bills = new ArrayList<>();
         Connection con = databaseConfiguration.getConnection();
         if (con != null) {
             PreparedStatement ps = null;
@@ -269,7 +269,7 @@ public class UserDAOJdbc implements UserDAO {
                 ps.setString(1, userMail);
                 rs = ps.executeQuery();
                 while (rs.next()) {
-                    bills.add(new BillDTO(rs.getInt("id"),
+                    bills.add(new Bill(rs.getInt("id"),
                             rs.getInt("user_id"),
                             ZonedDateTime.of(rs.getTimestamp("creation_date").toLocalDateTime(), ZoneId.of(this.ZONE_ID)),
                             ZonedDateTime.of(rs.getTimestamp("start_date").toLocalDateTime(), ZoneId.of(this.ZONE_ID)),
@@ -297,7 +297,7 @@ public class UserDAOJdbc implements UserDAO {
      * @see UserDAO
      */
     @Override
-    public BillDTO saveBill(BillDTO bill) throws SQLException {
+    public Bill saveBill(Bill bill) throws SQLException {
 
         Connection con = databaseConfiguration.getConnection();
         PreparedStatement ps = null;

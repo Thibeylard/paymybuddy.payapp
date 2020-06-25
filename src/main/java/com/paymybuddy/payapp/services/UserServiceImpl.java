@@ -1,7 +1,7 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.UserDAO;
-import com.paymybuddy.payapp.dtos.BillDTO;
+import com.paymybuddy.payapp.models.Bill;
 import com.paymybuddy.payapp.models.User;
 import com.paymybuddy.payapp.models.UserCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
      * @see UserService
      */
     @Override
-    public Collection<BillDTO> getUserBills() {
+    public Collection<Bill> getUserBills() {
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userDAO.getBills(authUser.getUsername());
     }
@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
      * @see UserService
      */
     @Override
-    public BillDTO createBill(ZonedDateTime startDate, ZonedDateTime endDate) throws SQLException, RuntimeException {
+    public Bill createBill(ZonedDateTime startDate, ZonedDateTime endDate) throws SQLException, RuntimeException {
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userDAO.find(authUser.getUsername()).orElseThrow(RuntimeException::new);
         ZonedDateTime creationDate = clockService.now();
@@ -112,6 +112,6 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Bill creation date must be greater than end date.");
         }
 
-        return userDAO.saveBill(new BillDTO(user.getId().orElseThrow(RuntimeException::new), creationDate, startDate, endDate));
+        return userDAO.saveBill(new Bill(user.getId().orElseThrow(RuntimeException::new), creationDate, startDate, endDate));
     }
 }

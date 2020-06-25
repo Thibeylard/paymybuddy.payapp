@@ -1,6 +1,6 @@
 package com.paymybuddy.payapp.services;
 
-import com.paymybuddy.payapp.models.Contact;
+import com.paymybuddy.payapp.dtos.ContactUserDTO;
 import org.springframework.dao.DataAccessException;
 
 import java.util.Collection;
@@ -13,7 +13,7 @@ public interface ContactService {
      * @return All User contacts as User Collection
      * @throws DataAccessException if error occurs during database operation
      */
-    Collection<Contact> getUserContacts()
+    Collection<ContactUserDTO> getUserContacts()
             throws DataAccessException;
 
     /**

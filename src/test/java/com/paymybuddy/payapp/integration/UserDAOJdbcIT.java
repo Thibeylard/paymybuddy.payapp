@@ -1,8 +1,8 @@
 package com.paymybuddy.payapp.integration;
 
 import com.paymybuddy.payapp.daos.UserDAO;
-import com.paymybuddy.payapp.dtos.BillDTO;
 import com.paymybuddy.payapp.enums.Role;
+import com.paymybuddy.payapp.models.Bill;
 import com.paymybuddy.payapp.models.User;
 import org.assertj.db.type.Table;
 import org.flywaydb.test.annotation.FlywayTest;
@@ -183,7 +183,7 @@ public class UserDAOJdbcIT {
     public void Given_validUserMail_When_getUserBills_Then_retrieveCorrespondingBills() {
 
         // User 1 has one bill : Must return it in collection with good values
-        ArrayList<BillDTO> bills = (ArrayList<BillDTO>) userDAO.getBills("user1@mail.com");
+        ArrayList<Bill> bills = (ArrayList<Bill>) userDAO.getBills("user1@mail.com");
         assertThat(bills)
                 .isNotNull()
                 .hasSize(1);
@@ -249,9 +249,9 @@ public class UserDAOJdbcIT {
         ZonedDateTime startDate = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
         ZonedDateTime endDate = ZonedDateTime.of(2020, 2, 1, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
         ZonedDateTime creationDate = ZonedDateTime.of(2020, 2, 10, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
-        BillDTO billToSave = new BillDTO(1, creationDate, startDate, endDate);
+        Bill billToSave = new Bill(1, creationDate, startDate, endDate);
 
-        BillDTO result = userDAO.saveBill(billToSave);
+        Bill result = userDAO.saveBill(billToSave);
 
         assertThat(result).isEqualTo(billToSave);
 

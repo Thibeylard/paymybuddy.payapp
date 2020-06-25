@@ -1,7 +1,7 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.TransactionDAO;
-import com.paymybuddy.payapp.dtos.TransactionToSaveDTO;
+import com.paymybuddy.payapp.dtos.TransactionWithMailsDTO;
 import com.paymybuddy.payapp.models.Transaction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -109,17 +109,17 @@ public class TransactionServiceTest {
     @WithMockUser
     @DisplayName("makeTransaction() Success")
     public void Given_validParams_When_makeTransaction_Then_nothingIsThrown() {
-        when(transactionDAO.save(any(TransactionToSaveDTO.class))).thenReturn(true);
+        when(transactionDAO.save(any(TransactionWithMailsDTO.class))).thenReturn(true);
 
         assertDoesNotThrow(() -> transactionService.makeTransaction("someuser@mail.com", "sampleDesription", BigDecimal.valueOf(10.00)));
-        verify(transactionDAO, times(1)).save(any(TransactionToSaveDTO.class));
+        verify(transactionDAO, times(1)).save(any(TransactionWithMailsDTO.class));
     }
 
     @Test
     @WithMockUser
     @DisplayName("makeTransaction() Exceptions")
     public void Given_databaseError_When_makeTransaction_Then_throwsDAOException() {
-        doThrow(DataRetrievalFailureException.class).when(transactionDAO).save(any(TransactionToSaveDTO.class));
+        doThrow(DataRetrievalFailureException.class).when(transactionDAO).save(any(TransactionWithMailsDTO.class));
 
         assertThrows(DataRetrievalFailureException.class, () -> transactionService.makeTransaction("someuser@mail.com", "sampleDesription", BigDecimal.valueOf(10.00)));
     }

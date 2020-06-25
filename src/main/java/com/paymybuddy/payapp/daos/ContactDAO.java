@@ -1,6 +1,6 @@
 package com.paymybuddy.payapp.daos;
 
-import com.paymybuddy.payapp.models.Contact;
+import com.paymybuddy.payapp.dtos.ContactUserDTO;
 import org.springframework.dao.DataAccessException;
 
 import java.util.Collection;
@@ -13,7 +13,7 @@ public interface ContactDAO {
      * @param userMail User mail
      * @return All User contacts as User Collection
      */
-    Collection<Contact> getContactsByUserMail(final String userMail)
+    Collection<ContactUserDTO> getContactsByUserMail(final String userMail)
             throws DataAccessException;
 
     /**

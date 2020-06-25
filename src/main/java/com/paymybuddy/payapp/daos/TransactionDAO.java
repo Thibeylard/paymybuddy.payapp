@@ -1,6 +1,6 @@
 package com.paymybuddy.payapp.daos;
 
-import com.paymybuddy.payapp.dtos.TransactionToSaveDTO;
+import com.paymybuddy.payapp.dtos.TransactionWithMailsDTO;
 import com.paymybuddy.payapp.models.Transaction;
 import org.springframework.dao.DataAccessException;
 
@@ -38,9 +38,9 @@ public interface TransactionDAO {
     /**
      * Save new Transaction based on TransactionDTO object.
      *
-     * @param transactionToSaveDTO Transaction object used to save a Transaction in database
+     * @param transactionWithMailsDTO Transaction object used to save a Transaction in database
      * @return true if operation succeed
      */
-    boolean save(final TransactionToSaveDTO transactionToSaveDTO)
+    boolean save(final TransactionWithMailsDTO transactionWithMailsDTO)
             throws DataAccessException;
 }

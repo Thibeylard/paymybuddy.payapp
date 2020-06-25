@@ -1,7 +1,7 @@
 package com.paymybuddy.payapp.integration;
 
 import com.paymybuddy.payapp.daos.TransactionDAO;
-import com.paymybuddy.payapp.dtos.TransactionToSaveDTO;
+import com.paymybuddy.payapp.dtos.TransactionWithMailsDTO;
 import com.paymybuddy.payapp.models.Transaction;
 import org.assertj.db.api.Assertions;
 import org.assertj.db.type.Table;
@@ -104,7 +104,7 @@ public class TransactionDAOSpringJdbcIT {
     @WithMockUser
     @DisplayName("makeTransaction() Success")
     public void Given_authenticatedUser_When_makeTransaction_Then_tableTransactionUpdated() {
-        TransactionToSaveDTO transactionDTO = new TransactionToSaveDTO(
+        TransactionWithMailsDTO transactionDTO = new TransactionWithMailsDTO(
                 "user4@mail.com",
                 "user1@mail.com",
                 newTransactionTime,
@@ -147,7 +147,7 @@ public class TransactionDAOSpringJdbcIT {
     @WithMockUser
     @DisplayName("makeTransaction() Exception")
     public void Given_databaseError_When_makeTransaction_Then_throwException() {
-        TransactionToSaveDTO transactionDTO = new TransactionToSaveDTO(
+        TransactionWithMailsDTO transactionDTO = new TransactionWithMailsDTO(
                 "user6@mail.com",
                 "user1@mail.com",
                 newTransactionTime,

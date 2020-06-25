@@ -1,6 +1,6 @@
 package com.paymybuddy.payapp.daos;
 
-import com.paymybuddy.payapp.dtos.BillDTO;
+import com.paymybuddy.payapp.models.Bill;
 import com.paymybuddy.payapp.models.User;
 import org.springframework.stereotype.Repository;
 
@@ -59,7 +59,7 @@ public interface UserDAO {
      * @param userMail Mail of User to get bills of
      * @return Collection of BillDTO, empty if no Bills, null if no user.
      */
-    Collection<BillDTO> getBills(final String userMail);
+    Collection<Bill> getBills(final String userMail);
 
     /**
      * Create new bill for User.
@@ -67,5 +67,5 @@ public interface UserDAO {
      * @param bill BillDTO object to save
      * @return BillDTO object just saved
      */
-    BillDTO saveBill(final BillDTO bill) throws SQLException;
+    Bill saveBill(final Bill bill) throws SQLException;
 }

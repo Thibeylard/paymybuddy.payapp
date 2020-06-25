@@ -1,10 +1,12 @@
-package com.paymybuddy.payapp.models;
+package com.paymybuddy.payapp.dtos;
+
+import com.paymybuddy.payapp.models.User;
 
 import javax.validation.constraints.NotNull;
 import java.util.NoSuchElementException;
 
 
-public class Contact {
+public class ContactUserDTO {
 
     /**
      * ID in database. Not null because retrieved from database.
@@ -22,15 +24,15 @@ public class Contact {
     @NotNull
     private final String mail;
 
-    public Contact(@NotNull Integer id,
-                   @NotNull String username,
-                   @NotNull String mail) {
+    public ContactUserDTO(@NotNull Integer id,
+                          @NotNull String username,
+                          @NotNull String mail) {
         this.id = id;
         this.username = username;
         this.mail = mail;
     }
 
-    public Contact(@NotNull User user) {
+    public ContactUserDTO(@NotNull User user) {
         this.id = user.getId().orElseThrow(NoSuchElementException::new);
         this.username = user.getUsername();
         this.mail = user.getMail();

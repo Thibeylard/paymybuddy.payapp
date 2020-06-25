@@ -1,8 +1,8 @@
 package com.paymybuddy.payapp.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.paymybuddy.payapp.dtos.BillDTO;
 import com.paymybuddy.payapp.enums.Role;
+import com.paymybuddy.payapp.models.Bill;
 import com.paymybuddy.payapp.models.User;
 import com.paymybuddy.payapp.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -141,8 +141,8 @@ public class UserControllerTest {
         ZonedDateTime creationDate = ZonedDateTime.of(2020, 2, 1, 1, 0, 0, 0, ZoneId.of(ZONE_ID));
         ZonedDateTime startDate = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
         ZonedDateTime endDate = ZonedDateTime.of(2020, 2, 1, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
-        BillDTO bill = new BillDTO(3, 2, creationDate, startDate, endDate, BigDecimal.valueOf(0.50));
-        Collection<BillDTO> returnValue = Collections.singletonList(bill);
+        Bill bill = new Bill(3, 2, creationDate, startDate, endDate, BigDecimal.valueOf(0.50));
+        Collection<Bill> returnValue = Collections.singletonList(bill);
         MvcResult result;
 
         when(userService.getUserBills())
@@ -233,7 +233,7 @@ public class UserControllerTest {
         ZonedDateTime creationDate = ZonedDateTime.of(2020, 2, 1, 1, 0, 0, 0, ZoneId.of(ZONE_ID));
         ZonedDateTime startDate = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
         ZonedDateTime endDate = ZonedDateTime.of(2020, 2, 1, 0, 0, 0, 0, ZoneId.of(ZONE_ID));
-        BillDTO bill = new BillDTO(3, 2, creationDate, startDate, endDate, BigDecimal.valueOf(0.50));
+        Bill bill = new Bill(3, 2, creationDate, startDate, endDate, BigDecimal.valueOf(0.50));
         MvcResult result;
         String billJSON = objectMapper.writeValueAsString(bill);
 

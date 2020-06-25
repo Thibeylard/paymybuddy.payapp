@@ -1,6 +1,6 @@
 package com.paymybuddy.payapp.controllers;
 
-import com.paymybuddy.payapp.models.Contact;
+import com.paymybuddy.payapp.dtos.ContactUserDTO;
 import com.paymybuddy.payapp.services.ContactService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -23,8 +23,8 @@ public class ContactController {
     }
 
     @GetMapping("/contacts")
-    public ResponseEntity<Collection<Contact>> getUserContacts() {
-        Collection<Contact> result;
+    public ResponseEntity<Collection<ContactUserDTO>> getUserContacts() {
+        Collection<ContactUserDTO> result;
         Logger.debug("Requested contacts of current user");
         try {
             result = contactService.getUserContacts();

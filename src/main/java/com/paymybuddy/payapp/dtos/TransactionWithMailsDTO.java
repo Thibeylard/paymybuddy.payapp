@@ -3,7 +3,7 @@ package com.paymybuddy.payapp.dtos;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
-public class TransactionToSaveDTO {
+public class TransactionWithMailsDTO {
 
     /**
      * Mail of User that send the money.
@@ -31,12 +31,12 @@ public class TransactionToSaveDTO {
      */
     private final String description;
 
-    public TransactionToSaveDTO(String userMail,
-                                String recipientMail,
-                                ZonedDateTime date,
-                                BigDecimal initialAmount,
-                                BigDecimal commission,
-                                String description) {
+    public TransactionWithMailsDTO(String userMail,
+                                   String recipientMail,
+                                   ZonedDateTime date,
+                                   BigDecimal initialAmount,
+                                   BigDecimal commission,
+                                   String description) {
         this.userMail = userMail;
         this.recipientMail = recipientMail;
         this.date = date;

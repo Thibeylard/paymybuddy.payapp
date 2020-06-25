@@ -1,6 +1,6 @@
 package com.paymybuddy.payapp.controllers;
 
-import com.paymybuddy.payapp.dtos.BillDTO;
+import com.paymybuddy.payapp.models.Bill;
 import com.paymybuddy.payapp.models.User;
 import com.paymybuddy.payapp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,9 +49,9 @@ public class UserController {
     }
 
     @GetMapping("/user/bills") // Return User balance
-    public ResponseEntity<Collection<BillDTO>> getUserBills() {
+    public ResponseEntity<Collection<Bill>> getUserBills() {
         Logger.debug("Request for principal user bills.");
-        Collection<BillDTO> bills = userService.getUserBills();
+        Collection<Bill> bills = userService.getUserBills();
         if (bills == null) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         } else if (bills.isEmpty()) {
@@ -84,12 +84,12 @@ public class UserController {
     }
 
     @PostMapping("/user/newBill")
-    public ResponseEntity<BillDTO> createUserBill(@RequestParam(name = "startDateYear") final int startDateYear,
-                                                  @RequestParam(name = "startDateMonth") final int startDateMonth,
-                                                  @RequestParam(name = "startDateDay") final int startDateDay,
-                                                  @RequestParam(name = "endDateYear") final int endDateYear,
-                                                  @RequestParam(name = "endDateMonth") final int endDateMonth,
-                                                  @RequestParam(name = "endDateDay") final int endDateDay) {
+    public ResponseEntity<Bill> createUserBill(@RequestParam(name = "startDateYear") final int startDateYear,
+                                               @RequestParam(name = "startDateMonth") final int startDateMonth,
+                                               @RequestParam(name = "startDateDay") final int startDateDay,
+                                               @RequestParam(name = "endDateYear") final int endDateYear,
+                                               @RequestParam(name = "endDateMonth") final int endDateMonth,
+                                               @RequestParam(name = "endDateDay") final int endDateDay) {
         ZonedDateTime startDate = ZonedDateTime.of(
                 startDateYear,
                 startDateMonth,
@@ -100,7 +100,7 @@ public class UserController {
                 endDateMonth,
                 endDateDay,
                 23, 59, 59, 999999999, ZoneId.of(ZONE_ID));
-        BillDTO result;
+        Bill result;
         try {
             Logger.debug("Request to create new bill for user.");
             result = userService.createBill(startDate, endDate);

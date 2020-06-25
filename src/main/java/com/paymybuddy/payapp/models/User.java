@@ -4,7 +4,6 @@ import com.paymybuddy.payapp.enums.Role;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -36,21 +35,6 @@ public class User {
      */
     @NotNull
     private final Collection<Role> roles;
-    /**
-     * Other User instance connected to this User. Null if User partially retrieved.
-     */
-    @Nullable
-    private Collection<Contact> contacts;
-    /**
-     * User transactions.  Null if User partially retrieved.
-     */
-    @Nullable
-    private Collection<Transaction> transactions;
-    /**
-     * User bank accounts.  Null if User partially retrieved.
-     */
-    @Nullable
-    private Collection<BankAccount> bankAccounts;
 
     public User(@NotNull String username,
                 @NotNull String mail,
@@ -61,8 +45,6 @@ public class User {
         this.mail = mail;
         this.password = password;
         this.roles = roles;
-        this.contacts = new ArrayList<Contact>();
-        this.transactions = new ArrayList<Transaction>();
     }
 
     public User(int id,
@@ -75,23 +57,6 @@ public class User {
         this.mail = mail;
         this.password = password;
         this.roles = roles;
-        this.contacts = null;
-        this.transactions = null;
-    }
-
-    public User withContacts(Collection<Contact> contacts) {
-        this.contacts = contacts;
-        return this;
-    }
-
-    public User withTransactions(Collection<Transaction> transactions) {
-        this.transactions = transactions;
-        return this;
-    }
-
-    public User withBankAccounts(Collection<BankAccount> bankAccounts) {
-        this.bankAccounts = bankAccounts;
-        return this;
     }
 
 
@@ -115,17 +80,5 @@ public class User {
 
     public Collection<Role> getRoles() {
         return roles;
-    }
-
-    public Optional<Collection<Contact>> getContacts() {
-        return Optional.ofNullable(contacts);
-    }
-
-    public Optional<Collection<Transaction>> getTransactions() {
-        return Optional.ofNullable(transactions);
-    }
-
-    public Optional<Collection<BankAccount>> getBankAccounts() {
-        return Optional.ofNullable(bankAccounts);
     }
 }

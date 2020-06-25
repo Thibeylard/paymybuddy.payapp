@@ -1,7 +1,7 @@
 package com.paymybuddy.payapp.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.paymybuddy.payapp.models.Contact;
+import com.paymybuddy.payapp.dtos.ContactUserDTO;
 import com.paymybuddy.payapp.services.ContactService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("Contact Controller tests on : ")
-public class ContactControllerTest {
+public class ContactUserDTOControllerTest {
     private final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     // Beans
     @Autowired
@@ -61,9 +61,9 @@ public class ContactControllerTest {
     @DisplayName("GET Contacts Success")
     public void Given_authenticatedUser_When_getUserContacts_Then_returnContactServiceValue() throws Exception {
         // Empty collection
-        Collection<Contact> contacts = Collections.emptyList();
-        when(contactService.getUserContacts()).thenReturn(contacts);
-        String contactsJson = objectMapper.writeValueAsString(contacts);
+        Collection<ContactUserDTO> contactUserDTOS = Collections.emptyList();
+        when(contactService.getUserContacts()).thenReturn(contactUserDTOS);
+        String contactsJson = objectMapper.writeValueAsString(contactUserDTOS);
 
 
         MvcResult result;
@@ -75,9 +75,9 @@ public class ContactControllerTest {
                 .isEqualTo(contactsJson);
 
         // At least one element in collection
-        contacts = Collections.singletonList(new Contact(4, "username2", "username2@mail.com"));
-        when(contactService.getUserContacts()).thenReturn(contacts);
-        contactsJson = objectMapper.writeValueAsString(contacts);
+        contactUserDTOS = Collections.singletonList(new ContactUserDTO(4, "username2", "username2@mail.com"));
+        when(contactService.getUserContacts()).thenReturn(contactUserDTOS);
+        contactsJson = objectMapper.writeValueAsString(contactUserDTOS);
 
         result = mvc.perform(get("/contacts"))
                 .andExpect(status().isOk())// Status OK

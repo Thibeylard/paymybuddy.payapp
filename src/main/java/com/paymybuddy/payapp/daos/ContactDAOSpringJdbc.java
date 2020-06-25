@@ -1,7 +1,7 @@
 package com.paymybuddy.payapp.daos;
 
 import com.paymybuddy.payapp.constants.DBStatements;
-import com.paymybuddy.payapp.models.Contact;
+import com.paymybuddy.payapp.dtos.ContactUserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -27,11 +27,11 @@ public class ContactDAOSpringJdbc implements ContactDAO {
      * @see ContactDAO
      */
     @Override
-    public Collection<Contact> getContactsByUserMail(final String userMail) throws DataAccessException {
+    public Collection<ContactUserDTO> getContactsByUserMail(final String userMail) throws DataAccessException {
         return jdbcTemplate.query(DBStatements.GET_CONTACTS,
                 new MapSqlParameterSource("userMail", userMail),
                 (rs, rowNum) ->
-                        new Contact(
+                        new ContactUserDTO(
                                 rs.getInt("id"),
                                 rs.getString("username"),
                                 rs.getString("mail")

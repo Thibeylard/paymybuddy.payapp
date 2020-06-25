@@ -1,7 +1,7 @@
 package com.paymybuddy.payapp.daos;
 
 import com.paymybuddy.payapp.constants.DBStatements;
-import com.paymybuddy.payapp.dtos.TransactionToSaveDTO;
+import com.paymybuddy.payapp.dtos.TransactionWithMailsDTO;
 import com.paymybuddy.payapp.models.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,14 +74,14 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
      * @see TransactionDAO
      */
     @Override
-    public boolean save(final TransactionToSaveDTO transactionToSaveDTO) throws DataAccessException {
+    public boolean save(final TransactionWithMailsDTO transactionWithMailsDTO) throws DataAccessException {
         Map<String, Object> parameterMap = new HashMap<>();
-        parameterMap.put("userMail", transactionToSaveDTO.getUserMail());
-        parameterMap.put("recipientMail", transactionToSaveDTO.getRecipientMail());
-        parameterMap.put("description", transactionToSaveDTO.getDescription());
-        parameterMap.put("zoned_date_time", transactionToSaveDTO.getDate());
-        parameterMap.put("amount", transactionToSaveDTO.getAmount());
-        parameterMap.put("commission", transactionToSaveDTO.getCommission());
+        parameterMap.put("userMail", transactionWithMailsDTO.getUserMail());
+        parameterMap.put("recipientMail", transactionWithMailsDTO.getRecipientMail());
+        parameterMap.put("description", transactionWithMailsDTO.getDescription());
+        parameterMap.put("zoned_date_time", transactionWithMailsDTO.getDate());
+        parameterMap.put("amount", transactionWithMailsDTO.getAmount());
+        parameterMap.put("commission", transactionWithMailsDTO.getCommission());
 
         if (jdbcTemplate.update(DBStatements.INSERT_TRANSACTION, parameterMap) == 0) {
             throw new DataRetrievalFailureException("One of requested user does not exists.");

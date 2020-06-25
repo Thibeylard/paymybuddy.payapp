@@ -1,8 +1,8 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.UserDAO;
-import com.paymybuddy.payapp.dtos.BillDTO;
 import com.paymybuddy.payapp.enums.Role;
+import com.paymybuddy.payapp.models.Bill;
 import com.paymybuddy.payapp.models.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -132,7 +132,7 @@ public class UserServiceTest {
         ZonedDateTime creationDate = ZonedDateTime.of(2020, 2, 1, 1, 0, 0, 0, clockService.getZone());
         ZonedDateTime startDate = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, clockService.getZone());
         ZonedDateTime endDate = ZonedDateTime.of(2020, 2, 1, 0, 0, 0, 0, clockService.getZone());
-        Collection<BillDTO> bills = Collections.singletonList(new BillDTO(2, creationDate, startDate, endDate));
+        Collection<Bill> bills = Collections.singletonList(new Bill(2, creationDate, startDate, endDate));
 
         when(mockUserDAO.getBills(anyString())).thenReturn(bills);
         assertThat(userService.getUserBills())
@@ -156,9 +156,9 @@ public class UserServiceTest {
         when(clockService.now()).thenReturn(creationDate);
         ZonedDateTime startDate = ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, clockService.getZone());
         ZonedDateTime endDate = ZonedDateTime.of(2020, 2, 1, 0, 0, 0, 0, clockService.getZone());
-        BillDTO billSaved = new BillDTO(3, 2, creationDate, startDate, endDate, BigDecimal.valueOf(0.50));
+        Bill billSaved = new Bill(3, 2, creationDate, startDate, endDate, BigDecimal.valueOf(0.50));
 
-        when(mockUserDAO.saveBill(any(BillDTO.class))).thenReturn(billSaved);
+        when(mockUserDAO.saveBill(any(Bill.class))).thenReturn(billSaved);
         when(mockUserDAO.find(anyString())).thenReturn(
                 Optional.of(new User(3,
                         "username3",

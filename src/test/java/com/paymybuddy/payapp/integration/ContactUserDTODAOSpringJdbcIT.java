@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @ActiveProfiles("test_h2")
 @DisplayName("ContactDAO tests on : ")
-public class ContactDAOSpringJdbcIT {
+public class ContactUserDTODAOSpringJdbcIT {
     @Autowired
     private ContactDAO contactDAO;
 

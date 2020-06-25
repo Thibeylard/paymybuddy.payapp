@@ -20,6 +20,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
@@ -70,9 +71,9 @@ public class TransactionDAOSpringJdbcIT {
         assertThat(result)
                 .extracting("creditorID").containsExactly(2, 3, 2);
         assertThat(result)
-                .extracting("initialAmount").containsExactly(10.00, 10.0, 10.0);
+                .extracting("amount").containsExactly(BigDecimal.valueOf(10.00), BigDecimal.valueOf(10.00), BigDecimal.valueOf(10.00));
         assertThat(result)
-                .extracting("total").containsExactly(9.5, 9.5, 9.5);
+                .extracting("commission").containsExactly(BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.05), BigDecimal.valueOf(0.05));
         assertThat(result)
                 .extracting("description").containsExactly("transaction1", "transaction3", "transaction6");
 
@@ -107,8 +108,8 @@ public class TransactionDAOSpringJdbcIT {
                 "user4@mail.com",
                 "user1@mail.com",
                 newTransactionTime,
-                50.00,
-                47.50,
+                BigDecimal.valueOf(50.00),
+                BigDecimal.valueOf(0.25),
                 "transaction7");
 
         Table transactionTable = new Table(jdbcTemplate.getJdbcTemplate().getDataSource(), "Transaction");
@@ -127,7 +128,7 @@ public class TransactionDAOSpringJdbcIT {
                 .value("creditor_id").isEqualTo(1)
                 .value("description").isEqualTo("transaction7")
                 .value("amount").isEqualTo(50.00)
-                .value("total").isEqualTo(47.50);
+                .value("commission").isEqualTo(0.25);
 
         TimestampWithTimeZone timestampWithTimeZoneExample =
                 (TimestampWithTimeZone) transactionTable.getRow(6).getColumnValue("zoned_date_time").getValue();
@@ -150,8 +151,8 @@ public class TransactionDAOSpringJdbcIT {
                 "user6@mail.com",
                 "user1@mail.com",
                 newTransactionTime,
-                50.00,
-                47.50,
+                BigDecimal.valueOf(50.00),
+                BigDecimal.valueOf(0.25),
                 "transaction7");
 
         // User 6 doesn't exist

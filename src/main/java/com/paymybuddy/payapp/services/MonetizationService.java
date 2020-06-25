@@ -1,5 +1,7 @@
 package com.paymybuddy.payapp.services;
 
+import java.math.BigDecimal;
+
 public interface MonetizationService {
-    double monetize(final double amount);
+    BigDecimal monetize(final BigDecimal amount);
 }

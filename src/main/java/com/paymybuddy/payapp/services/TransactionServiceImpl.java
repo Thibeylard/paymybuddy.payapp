@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 @Service
@@ -64,14 +65,14 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(readOnly = false)
     public void makeTransaction(final String recipientMail,
                                 final @Size(min = 5, max = 30) String description,
-                                final double amount) throws DataAccessException {
-        if (amount <= 0)
+                                final BigDecimal amount) throws DataAccessException {
+        if (amount.compareTo(BigDecimal.ZERO) < 0)
             throw new IllegalArgumentException("Amount to send can't be negative or null.");
 
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        double total = amount - monetizationService.monetize(amount);
+        BigDecimal commission = monetizationService.monetize(amount);
 
-        transactionDAO.save(new TransactionToSaveDTO(authUser.getUsername(), recipientMail, clockService.now(), amount, total, description));
+        transactionDAO.save(new TransactionToSaveDTO(authUser.getUsername(), recipientMail, clockService.now(), amount, commission, description));
 
     }
 }

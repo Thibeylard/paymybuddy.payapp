@@ -14,6 +14,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -47,8 +48,8 @@ public class TransactionServiceTest {
                 2,
                 4,
                 transactionTime,
-                10.00,
-                9.50,
+                BigDecimal.valueOf(10.00),
+                BigDecimal.valueOf(9.50),
                 "sample"));
 
         // --------------------------------------------------------------------- Empty collection for all getTransactions methods
@@ -110,7 +111,7 @@ public class TransactionServiceTest {
     public void Given_validParams_When_makeTransaction_Then_nothingIsThrown() {
         when(transactionDAO.save(any(TransactionToSaveDTO.class))).thenReturn(true);
 
-        assertDoesNotThrow(() -> transactionService.makeTransaction("someuser@mail.com", "sampleDesription", 10.00));
+        assertDoesNotThrow(() -> transactionService.makeTransaction("someuser@mail.com", "sampleDesription", BigDecimal.valueOf(10.00)));
         verify(transactionDAO, times(1)).save(any(TransactionToSaveDTO.class));
     }
 
@@ -120,6 +121,6 @@ public class TransactionServiceTest {
     public void Given_databaseError_When_makeTransaction_Then_throwsDAOException() {
         doThrow(DataRetrievalFailureException.class).when(transactionDAO).save(any(TransactionToSaveDTO.class));
 
-        assertThrows(DataRetrievalFailureException.class, () -> transactionService.makeTransaction("someuser@mail.com", "sampleDesription", 10.00));
+        assertThrows(DataRetrievalFailureException.class, () -> transactionService.makeTransaction("someuser@mail.com", "sampleDesription", BigDecimal.valueOf(10.00)));
     }
 }

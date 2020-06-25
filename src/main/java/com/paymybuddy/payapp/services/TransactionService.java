@@ -4,6 +4,7 @@ import com.paymybuddy.payapp.models.Transaction;
 import org.springframework.dao.DataAccessException;
 
 import javax.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 public interface TransactionService {
@@ -40,6 +41,6 @@ public interface TransactionService {
      */
     void makeTransaction(final String recipientMail,
                          final @Size(min = 5, max = 30) String description,
-                         final double amount)
+                         final BigDecimal amount)
             throws DataAccessException;
 }

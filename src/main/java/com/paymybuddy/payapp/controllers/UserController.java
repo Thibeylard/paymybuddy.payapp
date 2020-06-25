@@ -1,8 +1,10 @@
 package com.paymybuddy.payapp.controllers;
 
+import com.paymybuddy.payapp.dtos.BillDTO;
 import com.paymybuddy.payapp.models.User;
 import com.paymybuddy.payapp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -11,6 +13,9 @@ import org.tinylog.Logger;
 
 import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.Optional;
 
 @RestController
@@ -18,13 +23,13 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
-
+    private final String ZONE_ID;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, @Value("${default.zoneID}") String ZONE_ID) {
         this.userService = userService;
+        this.ZONE_ID = ZONE_ID;
     }
-
 
     @GetMapping("/user") // Return basic view of current User (no Contacts, no Transactions)
     public ResponseEntity<User> getUser() {
@@ -40,6 +45,19 @@ public class UserController {
         Optional<Double> balance = userService.getUserBalance();
         return balance.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR));
+    }
+
+    @GetMapping("/user/bills") // Return User balance
+    public ResponseEntity<Collection<BillDTO>> getUserBills() {
+        Logger.debug("Request for principal user bills.");
+        Collection<BillDTO> bills = userService.getUserBills();
+        if (bills == null) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        } else if (bills.isEmpty()) {
+            return new ResponseEntity<>(bills, HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(bills, HttpStatus.OK);
+        }
     }
 
     @PutMapping("/user/profile")
@@ -62,6 +80,41 @@ public class UserController {
         }
         Logger.info("Successfully update settings");
         return new ResponseEntity<>("Successfully update settings", HttpStatus.OK);
+    }
+
+    @PostMapping("/user/newBill")
+    public ResponseEntity<BillDTO> createUserBill(@RequestParam(name = "startDateYear") final int startDateYear,
+                                                  @RequestParam(name = "startDateMonth") final int startDateMonth,
+                                                  @RequestParam(name = "startDateDay") final int startDateDay,
+                                                  @RequestParam(name = "endDateYear") final int endDateYear,
+                                                  @RequestParam(name = "endDateMonth") final int endDateMonth,
+                                                  @RequestParam(name = "endDateDay") final int endDateDay) {
+        ZonedDateTime startDate = ZonedDateTime.of(
+                startDateYear,
+                startDateMonth,
+                startDateDay,
+                0, 0, 0, 0, ZoneId.of(ZONE_ID));
+        ZonedDateTime endDate = ZonedDateTime.of(
+                endDateYear,
+                endDateMonth,
+                endDateDay,
+                23, 59, 59, 999999999, ZoneId.of(ZONE_ID));
+        BillDTO result;
+        try {
+            Logger.debug("Request to create new bill for user.");
+            result = userService.createBill(startDate, endDate);
+        } catch (IllegalArgumentException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } catch (RuntimeException e) {
+            Logger.error("An unexpected error occurred : User could not be find.");
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (SQLException e) {
+            Logger.error(e.getMessage());
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        Logger.info("Successfully created user bill");
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 }

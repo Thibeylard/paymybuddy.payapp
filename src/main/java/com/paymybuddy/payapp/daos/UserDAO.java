@@ -53,7 +53,7 @@ public interface UserDAO {
     Optional<Double> getBalance(final String userMail);
 
     /**
-     * Get User bills.
+     * Get User bills from Bill table.
      *
      * @param userMail Mail of User to get bills of
      * @return Collection of BillDTO, empty if no Bills, null if no user.
@@ -66,5 +66,5 @@ public interface UserDAO {
      * @param bill BillDTO object to save
      * @return BillDTO object just saved
      */
-    BillDTO saveBill(final BillDTO bill) throws Exception;
+    BillDTO saveBill(final BillDTO bill) throws SQLException;
 }

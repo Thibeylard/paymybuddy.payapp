@@ -303,7 +303,7 @@ public class UserDAOJdbc implements UserDAO {
      * @see UserDAO
      */
     @Override
-    public BillDTO saveBill(BillDTO bill) throws Exception {
+    public BillDTO saveBill(BillDTO bill) throws SQLException {
 
         Connection con = databaseConfiguration.getConnection();
         PreparedStatement ps = null;

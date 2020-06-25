@@ -1,6 +1,7 @@
 package com.paymybuddy.payapp.services;
 
 import com.paymybuddy.payapp.daos.UserDAO;
+import com.paymybuddy.payapp.dtos.BillDTO;
 import com.paymybuddy.payapp.models.User;
 import com.paymybuddy.payapp.models.UserCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.Optional;
 
 @Service
@@ -27,11 +30,13 @@ public class UserServiceImpl implements UserService {
 
     private final UserDAO userDAO;
     private final PasswordEncoder passwordEncoder;
+    private final ClockService clockService;
 
     @Autowired
-    public UserServiceImpl(UserDAO userDAO, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserDAO userDAO, PasswordEncoder passwordEncoder, ClockService clockService) {
         this.userDAO = userDAO;
         this.passwordEncoder = passwordEncoder;
+        this.clockService = clockService;
     }
 
     /**
@@ -80,5 +85,32 @@ public class UserServiceImpl implements UserService {
     public Optional<Double> getUserBalance() {
         UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userDAO.getBalance(authUser.getUsername());
+    }
+
+    /**
+     * @see UserService
+     */
+    @Override
+    public Collection<BillDTO> getUserBills() {
+        UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userDAO.getBills(authUser.getUsername());
+    }
+
+    /**
+     * @see UserService
+     */
+    @Override
+    public BillDTO createBill(ZonedDateTime startDate, ZonedDateTime endDate) throws SQLException, RuntimeException {
+        UserDetails authUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userDAO.find(authUser.getUsername()).orElseThrow(RuntimeException::new);
+        ZonedDateTime creationDate = clockService.now();
+        if (startDate.compareTo(endDate) > 0) {
+            throw new IllegalArgumentException("Bill end date must be greater than start date.");
+        }
+        if (endDate.compareTo(creationDate) > 0) {
+            throw new IllegalArgumentException("Bill creation date must be greater than end date.");
+        }
+
+        return userDAO.saveBill(new BillDTO(user.getId().orElseThrow(RuntimeException::new), creationDate, startDate, endDate));
     }
 }

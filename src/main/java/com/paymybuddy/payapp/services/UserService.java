@@ -1,5 +1,6 @@
 package com.paymybuddy.payapp.services;
 
+import com.paymybuddy.payapp.dtos.BillDTO;
 import com.paymybuddy.payapp.models.User;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -9,6 +10,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.Optional;
 
 public interface UserService {
@@ -44,4 +47,21 @@ public interface UserService {
      * @return User balance as Optional<Double>, empty if error occurs
      */
     Optional<Double> getUserBalance();
+
+    /**
+     * Get User bills
+     *
+     * @return Collection of BillDTO, empty if no Bills, null if no user.
+     */
+    Collection<BillDTO> getUserBills();
+
+    /**
+     * Create new bill for User.
+     *
+     * @param startDate Date before which transactions does not enter into account
+     * @param endDate   Date after which transactions does not enter into account
+     * @return BillDTO object just saved
+     */
+    BillDTO createBill(final ZonedDateTime startDate,
+                       final ZonedDateTime endDate) throws RuntimeException, SQLException;
 }

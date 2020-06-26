@@ -31,7 +31,8 @@ public final class DBStatements {
                     "INNER JOIN BANK_ACCOUNT AS acc ON acc.user_id = u.id " +
                     "INNER JOIN BANK_OPERATION AS op ON op.bank_account_id = acc.id " +
                     "WHERE u.mail = ?" +
-                    ") ";
+                    ") AS T" +
+                    "GROUP BY userID";
 
     public static final String GET_USER_BILLS_CLASSIC_JDBC =
             "SELECT  b.id, u.id AS user_id, creation_date, start_date, end_date, total FROM USER AS u " +
@@ -44,7 +45,7 @@ public final class DBStatements {
     public static final String GET_BILL_TOTAL_CLASSIC_JDBC =
             "SELECT SUM(t.commission) AS commission FROM TRANSACTION as t " +
                     "INNER JOIN User AS u ON u.id = t.debtor_id " +
-                    "WHERE t.zoned_date_time >= ? AND t.zoned_date_time <= ? AND u.id = ?";
+                    "WHERE t.date >= ? AND t.date <= ? AND u.id = ?";
 
     // USER_ROLE Table statements
     public static final String GET_USER_ROLES_CLASSIC_JDBC =
@@ -88,7 +89,7 @@ public final class DBStatements {
 
     // TRANSACTION Table statements
     private static final String GET_TRANSACTIONS_MODEL =
-            "SELECT t.id, debtor_id, creditor_id, amount, description, zoned_date_time, commission FROM TRANSACTION AS t ";
+            "SELECT t.id, debtor_id, creditor_id, amount, description, date, commission FROM TRANSACTION AS t ";
 
     public static final String GET_DEBIT_TRANSACTIONS =
             GET_TRANSACTIONS_MODEL +
@@ -104,8 +105,8 @@ public final class DBStatements {
             GET_DEBIT_TRANSACTIONS + " UNION " + GET_CREDIT_TRANSACTIONS;
 
     public static final String INSERT_TRANSACTION =
-            "INSERT INTO TRANSACTION (debtor_id, creditor_id, amount, description, zoned_date_time, commission) " +
-                    "SELECT u.id, r.id, :amount, :description, :zoned_date_time, :commission FROM USER AS u " +
+            "INSERT INTO TRANSACTION (debtor_id, creditor_id, amount, description, date, commission) " +
+                    "SELECT u.id, r.id, :amount, :description, :date, :commission FROM USER AS u " +
                     "INNER JOIN USER AS r ON r.mail <> u.mail " +
                     "WHERE u.mail = :userMail AND r.mail = :recipientMail";
 
@@ -138,5 +139,6 @@ public final class DBStatements {
 
     public static final String INSERT_BANK_OPERATION =
             "INSERT INTO BANK_OPERATION (bank_account_id, date, amount) VALUES(:bankAccountID, :date, :amount)";
+
 
 }

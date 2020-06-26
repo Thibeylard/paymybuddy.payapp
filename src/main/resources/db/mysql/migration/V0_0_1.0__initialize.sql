@@ -9,7 +9,7 @@ CREATE TABLE User
     id       INT AUTO_INCREMENT NOT NULL,
     username VARCHAR(30)        NOT NULL,
     mail     VARCHAR(50)        NOT NULL,
-    password VARCHAR(30)        NOT NULL,
+    password VARCHAR(80)        NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -25,9 +25,9 @@ CREATE TABLE Bill
 (
     id            INT AUTO_INCREMENT NOT NULL,
     user_id       INT                NOT NULL,
-    creation_date TIMESTAMP          NOT NULL,
-    start_date    TIMESTAMP          NOT NULL,
-    end_date      TIMESTAMP          NOT NULL,
+    creation_date DATETIME           NOT NULL,
+    start_date    DATETIME           NOT NULL,
+    end_date      DATETIME           NOT NULL,
     total         DECIMAL(5, 2)      NOT NULL,
     PRIMARY KEY (id)
 );
@@ -48,8 +48,8 @@ CREATE TABLE Transaction
     creditor_id INT           NOT NULL,
     description VARCHAR(40)   NOT NULL,
     amount      DECIMAL(5, 2) NOT NULL,
-    commission  DECIMAL(5, 2) NOT NULL,
-    date        TIMESTAMP     NOT NULL,
+    commission  DECIMAL(4, 4) NOT NULL,
+    date        DATETIME      NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -73,13 +73,10 @@ CREATE TABLE Bank_Operation
 (
     id              INT AUTO_INCREMENT NOT NULL,
     bank_account_id INT                NOT NULL,
-    amount          DECIMAL(6, 2)      NOT NULL,
-    date            TIMESTAMP          NOT NULL,
+    amount          DECIMAL(5, 2)      NOT NULL,
+    date            DATETIME           NOT NULL,
     PRIMARY KEY (id)
 );
-
-ALTER TABLE Bank_Operation
-    ALTER COLUMN amount DECIMAL(6, 2);
 
 
 CREATE TABLE Contact

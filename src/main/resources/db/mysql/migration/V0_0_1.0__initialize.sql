@@ -1,6 +1,6 @@
 /*
     SQL Dialect : MySQL
-    DB Version : 0.0.1
+    DB Version : 0.0.1.0
     Description : Initialize database for production
  */
 

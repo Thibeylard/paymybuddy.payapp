@@ -21,17 +21,17 @@ public final class DBStatements {
             "SELECT userID, SUM(balance) AS balance FROM (" +
                     "SELECT u.id AS userID, SUM(c.amount) AS balance FROM USER AS u " +
                     "INNER JOIN TRANSACTION AS c ON c.creditor_id = u.id " +
-                    "WHERE u.mail = ?" +
+                    "WHERE u.mail = ? " +
                     "UNION " +
                     "SELECT u.id AS userID, SUM(-d.amount) AS balance FROM USER AS u " +
                     "INNER JOIN TRANSACTION AS d ON d.debtor_id = u.id " +
-                    "WHERE u.mail = ?" +
+                    "WHERE u.mail = ? " +
                     "UNION " +
                     "SELECT u.id AS userID, SUM(op.amount) AS balance FROM USER AS u " +
                     "INNER JOIN BANK_ACCOUNT AS acc ON acc.user_id = u.id " +
                     "INNER JOIN BANK_OPERATION AS op ON op.bank_account_id = acc.id " +
-                    "WHERE u.mail = ?" +
-                    ") AS T" +
+                    "WHERE u.mail = ? " +
+                    ") AS T " +
                     "GROUP BY userID";
 
     public static final String GET_USER_BILLS_CLASSIC_JDBC =

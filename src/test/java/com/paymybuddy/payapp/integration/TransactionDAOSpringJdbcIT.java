@@ -131,9 +131,9 @@ public class TransactionDAOSpringJdbcIT {
                 .value("commission").isEqualTo(0.25);
 
         TimestampWithTimeZone timestampWithTimeZoneExample =
-                (TimestampWithTimeZone) transactionTable.getRow(6).getColumnValue("zoned_date_time").getValue();
+                (TimestampWithTimeZone) transactionTable.getRow(6).getColumnValue("date").getValue();
 
-        // Check that zoned_date_time in database perfectly match with passed ZonedDateTime object
+        // Check that date in database perfectly match with passed ZonedDateTime object
         assertThat(timestampWithTimeZoneExample.getDay()).isEqualTo(newTransactionTime.getDayOfMonth());
         assertThat(timestampWithTimeZoneExample.getMonth()).isEqualTo(newTransactionTime.getMonthValue());
         assertThat(timestampWithTimeZoneExample.getYear()).isEqualTo(newTransactionTime.getYear());

@@ -63,7 +63,7 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
                                 rs.getInt("id"),
                                 rs.getInt("debtor_id"),
                                 rs.getInt("creditor_id"),
-                                ZonedDateTime.of(rs.getTimestamp("zoned_date_time").toLocalDateTime(), ZoneId.of(this.ZONE_ID)),
+                                ZonedDateTime.of(rs.getTimestamp("date").toLocalDateTime(), ZoneId.of(this.ZONE_ID)),
                                 BigDecimal.valueOf(rs.getDouble("amount")),
                                 BigDecimal.valueOf(rs.getDouble("commission")),
                                 rs.getString("description")
@@ -79,7 +79,7 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
         parameterMap.put("userMail", transactionWithMailsDTO.getUserMail());
         parameterMap.put("recipientMail", transactionWithMailsDTO.getRecipientMail());
         parameterMap.put("description", transactionWithMailsDTO.getDescription());
-        parameterMap.put("zoned_date_time", transactionWithMailsDTO.getDate());
+        parameterMap.put("date", transactionWithMailsDTO.getDate());
         parameterMap.put("amount", transactionWithMailsDTO.getAmount());
         parameterMap.put("commission", transactionWithMailsDTO.getCommission());
 

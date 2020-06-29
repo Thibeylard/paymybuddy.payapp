@@ -36,8 +36,10 @@ public class UserController {
     public ResponseEntity<User> getUser() {
         Logger.debug("Request for principal user.");
         Optional<User> user = userService.getUserByMail();
+        return new ResponseEntity<>(user.get(), HttpStatus.OK);
+        /*
         return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
+                .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));*/
     }
 
     @GetMapping("/user/balance") // Return User balance
@@ -48,15 +50,14 @@ public class UserController {
                 .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
-    @GetMapping("/user/bills") // Return User balance
+    @GetMapping("/user/bills") // Return User bills
     public ResponseEntity<Collection<Bill>> getUserBills() {
         Logger.debug("Request for principal user bills.");
         Collection<Bill> bills = userService.getUserBills();
         if (bills == null) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        } else if (bills.isEmpty()) {
-            return new ResponseEntity<>(bills, HttpStatus.NO_CONTENT);
         } else {
+            Logger.info("Bills of user found.");
             return new ResponseEntity<>(bills, HttpStatus.OK);
         }
     }

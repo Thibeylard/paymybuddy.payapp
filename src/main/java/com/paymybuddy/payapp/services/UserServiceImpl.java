@@ -111,7 +111,9 @@ public class UserServiceImpl implements UserService {
         if (endDate.compareTo(creationDate) > 0) {
             throw new IllegalArgumentException("Bill creation date must be greater than end date.");
         }
-
-        return userDAO.saveBill(new Bill(user.getId().orElseThrow(RuntimeException::new), creationDate, startDate, endDate));
+        if (user.getId() == null) {
+            throw new RuntimeException();
+        }
+        return userDAO.saveBill(new Bill(user.getId(), creationDate, startDate, endDate));
     }
 }

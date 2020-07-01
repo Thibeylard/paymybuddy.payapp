@@ -1,8 +1,11 @@
 package com.paymybuddy.payapp.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.paymybuddy.payapp.dtos.ContactUserDTO;
 import com.paymybuddy.payapp.enums.Role;
+import com.paymybuddy.payapp.models.Transaction;
 import com.paymybuddy.payapp.models.User;
+import com.paymybuddy.payapp.models.UserCredentials;
 import org.flywaydb.test.annotation.FlywayTest;
 import org.flywaydb.test.junit5.FlywayTestExtension;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -23,6 +27,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,9 +35,12 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+//TODO test d'intégration sur suppression de contact
+//TODO test d'integration sur les bank accounts
+//TODO test d'integration sur création de facture
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith({FlywayTestExtension.class})
@@ -88,7 +96,6 @@ public class UserStoriesIT {
                 .andExpect(status().isOk());
 
         // ---------------------------------------------------------------- User logs in successfully
-        params.clear();
         mvc.perform(formLogin()
                 .user(user.getMail())
                 .password(userPass))
@@ -96,7 +103,6 @@ public class UserStoriesIT {
 
         // ---------------------------------------------------------------- User has been properly saved
         result = mvc.perform(get("/user")
-                .params(params)
                 .with(user(user.getMail())))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -111,7 +117,6 @@ public class UserStoriesIT {
 
         // ---------------------------------------------------------------- User has no contacts
         result = mvc.perform(get("/contacts")
-                .params(params)
                 .with(user(user.getMail())))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -123,7 +128,6 @@ public class UserStoriesIT {
 
         // ---------------------------------------------------------------- User has no transaction
         result = mvc.perform(get("/transactions")
-                .params(params)
                 .with(user(user.getMail())))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -135,7 +139,6 @@ public class UserStoriesIT {
 
         // ---------------------------------------------------------------- User has balance at 0
         result = mvc.perform(get("/user/balance")
-                .params(params)
                 .with(user(user.getMail())))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -147,7 +150,6 @@ public class UserStoriesIT {
 
         // ---------------------------------------------------------------- User has no bill
         result = mvc.perform(get("/user/bills")
-                .params(params)
                 .with(user(user.getMail())))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -159,7 +161,6 @@ public class UserStoriesIT {
 
         // ---------------------------------------------------------------- User has no bank account
         result = mvc.perform(get("/bankAccounts")
-                .params(params)
                 .with(user(user.getMail())))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -172,51 +173,204 @@ public class UserStoriesIT {
 
     @Test
     @FlywayTest
-    @DisplayName("Story#2 : Existing User ask new bill")
-    public void existingUserLogsInAndAsksForBill() {
-/*
-        String userUsername = "maurice.robertson@example.com";
+    @DisplayName("Story#2 : User update profile")
+    public void userUpdateProfileSuccessfully() throws Exception {
+        final String userPass = "superarcher";
 
-        // ---------------------------------------------------------------- User add three new contacts
+        User user = new User("leslin",
+                "leslie.austin@example.com",
+                bcryptEncoder.encode(userPass),
+                Collections.singletonList(Role.USER));
+
+        // ---------------------------------------------------------------- User logs in successfully
         params.clear();
-        params.add("contactMail", "nelson.harvey@example.com");
-        mvc.perform(post("/contacts")
-                .params(params)
-                .with(csrf())
-                .with(user(userUsername)))
-                .andExpect(status().isCreated());
+        mvc.perform(formLogin()
+                .user(user.getMail())
+                .password(userPass))
+                .andExpect(authenticated());
 
-        params.clear();
-        params.add("contactMail", "antonio.wright@example.com");
-        mvc.perform(post("/contacts")
-                .params(params)
-                .with(csrf())
-                .with(user(userUsername)))
-                .andExpect(status().isCreated());
-
-        params.clear();
-        params.add("contactMail", "leslie.austin@example.com");
-        mvc.perform(post("/contacts")
-                .params(params)
-                .with(csrf())
-                .with(user(userUsername)))
-                .andExpect(status().isCreated());
-
-        userContacts = new ArrayList<>();
-        userContacts.add(new ContactUserDTO(1, "nharvey", "nelson.harvey@example.com"));
-        userContacts.add(new ContactUserDTO(2, "leslin", "leslie.austin@example.com"));
-        userContacts.add(new ContactUserDTO(3, "antowright", "antonio.wright@example.com"));
-
-        jsonExpected = objectMapper.writeValueAsString(userContacts);
-
-        // ---------------------------------------------------------------- User has now three contacts
-        params.clear();
-        result = mvc.perform(get("/contacts")
-                .params(params)
-                .with(user(userUsername)))
+        // ---------------------------------------------------------------- User is retrieved correctly
+        result = mvc.perform(get("/user")
+                .with(user(user.getMail())))
                 .andExpect(status().isOk())
                 .andReturn();
-        assertThat(result.getResponse().getContentAsString())
-                .isEqualTo(jsonExpected);*/
+
+        User savedUser = objectMapper.readValue(result.getResponse().getContentAsString(), User.class);
+
+        assertThat(user.getUsername()).isEqualTo(savedUser.getUsername());
+        assertThat(user.getMail()).isEqualTo(savedUser.getMail());
+        assertThat(user.getRoles()).usingRecursiveFieldByFieldElementComparator().isEqualTo(savedUser.getRoles());
+        assertThat(bcryptEncoder.matches(userPass, user.getPassword())).isTrue();
+        assertThat(bcryptEncoder.matches(userPass, savedUser.getPassword())).isTrue();
+
+        // ---------------------------------------------------------------- User update its profile
+        UserDetails userDetails = new UserCredentials(user.getMail(), user.getPassword(), user.getRoles());
+
+        user = new User("leslied",
+                "leslie.married@example.com",
+                bcryptEncoder.encode(userPass),
+                Collections.singletonList(Role.USER));
+
+        params.add("username", user.getUsername());
+        params.add("mail", user.getMail());
+        params.add("password", userPass);
+        result = mvc.perform(put("/user/profile")
+                .params(params)
+                .with(user(userDetails))
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // ---------------------------------------------------------------- User has been properly modified
+        result = mvc.perform(get("/user")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        savedUser = objectMapper.readValue(result.getResponse().getContentAsString(), User.class);
+
+        assertThat(user.getUsername()).isEqualTo(savedUser.getUsername());
+        assertThat(user.getMail()).isEqualTo(savedUser.getMail());
+
+        // ---------------------------------------------------------------- All User data can be accessed normally
+        // ---------------------------------------------------------------- User has contacts with id 1 and 3
+        result = mvc.perform(get("/contacts")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ArrayList<ContactUserDTO> userContacts = objectMapper.readValue(result.getResponse().getContentAsString(), ArrayList.class);
+
+        assertThat(userContacts.size()).isEqualTo(2);
+        assertThat(userContacts)
+                .extracting("id").contains(1, 3);
+        assertThat(userContacts)
+                .extracting("username").contains("antowright", "nharvey");
+
+        // ---------------------------------------------------------------- User has three transactions
+        result = mvc.perform(get("/transactions")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ArrayList<Transaction> userTransactions = objectMapper.readValue(result.getResponse().getContentAsString(), ArrayList.class);
+
+        assertThat(userTransactions.size()).isEqualTo(3);
+        assertThat(userTransactions)
+                .extracting("id").contains(1, 3, 6);
+        assertThat(userTransactions)
+                .extracting("description").contains("restaurant bill", "misc drinks", "flat-share week rent");
+    }
+
+    @Test
+    @FlywayTest
+    @DisplayName("Story#3 : User send money to new contact")
+    public void existingUserLogsInAndAsksForBill() throws Exception {
+
+        final String userPass = "book7books";
+
+        User user = new User("antowright",
+                "antonio.wright@example.com",
+                bcryptEncoder.encode(userPass),
+                Collections.singletonList(Role.USER));
+
+        // ---------------------------------------------------------------- User logs in successfully
+        params.clear();
+        mvc.perform(formLogin()
+                .user(user.getMail())
+                .password(userPass))
+                .andExpect(authenticated());
+
+        // ---------------------------------------------------------------- User has contacts with id 1 and 2
+        result = mvc.perform(get("/contacts")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ArrayList<ContactUserDTO> userContacts = objectMapper.readValue(result.getResponse().getContentAsString(), ArrayList.class);
+
+        assertThat(userContacts.size()).isEqualTo(2);
+        assertThat(userContacts)
+                .extracting("id").contains(1, 2);
+        assertThat(userContacts)
+                .extracting("username").contains("leslin", "nharvey");
+
+        // ---------------------------------------------------------------- User add new contact
+        params.clear();
+        params.add("contactMail", "diana.moreno@example.com");
+        mvc.perform(post("/contacts")
+                .params(params)
+                .with(csrf())
+                .with(user(user.getMail())))
+                .andExpect(status().isCreated());
+
+        // ---------------------------------------------------------------- User has contacts with id 1, 2 and 4
+        result = mvc.perform(get("/contacts")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        userContacts = objectMapper.readValue(result.getResponse().getContentAsString(), ArrayList.class);
+
+        assertThat(userContacts.size()).isEqualTo(3);
+        assertThat(userContacts)
+                .extracting("id").contains(1, 2, 4);
+        assertThat(userContacts)
+                .extracting("username").contains("leslin", "nharvey", "dianoreno");
+
+        // ---------------------------------------------------------------- User get their balance
+        result = mvc.perform(get("/user/balance")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        assertThat(result.getResponse().getContentAsString()).isEqualTo("67.9");
+
+        // ---------------------------------------------------------------- User send money to new contact
+        params.clear();
+        params.add("recipientMail", "diana.moreno@example.com");
+        params.add("description", "parking bill");
+        params.add("amount", "5");
+        mvc.perform(post("/transactions")
+                .params(params)
+                .with(csrf())
+                .with(user(user.getMail())))
+                .andExpect(status().isCreated());
+
+        // ---------------------------------------------------------------- User get their debit transactions
+        result = mvc.perform(get("/transactions/debit")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        userContacts = objectMapper.readValue(result.getResponse().getContentAsString(), ArrayList.class);
+
+        assertThat(userContacts.size()).isEqualTo(4);
+        assertThat(userContacts)
+                .extracting("id").contains(2, 4, 6, 7);
+        assertThat(userContacts)
+                .extracting("description").contains("cinema ticket", "car pool", "flat-share week rent", "parking bill");
+
+        // ---------------------------------------------------------------- User get their credit transactions
+        result = mvc.perform(get("/transactions/credit")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        userContacts = objectMapper.readValue(result.getResponse().getContentAsString(), ArrayList.class);
+
+        assertThat(userContacts.size()).isEqualTo(1);
+        assertThat(userContacts)
+                .extracting("id").contains(3);
+        assertThat(userContacts)
+                .extracting("description").contains("misc drinks");
+
+        // ---------------------------------------------------------------- User get their updated balance
+        result = mvc.perform(get("/user/balance")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        assertThat(result.getResponse().getContentAsString()).isEqualTo("62.9");
     }
 }

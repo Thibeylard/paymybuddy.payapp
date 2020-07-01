@@ -43,13 +43,13 @@ CREATE TABLE User_Role
 
 CREATE TABLE Transaction
 (
-    id          INT           NOT NULL,
-    debtor_id   INT           NOT NULL,
-    creditor_id INT           NOT NULL,
-    description VARCHAR(40)   NOT NULL,
-    amount      DECIMAL(5, 2) NOT NULL,
-    commission  DECIMAL(4, 4) NOT NULL,
-    date        DATETIME      NOT NULL,
+    id          INT AUTO_INCREMENT NOT NULL,
+    debtor_id   INT                NOT NULL,
+    creditor_id INT                NOT NULL,
+    description VARCHAR(40)        NOT NULL,
+    amount      DECIMAL(5, 2)      NOT NULL,
+    commission  DECIMAL(4, 4)      NOT NULL,
+    date        DATETIME           NOT NULL,
     PRIMARY KEY (id)
 );
 

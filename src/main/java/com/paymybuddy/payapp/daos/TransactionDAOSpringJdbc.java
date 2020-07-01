@@ -79,7 +79,7 @@ public class TransactionDAOSpringJdbc implements TransactionDAO {
         parameterMap.put("userMail", transactionWithMailsDTO.getUserMail());
         parameterMap.put("recipientMail", transactionWithMailsDTO.getRecipientMail());
         parameterMap.put("description", transactionWithMailsDTO.getDescription());
-        parameterMap.put("date", transactionWithMailsDTO.getDate());
+        parameterMap.put("date", transactionWithMailsDTO.getDate().toLocalDateTime());
         parameterMap.put("amount", transactionWithMailsDTO.getAmount());
         parameterMap.put("commission", transactionWithMailsDTO.getCommission());
 

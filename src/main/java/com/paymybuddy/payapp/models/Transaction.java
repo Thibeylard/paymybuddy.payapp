@@ -1,5 +1,7 @@
 package com.paymybuddy.payapp.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -47,6 +49,7 @@ public class Transaction {
      * @param commission  from Transaction.monetizedTotal
      * @param description from Transaction.description
      */
+    @JsonCreator
     public Transaction(int id,
                        int debtorID,
                        int creditorID,

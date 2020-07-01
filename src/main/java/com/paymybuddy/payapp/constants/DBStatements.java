@@ -15,7 +15,7 @@ public final class DBStatements {
             "INSERT INTO User (username, mail, password) VALUES ( ?, ?, ?)";
 
     public static final String UPDATE_USER_CLASSIC_JDBC =
-            "UPDATE User SET (username, mail, password) = ( ?, ?, ?) WHERE User.mail = ?";
+            "UPDATE User SET username = ?, mail = ?, password = ? WHERE mail = ?";
 
     public static final String GET_USER_BALANCE_CLASSIC_JDBC =
             "SELECT userID, SUM(balance) AS balance FROM (" +

@@ -163,7 +163,7 @@ public class UserControllerTest {
         // Empty collection
         billsJSON = objectMapper.writeValueAsString(Collections.emptyList());
         result = mvc.perform(get("/user/bills"))
-                .andExpect(status().isNoContent())
+                .andExpect(status().isOk())
                 .andReturn();
 
         assertThat(result.getResponse().getContentAsString())

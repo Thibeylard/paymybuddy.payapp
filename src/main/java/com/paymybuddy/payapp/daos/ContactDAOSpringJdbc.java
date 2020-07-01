@@ -41,6 +41,7 @@ public class ContactDAOSpringJdbc implements ContactDAO {
     /**
      * @see ContactDAO
      */
+    // TODO Empêcher la création d'un contact a b qui existe déjà en tant que b a
     @Override
     public boolean save(final String userMail,
                         final String contactMail) throws DataAccessException {

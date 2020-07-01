@@ -3,6 +3,7 @@ package com.paymybuddy.payapp.dtos;
 import com.paymybuddy.payapp.models.User;
 
 import javax.validation.constraints.NotNull;
+import java.util.NoSuchElementException;
 
 
 public class ContactUserDTO {
@@ -32,7 +33,7 @@ public class ContactUserDTO {
     }
 
     public ContactUserDTO(@NotNull User user) {
-        this.id = user.getId();
+        this.id = user.getId().orElseThrow(NoSuchElementException::new);
         this.username = user.getUsername();
         this.mail = user.getMail();
     }

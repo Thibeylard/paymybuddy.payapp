@@ -36,10 +36,8 @@ public class UserController {
     public ResponseEntity<User> getUser() {
         Logger.debug("Request for principal user.");
         Optional<User> user = userService.getUserByMail();
-        return new ResponseEntity<>(user.get(), HttpStatus.OK);
-        /*
         return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));*/
+                .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/user/balance") // Return User balance

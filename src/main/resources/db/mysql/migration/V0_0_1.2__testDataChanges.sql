@@ -4,9 +4,6 @@
     Description : Minor changes for integration test with MySQL test data
  */
 
-INSERT INTO Contact (user_a_id, user_b_id)
-VALUES (4, 3);
-
 UPDATE Transaction
 SET DATE = '2020-06-27 19:53:54.000000'
 WHERE id = 6;

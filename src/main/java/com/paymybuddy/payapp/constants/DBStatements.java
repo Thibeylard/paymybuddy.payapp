@@ -122,15 +122,17 @@ public final class DBStatements {
 
     public static final String INSERT_BANK_ACCOUNT =
             "INSERT INTO Bank_Account (user_id, owner_fullname, description, IBAN) " +
-                    "SELECT u.id, :ownerFullName, :description, :IBAN, FROM User AS u " +
+                    "SELECT u.id, :ownerFullName, :description, :IBAN FROM User AS u " +
                     "WHERE u.mail = :userMail";
 
     public static final String UPDATE_BANK_ACCOUNT =
             "UPDATE Bank_Account SET (owner_fullname, description, IBAN) = ( :ownerFullName, :description, :IBAN) WHERE id = :bankAccountID";
 
+    public static final String DELETE_BANK_ACCOUNT_OPERATIONS =
+            "DELETE FROM Bank_Operation WHERE bank_account_id = :bankAccountID";
+
     public static final String DELETE_BANK_ACCOUNT =
-            "DELETE FROM Bank_Operation WHERE bank_account_id = :bankAccountID; " +
-                    "DELETE FROM Bank_Account WHERE id = :bankAccountID";
+            "DELETE FROM Bank_Account WHERE id = :bankAccountID";
 
     // Bank_Operation Table statements
     public static final String GET_BANK_OPERATIONS =

@@ -30,7 +30,7 @@ public class DatabaseConfiguration {
         Connection con = null;
         try {
             con = dataSource.getConnection();
-            Logger.debug("Connected to database.");
+//            Logger.debug("Connected to database.");
         } catch (SQLException e) {
             Logger.error("Error while getting connection to database.");
         }
@@ -48,7 +48,7 @@ public class DatabaseConfiguration {
 
         try {
             con.close();
-            Logger.debug("Database connection closed.");
+//            Logger.debug("Database connection closed.");
         } catch (SQLException e) {
             Logger.error("Error while closing connection to database.");
         }
@@ -65,7 +65,7 @@ public class DatabaseConfiguration {
 
         try {
             ps.close();
-            Logger.debug("PreparedStatement closed.");
+//            Logger.debug("PreparedStatement closed.");
         } catch (SQLException e) {
             Logger.error("Error while closing PreparedStatement.");
         }
@@ -82,7 +82,7 @@ public class DatabaseConfiguration {
 
         try {
             rs.close();
-            Logger.debug("ResultSet closed.");
+//            Logger.debug("ResultSet closed.");
         } catch (SQLException e) {
             Logger.error("Error while closing ResultSet.");
         }

@@ -1,6 +1,6 @@
 package com.paymybuddy.payapp.models;
 
-import java.util.Collection;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class BankAccount {
     /**
@@ -24,15 +24,8 @@ public class BankAccount {
      */
     private String IBAN;
 
+    @JsonCreator
     public BankAccount(int id, int ownerID, String ownerFullName, String description, String IBAN) {
-        this.id = id;
-        this.ownerID = ownerID;
-        this.ownerFullName = ownerFullName;
-        this.description = description;
-        this.IBAN = IBAN;
-    }
-
-    public BankAccount(int id, int ownerID, String ownerFullName, String description, String IBAN, Collection<BankOperation> operations) {
         this.id = id;
         this.ownerID = ownerID;
         this.ownerFullName = ownerFullName;

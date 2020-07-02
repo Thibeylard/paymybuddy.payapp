@@ -3,9 +3,7 @@ package com.paymybuddy.payapp.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paymybuddy.payapp.dtos.ContactUserDTO;
 import com.paymybuddy.payapp.enums.Role;
-import com.paymybuddy.payapp.models.Transaction;
-import com.paymybuddy.payapp.models.User;
-import com.paymybuddy.payapp.models.UserCredentials;
+import com.paymybuddy.payapp.models.*;
 import org.flywaydb.test.annotation.FlywayTest;
 import org.flywaydb.test.junit5.FlywayTestExtension;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +26,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,8 +74,8 @@ public class UserStoriesIT {
 
     @Test
     @FlywayTest
-    @DisplayName("Story#1 : New User got blank account")
-    public void newUserSignsInAndGotFreshAccount() throws Exception {
+    @DisplayName("Story#1 : New User got blank account and add bank account")
+    public void newUserSignsInAndAddBankAccountToFreshAccount() throws Exception {
         String userPass = "fiftybucks";
 
         User user = new User("maurobertson",
@@ -161,6 +160,112 @@ public class UserStoriesIT {
 
         // ---------------------------------------------------------------- User has no bank account
         result = mvc.perform(get("/bankAccounts")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        jsonExpected = objectMapper.writeValueAsString(Collections.emptyList());
+
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualTo(jsonExpected);
+
+        // ---------------------------------------------------------------- User add bank account
+        params.clear();
+        params.add("ownerFullName", "Maurice ROBERTSON");
+        params.add("description", "My bank account");
+        params.add("IBAN", "GB56BARC20038498695629");
+        mvc.perform(post("/bankAccounts")
+                .params(params)
+                .with(user(user.getMail()))
+                .with(csrf()))
+                .andExpect(status().isCreated());
+
+        // ---------------------------------------------------------------- User has now one bank account
+        result = mvc.perform(get("/bankAccounts")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Collection<BankAccount> userBankAccounts = objectMapper.readValue(result.getResponse().getContentAsString(), ArrayList.class);
+
+        assertThat(userBankAccounts)
+                .extracting("id").contains(5);
+        assertThat(userBankAccounts)
+                .extracting("iban").contains("GB56BARC20038498695629");
+
+        // ---------------------------------------------------------------- There is no operation on this bank account
+        params.clear();
+        params.add("bankAccountID", "5");
+        result = mvc.perform(get("/bankAccount/operations")
+                .params(params)
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        jsonExpected = objectMapper.writeValueAsString(Collections.emptyList());
+
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualTo(jsonExpected);
+
+        // ---------------------------------------------------------------- User transfer money to its account
+        params.clear();
+        params.add("bankAccountID", "5");
+        params.add("amount", "200.0");
+        mvc.perform(post("/bankAccount/withdraw")
+                .params(params)
+                .with(csrf())
+                .with(user(user.getMail())))
+                .andExpect(status().isOk());
+
+        // ---------------------------------------------------------------- User has now one operation on bank account
+        params.clear();
+        params.add("bankAccountID", "5");
+        result = mvc.perform(get("/bankAccount/operations")
+                .params(params)
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Collection<BankOperation> userBankOperations = objectMapper.readValue(result.getResponse().getContentAsString(), ArrayList.class);
+
+        assertThat(userBankOperations)
+                .extracting("id").contains(9);
+        assertThat(userBankOperations)
+                .extracting("bankAccountID").contains(5);
+
+        // ---------------------------------------------------------------- User get their updated balance
+        result = mvc.perform(get("/user/balance")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        assertThat(result.getResponse().getContentAsString()).isEqualTo("200.0");
+
+        // ---------------------------------------------------------------- User delete its bank account
+        params.clear();
+        params.add("bankAccountID", "5");
+        mvc.perform(delete("/bankAccounts")
+                .params(params)
+                .with(user(user.getMail()))
+                .with(csrf()))
+                .andExpect(status().isOk());
+
+        // ---------------------------------------------------------------- User has no more bank account
+        result = mvc.perform(get("/bankAccounts")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        jsonExpected = objectMapper.writeValueAsString(Collections.emptyList());
+
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualTo(jsonExpected);
+
+        // ---------------------------------------------------------------- There is no more operation about this bank account
+        params.clear();
+        params.add("bankAccountID", "5");
+        result = mvc.perform(get("/bankAccount/operations")
+                .params(params)
                 .with(user(user.getMail())))
                 .andExpect(status().isOk())
                 .andReturn();

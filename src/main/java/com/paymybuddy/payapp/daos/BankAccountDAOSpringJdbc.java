@@ -116,6 +116,8 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
         Map<String, Object> parameterMap = new HashMap<>();
         parameterMap.put("bankAccountID", bankAccountID);
 
+        jdbcTemplate.update(DBStatements.DELETE_BANK_ACCOUNT_OPERATIONS, parameterMap);
+
         if (jdbcTemplate.update(DBStatements.DELETE_BANK_ACCOUNT, parameterMap) == 0) {
             throw new DataRetrievalFailureException("Requested Bank Account does not exists.");
         }
@@ -162,7 +164,7 @@ public class BankAccountDAOSpringJdbc implements BankAccountDAO {
     private boolean saveOperation(int bankAccountID, ZonedDateTime date, BigDecimal amount) {
         Map<String, Object> parameterMap = new HashMap<>();
         parameterMap.put("bankAccountID", bankAccountID);
-        parameterMap.put("date", date);
+        parameterMap.put("date", date.toLocalDateTime());
         parameterMap.put("amount", amount);
 
         if (jdbcTemplate.update(DBStatements.INSERT_BANK_OPERATION, parameterMap) == 0) {

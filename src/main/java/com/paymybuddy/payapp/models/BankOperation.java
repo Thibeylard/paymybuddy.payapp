@@ -1,5 +1,7 @@
 package com.paymybuddy.payapp.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
@@ -23,6 +25,7 @@ public class BankOperation {
      */
     private final BigDecimal amount;
 
+    @JsonCreator
     public BankOperation(Integer id, int bankAccountID, ZonedDateTime date, BigDecimal amount) {
         this.id = id;
         this.bankAccountID = bankAccountID;

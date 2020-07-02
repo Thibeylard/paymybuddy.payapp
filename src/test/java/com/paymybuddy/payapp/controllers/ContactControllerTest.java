@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("Contact Controller tests on : ")
-public class ContactUserDTOControllerTest {
+public class ContactControllerTest {
     private final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     // Beans
     @Autowired

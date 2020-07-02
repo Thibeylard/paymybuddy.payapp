@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("ContactService tests on : ")
-public class ContactUserDTOServiceTest {
+public class ContactServiceTest {
     // Beans
     @Autowired
     private ContactService contactService;

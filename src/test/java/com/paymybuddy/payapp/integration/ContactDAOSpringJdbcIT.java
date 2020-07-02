@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @ActiveProfiles("test_h2")
 @DisplayName("ContactDAO tests on : ")
-public class ContactUserDTODAOSpringJdbcIT {
+public class ContactDAOSpringJdbcIT {
     @Autowired
     private ContactDAO contactDAO;
 
@@ -73,6 +73,7 @@ public class ContactUserDTODAOSpringJdbcIT {
     @DisplayName("addContact() Exceptions")
     public void Given_databaseError_When_addContact_Then_throwsDataAccessException() {
         assertThrows(DataAccessException.class, () -> contactDAO.save("user1@mail.com", "user2@mail.com")); // Already contacts
+        assertThrows(DataAccessException.class, () -> contactDAO.save("user2@mail.com", "user1@mail.com")); // Already contacts (inverted)
         assertThrows(DataAccessException.class, () -> contactDAO.save("user6@mail.com", "user2@mail.com")); // User 6 doesn't exist
         assertThrows(DataAccessException.class, () -> contactDAO.save("user1@mail.com", "user8@mail.com")); // User 8 doesn't exist
     }

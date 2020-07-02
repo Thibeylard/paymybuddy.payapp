@@ -7,7 +7,6 @@ import org.assertj.db.api.Assertions;
 import org.assertj.db.type.Table;
 import org.flywaydb.test.annotation.FlywayTest;
 import org.flywaydb.test.junit5.FlywayTestExtension;
-import org.h2.api.TimestampWithTimeZone;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,9 +20,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -130,15 +129,11 @@ public class TransactionDAOSpringJdbcIT {
                 .value("amount").isEqualTo(50.00)
                 .value("commission").isEqualTo(0.25);
 
-        TimestampWithTimeZone timestampWithTimeZoneExample =
-                (TimestampWithTimeZone) transactionTable.getRow(6).getColumnValue("date").getValue();
+        Timestamp timestampExample =
+                (Timestamp) transactionTable.getRow(6).getColumnValue("date").getValue();
 
         // Check that date in database perfectly match with passed ZonedDateTime object
-        assertThat(timestampWithTimeZoneExample.getDay()).isEqualTo(newTransactionTime.getDayOfMonth());
-        assertThat(timestampWithTimeZoneExample.getMonth()).isEqualTo(newTransactionTime.getMonthValue());
-        assertThat(timestampWithTimeZoneExample.getYear()).isEqualTo(newTransactionTime.getYear());
-        assertThat(timestampWithTimeZoneExample.getNanosSinceMidnight()).isEqualTo(newTransactionTime.getLong(ChronoField.NANO_OF_DAY));
-        assertThat(timestampWithTimeZoneExample.getTimeZoneOffsetSeconds()).isEqualTo(newTransactionTime.getOffset().get(ChronoField.OFFSET_SECONDS));
+        assertThat(timestampExample.toLocalDateTime()).isEqualTo(newTransactionTime.toLocalDateTime());
 
     }
 

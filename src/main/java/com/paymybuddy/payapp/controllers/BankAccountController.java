@@ -63,7 +63,7 @@ public class BankAccountController {
                                                     @RequestParam(name = "ownerFullName") final String ownerFullName,
                                                     @RequestParam(name = "description") final String description,
                                                     @RequestParam(name = "IBAN") final String IBAN) {
-        Logger.debug("Requested bankAccount {} to be updated with IBAN {}", bankAccountID, IBAN);
+        Logger.debug("Requested bankAccount {} to be updated", bankAccountID);
         try {
             bankAccountService.updateBankAccount(bankAccountID, ownerFullName, description, IBAN);
             Logger.info("BankAccount successfully modified.");

@@ -1,5 +1,6 @@
 package com.paymybuddy.payapp.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
@@ -44,6 +45,7 @@ public class Bill {
         this.total = null;
     }
 
+    @JsonCreator
     public Bill(int id, int userID, ZonedDateTime creationDate, ZonedDateTime startDate, ZonedDateTime endDate, @NotNull BigDecimal total) {
         this.id = id;
         this.userID = userID;
@@ -52,6 +54,7 @@ public class Bill {
         this.endDate = endDate;
         this.total = total;
     }
+
 
     public Optional<Integer> getId() {
         return Optional.ofNullable(id);
@@ -65,30 +68,12 @@ public class Bill {
         return creationDate;
     }
 
-    public String getCreationDateAsTimestampWithTimeZoneString() {
-        return creationDate.getYear() + "-" + creationDate.getMonthValue() + "-" + creationDate.getDayOfMonth() +
-                " " + creationDate.getHour() + ":" + creationDate.getMinute() + ":" + creationDate.getSecond() +
-                "+" + (creationDate.getOffset().getTotalSeconds() / 3600);
-    }
-
     public ZonedDateTime getStartDate() {
         return startDate;
     }
 
-    public String getStartDateAsTimestampWithTimeZoneString() {
-        return startDate.getYear() + "-" + startDate.getMonthValue() + "-" + startDate.getDayOfMonth() +
-                " " + startDate.getHour() + ":" + startDate.getMinute() + ":" + startDate.getSecond() +
-                "+" + (startDate.getOffset().getTotalSeconds() / 3600);
-    }
-
     public ZonedDateTime getEndDate() {
         return endDate;
-    }
-
-    public String getEndDateAsTimestampWithTimeZoneString() {
-        return endDate.getYear() + "-" + endDate.getMonthValue() + "-" + endDate.getDayOfMonth() +
-                " " + endDate.getHour() + ":" + endDate.getMinute() + ":" + endDate.getSecond() +
-                "+" + (endDate.getOffset().getTotalSeconds() / 3600);
     }
 
     public Optional<BigDecimal> getTotal() {

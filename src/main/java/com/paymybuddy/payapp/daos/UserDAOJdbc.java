@@ -11,10 +11,8 @@ import org.springframework.stereotype.Repository;
 import org.tinylog.Logger;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.math.RoundingMode;
+import java.sql.*;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -312,35 +310,40 @@ public class UserDAOJdbc implements UserDAO {
 
                 // Bill total is calculated with all concerned transactions commissions
                 ps = con.prepareStatement(DBStatements.GET_BILL_TOTAL_CLASSIC_JDBC);
-                ps.setString(1, bill.getStartDateAsTimestampWithTimeZoneString());
-                ps.setString(2, bill.getEndDateAsTimestampWithTimeZoneString());
+                ps.setString(1, bill.getStartDate().toLocalDateTime().toString().replace("T", " "));
+                ps.setString(2, bill.getEndDate().toLocalDateTime().toString().replace("T", " "));
                 ps.setInt(3, bill.getUserID());
                 rs = ps.executeQuery();
                 if (rs.next()) {
-                    bill.setTotal(BigDecimal.valueOf(rs.getDouble("commission")));
+                    bill.setTotal(BigDecimal.valueOf(rs.getDouble("commission")).setScale(2, RoundingMode.HALF_UP));
                     Logger.debug("Bill total calculated");
                 } else {
                     throw new SQLException("Total could not be calculated");
                 }
 
                 // New Bill is inserted in database
-                ps = con.prepareStatement(DBStatements.INSERT_BILL_CLASSIC_JDBC);
+                ps = con.prepareStatement(DBStatements.INSERT_BILL_CLASSIC_JDBC, Statement.RETURN_GENERATED_KEYS);
                 ps.setInt(1, bill.getUserID());
-                ps.setString(2, bill.getCreationDateAsTimestampWithTimeZoneString());
-                ps.setString(3, bill.getStartDateAsTimestampWithTimeZoneString());
-                ps.setString(4, bill.getEndDateAsTimestampWithTimeZoneString());
+                ps.setString(2, bill.getCreationDate().toLocalDateTime().toString().replace("T", " "));
+                ps.setString(3, bill.getStartDate().toLocalDateTime().toString().replace("T", " "));
+                ps.setString(4, bill.getEndDate().toLocalDateTime().toString().replace("T", " "));
                 ps.setDouble(5, bill.getTotal().get().doubleValue());
                 ps.execute();
                 Logger.debug("New Bill inserted in Bill table.");
+
+                rs = ps.getGeneratedKeys();
+
+                if (rs.next()) {
+                    bill = new Bill(rs.getInt(1), bill.getUserID(), bill.getCreationDate(), bill.getStartDate(), bill.getEndDate(), bill.getTotal().get());
+                    Logger.debug("Created Bill ID retrieved");
+                } else {
+                    throw new SQLException("Bill could not be retrieved");
+                }
 
                 // Transaction is over
                 con.commit();
                 Logger.debug("Commit SQL transaction.");
                 con.setAutoCommit(true); // autocommit set back to true
-
-            } catch (SQLException e) {
-                Logger.error(e.getMessage());
-                throw e;
             } finally {
                 databaseConfiguration.closeResultSet(rs);
                 databaseConfiguration.closePreparedStatement(ps);

@@ -7,7 +7,6 @@ import com.paymybuddy.payapp.models.User;
 import org.assertj.db.type.Table;
 import org.flywaydb.test.annotation.FlywayTest;
 import org.flywaydb.test.junit5.FlywayTestExtension;
-import org.h2.api.TimestampWithTimeZone;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,9 +19,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
@@ -190,12 +189,12 @@ public class UserDAOJdbcIT {
 
         Table billTable = new Table(dataSource, "Bill");
 
-        TimestampWithTimeZone creationDateTs =
-                (TimestampWithTimeZone) billTable.getRow(0).getColumnValue("creation_date").getValue();
-        TimestampWithTimeZone startDateTs =
-                (TimestampWithTimeZone) billTable.getRow(0).getColumnValue("start_date").getValue();
-        TimestampWithTimeZone endDateTs =
-                (TimestampWithTimeZone) billTable.getRow(0).getColumnValue("end_date").getValue();
+        Timestamp creationDateTs =
+                (Timestamp) billTable.getRow(0).getColumnValue("creation_date").getValue();
+        Timestamp startDateTs =
+                (Timestamp) billTable.getRow(0).getColumnValue("start_date").getValue();
+        Timestamp endDateTs =
+                (Timestamp) billTable.getRow(0).getColumnValue("end_date").getValue();
 
         // Check BillDTO IDs
         assertThat(bills.get(0).getId())
@@ -203,26 +202,10 @@ public class UserDAOJdbcIT {
                 .get().isEqualTo(1);
         assertThat(bills.get(0).getUserID()).isEqualTo(1);
 
-        // Compare BillDTO ZonedDateTime "creationDate" to Bill table creation_date value
-        assertThat(creationDateTs.getDay()).isEqualTo(bills.get(0).getCreationDate().getDayOfMonth());
-        assertThat(creationDateTs.getMonth()).isEqualTo(bills.get(0).getCreationDate().getMonthValue());
-        assertThat(creationDateTs.getYear()).isEqualTo(bills.get(0).getCreationDate().getYear());
-        assertThat(creationDateTs.getNanosSinceMidnight()).isEqualTo(bills.get(0).getCreationDate().getLong(ChronoField.NANO_OF_DAY));
-        assertThat(creationDateTs.getTimeZoneOffsetSeconds()).isEqualTo(bills.get(0).getCreationDate().getOffset().get(ChronoField.OFFSET_SECONDS));
-
-        // Compare BillDTO ZonedDateTime "startDate" to Bill table start_date value
-        assertThat(startDateTs.getDay()).isEqualTo(bills.get(0).getStartDate().getDayOfMonth());
-        assertThat(startDateTs.getMonth()).isEqualTo(bills.get(0).getStartDate().getMonthValue());
-        assertThat(startDateTs.getYear()).isEqualTo(bills.get(0).getStartDate().getYear());
-        assertThat(startDateTs.getNanosSinceMidnight()).isEqualTo(bills.get(0).getStartDate().getLong(ChronoField.NANO_OF_DAY));
-        assertThat(startDateTs.getTimeZoneOffsetSeconds()).isEqualTo(bills.get(0).getStartDate().getOffset().get(ChronoField.OFFSET_SECONDS));
-
-        // Compare BillDTO ZonedDateTime "endDate" to table end_date value
-        assertThat(endDateTs.getDay()).isEqualTo(bills.get(0).getEndDate().getDayOfMonth());
-        assertThat(endDateTs.getMonth()).isEqualTo(bills.get(0).getEndDate().getMonthValue());
-        assertThat(endDateTs.getYear()).isEqualTo(bills.get(0).getEndDate().getYear());
-        assertThat(endDateTs.getNanosSinceMidnight()).isEqualTo(bills.get(0).getEndDate().getLong(ChronoField.NANO_OF_DAY));
-        assertThat(endDateTs.getTimeZoneOffsetSeconds()).isEqualTo(bills.get(0).getEndDate().getOffset().get(ChronoField.OFFSET_SECONDS));
+        // Compare BillDTO ZonedDateTimes as LocalDateTimes to Bill table DateTime values
+        assertThat(creationDateTs.toLocalDateTime()).isEqualTo(bills.get(0).getCreationDate().toLocalDateTime());
+        assertThat(startDateTs.toLocalDateTime()).isEqualTo(bills.get(0).getStartDate().toLocalDateTime());
+        assertThat(endDateTs.toLocalDateTime()).isEqualTo(bills.get(0).getEndDate().toLocalDateTime());
 
         // Check BillDTO Total
         assertThat(bills.get(0).getTotal())
@@ -253,18 +236,21 @@ public class UserDAOJdbcIT {
 
         Bill result = userDAO.saveBill(billToSave);
 
-        assertThat(result).isEqualTo(billToSave);
+        assertThat(result.getUserID()).isEqualTo(billToSave.getUserID());
+        assertThat(result.getCreationDate()).isEqualTo(billToSave.getCreationDate());
+        assertThat(result.getStartDate()).isEqualTo(billToSave.getStartDate());
+        assertThat(result.getEndDate()).isEqualTo(billToSave.getEndDate());
 
         Table billTable = new Table(dataSource, "Bill");
 
         assertThat(billTable).hasNumberOfRows(2);
 
-        TimestampWithTimeZone creationDateTs =
-                (TimestampWithTimeZone) billTable.getRow(1).getColumnValue("creation_date").getValue();
-        TimestampWithTimeZone startDateTs =
-                (TimestampWithTimeZone) billTable.getRow(1).getColumnValue("start_date").getValue();
-        TimestampWithTimeZone endDateTs =
-                (TimestampWithTimeZone) billTable.getRow(1).getColumnValue("end_date").getValue();
+        Timestamp creationDateTs =
+                (Timestamp) billTable.getRow(1).getColumnValue("creation_date").getValue();
+        Timestamp startDateTs =
+                (Timestamp) billTable.getRow(1).getColumnValue("start_date").getValue();
+        Timestamp endDateTs =
+                (Timestamp) billTable.getRow(1).getColumnValue("end_date").getValue();
 
         // Check BillDTO IDs
         assertThat(billTable)
@@ -277,26 +263,10 @@ public class UserDAOJdbcIT {
                 .value("user_id")
                 .isEqualTo(1);
 
-        // Compare BillDTO ZonedDateTime "creationDate" to Bill table creation_date value
-        assertThat(creationDateTs.getDay()).isEqualTo(creationDate.getDayOfMonth());
-        assertThat(creationDateTs.getMonth()).isEqualTo(creationDate.getMonthValue());
-        assertThat(creationDateTs.getYear()).isEqualTo(creationDate.getYear());
-        assertThat(creationDateTs.getNanosSinceMidnight()).isEqualTo(creationDate.getLong(ChronoField.NANO_OF_DAY));
-        assertThat(creationDateTs.getTimeZoneOffsetSeconds()).isEqualTo(creationDate.getOffset().get(ChronoField.OFFSET_SECONDS));
-
-        // Compare BillDTO ZonedDateTime "startDate" to Bill table start_date value
-        assertThat(startDateTs.getDay()).isEqualTo(startDate.getDayOfMonth());
-        assertThat(startDateTs.getMonth()).isEqualTo(startDate.getMonthValue());
-        assertThat(startDateTs.getYear()).isEqualTo(startDate.getYear());
-        assertThat(startDateTs.getNanosSinceMidnight()).isEqualTo(startDate.getLong(ChronoField.NANO_OF_DAY));
-        assertThat(startDateTs.getTimeZoneOffsetSeconds()).isEqualTo(startDate.getOffset().get(ChronoField.OFFSET_SECONDS));
-
-        // Compare BillDTO ZonedDateTime "endDate" to table end_date value
-        assertThat(endDateTs.getDay()).isEqualTo(endDate.getDayOfMonth());
-        assertThat(endDateTs.getMonth()).isEqualTo(endDate.getMonthValue());
-        assertThat(endDateTs.getYear()).isEqualTo(endDate.getYear());
-        assertThat(endDateTs.getNanosSinceMidnight()).isEqualTo(endDate.getLong(ChronoField.NANO_OF_DAY));
-        assertThat(endDateTs.getTimeZoneOffsetSeconds()).isEqualTo(endDate.getOffset().get(ChronoField.OFFSET_SECONDS));
+        // Compare BillDTO ZonedDateTimes as LocalDateTimes to Bill table DateTime values
+        assertThat(creationDateTs.toLocalDateTime()).isEqualTo(result.getCreationDate().toLocalDateTime());
+        assertThat(startDateTs.toLocalDateTime()).isEqualTo(result.getStartDate().toLocalDateTime());
+        assertThat(endDateTs.toLocalDateTime()).isEqualTo(result.getEndDate().toLocalDateTime());
 
         // Check BillDTO Total
         assertThat(billTable)

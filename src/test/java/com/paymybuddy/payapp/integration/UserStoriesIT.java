@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
@@ -37,9 +38,6 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//TODO test d'intégration sur suppression de contact
-//TODO test d'integration sur les bank accounts
-//TODO test d'integration sur création de facture
 
 @ExtendWith(SpringExtension.class)
 @ExtendWith({FlywayTestExtension.class})
@@ -365,6 +363,34 @@ public class UserStoriesIT {
                 .extracting("id").contains(1, 3, 6);
         assertThat(userTransactions)
                 .extracting("description").contains("restaurant bill", "misc drinks", "flat-share week rent");
+
+        // ---------------------------------------------------------------- User update its bank account info
+        params.clear();
+        params.add("bankAccountID", "2");
+        params.add("ownerFullName", "Leslie MARRIED");
+        params.add("description", "Main bank account as married");
+        params.add("IBAN", "GB89IJNZ65882840666637");
+        result = mvc.perform(put("/bankAccounts")
+                .params(params)
+                .with(user(user.getMail()))
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // ---------------------------------------------------------------- User bank account is updated
+        result = mvc.perform(get("/bankAccounts")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Collection<BankAccount> userBankAccounts = objectMapper.readValue(result.getResponse().getContentAsString(), ArrayList.class);
+
+        assertThat(userBankAccounts)
+                .extracting("id").contains(2);
+        assertThat(userBankAccounts)
+                .extracting("ownerFullName").contains("Leslie MARRIED");
+        assertThat(userBankAccounts)
+                .extracting("description").contains("Main bank account as married");
     }
 
     @Test
@@ -477,5 +503,52 @@ public class UserStoriesIT {
                 .andReturn();
 
         assertThat(result.getResponse().getContentAsString()).isEqualTo("62.9");
+
+        // ---------------------------------------------------------------- User ask for bill
+        params.clear();
+        params.add("startDateYear", "2020");
+        params.add("startDateMonth", "1");
+        params.add("startDateDay", "1");
+        params.add("endDateYear", "2020");
+        params.add("endDateMonth", "6");
+        params.add("endDateDay", "30");
+        result = mvc.perform(post("/user/newBill")
+                .params(params)
+                .with(csrf())
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Bill newBill = objectMapper.readValue(result.getResponse().getContentAsString(), Bill.class);
+
+        assertThat(newBill)
+                .extracting("id").isEqualTo(Optional.of(3));
+        assertThat(newBill)
+                .extracting("userID").isEqualTo(3);
+        assertThat(newBill)
+                .extracting("total").isEqualTo(Optional.of(BigDecimal.valueOf(0.31)));
+
+        // ---------------------------------------------------------------- User delete contact
+        params.clear();
+        params.add("contactMail", "nelson.harvey@example.com");
+        mvc.perform(delete("/contacts")
+                .params(params)
+                .with(csrf())
+                .with(user(user.getMail())))
+                .andExpect(status().isOk());
+
+        // ---------------------------------------------------------------- User has contacts with id 2 and 4
+        result = mvc.perform(get("/contacts")
+                .with(user(user.getMail())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        userContacts = objectMapper.readValue(result.getResponse().getContentAsString(), ArrayList.class);
+
+        assertThat(userContacts.size()).isEqualTo(2);
+        assertThat(userContacts)
+                .extracting("id").contains(2, 4);
+        assertThat(userContacts)
+                .extracting("username").contains("leslin", "dianoreno");
     }
 }

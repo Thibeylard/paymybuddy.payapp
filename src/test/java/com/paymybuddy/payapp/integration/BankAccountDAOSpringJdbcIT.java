@@ -7,7 +7,6 @@ import org.assertj.db.api.Assertions;
 import org.assertj.db.type.Table;
 import org.flywaydb.test.annotation.FlywayTest;
 import org.flywaydb.test.junit5.FlywayTestExtension;
-import org.h2.api.TimestampWithTimeZone;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,9 +20,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -280,15 +279,12 @@ public class BankAccountDAOSpringJdbcIT {
                 .value("bank_account_id").isEqualTo(1)
                 .value("amount").isEqualTo(-50);
 
-        TimestampWithTimeZone timestampWithTimeZoneExample =
-                (TimestampWithTimeZone) bankOperationTable.getRow(8).getColumnValue("date").getValue();
+        Timestamp timestampExample =
+                (Timestamp) bankOperationTable.getRow(8).getColumnValue("date").getValue();
 
         // Check that zoned_date_time in database perfectly match with passed ZonedDateTime object
-        assertThat(timestampWithTimeZoneExample.getDay()).isEqualTo(25);
-        assertThat(timestampWithTimeZoneExample.getMonth()).isEqualTo(12);
-        assertThat(timestampWithTimeZoneExample.getYear()).isEqualTo(2020);
-        assertThat(timestampWithTimeZoneExample.getNanosSinceMidnight()).isEqualTo(0);
-        assertThat(timestampWithTimeZoneExample.getTimeZoneOffsetSeconds()).isEqualTo(operationDate.getOffset().get(ChronoField.OFFSET_SECONDS));
+
+        assertThat(timestampExample.toLocalDateTime()).isEqualTo(operationDate.toLocalDateTime());
     }
 
     @Test
@@ -324,15 +320,11 @@ public class BankAccountDAOSpringJdbcIT {
                 .value("bank_account_id").isEqualTo(2)
                 .value("amount").isEqualTo(60);
 
-        TimestampWithTimeZone timestampWithTimeZoneExample =
-                (TimestampWithTimeZone) bankOperationTable.getRow(8).getColumnValue("date").getValue();
+        Timestamp timestampExample =
+                (Timestamp) bankOperationTable.getRow(8).getColumnValue("date").getValue();
 
         // Check that zoned_date_time in database perfectly match with passed ZonedDateTime object
-        assertThat(timestampWithTimeZoneExample.getDay()).isEqualTo(25);
-        assertThat(timestampWithTimeZoneExample.getMonth()).isEqualTo(12);
-        assertThat(timestampWithTimeZoneExample.getYear()).isEqualTo(2020);
-        assertThat(timestampWithTimeZoneExample.getNanosSinceMidnight()).isEqualTo(0);
-        assertThat(timestampWithTimeZoneExample.getTimeZoneOffsetSeconds()).isEqualTo(operationDate.getOffset().get(ChronoField.OFFSET_SECONDS));
+        assertThat(timestampExample.toLocalDateTime()).isEqualTo(operationDate.toLocalDateTime());
     }
 
     @Test

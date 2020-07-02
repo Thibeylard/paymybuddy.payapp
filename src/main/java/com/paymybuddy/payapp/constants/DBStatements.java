@@ -126,7 +126,7 @@ public final class DBStatements {
                     "WHERE u.mail = :userMail";
 
     public static final String UPDATE_BANK_ACCOUNT =
-            "UPDATE Bank_Account SET (owner_fullname, description, IBAN) = ( :ownerFullName, :description, :IBAN) WHERE id = :bankAccountID";
+            "UPDATE Bank_Account SET owner_fullname = :ownerFullName, description = :description, IBAN = :IBAN WHERE id = :bankAccountID";
 
     public static final String DELETE_BANK_ACCOUNT_OPERATIONS =
             "DELETE FROM Bank_Operation WHERE bank_account_id = :bankAccountID";

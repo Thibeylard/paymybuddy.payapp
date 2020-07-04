@@ -4,7 +4,9 @@ import com.paymybuddy.payapp.constants.DBStatements;
 import com.paymybuddy.payapp.dtos.ContactUserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -41,17 +43,22 @@ public class ContactDAOSpringJdbc implements ContactDAO {
     /**
      * @see ContactDAO
      */
-    // TODO Empêcher la création d'un contact a b qui existe déjà en tant que b a
     @Override
     public boolean save(final String userMail,
                         final String contactMail) throws DataAccessException {
-        Map<String, String> mails = new HashMap<>();
-        mails.put("userMail", userMail);
-        mails.put("contactMail", contactMail);
-        if (jdbcTemplate.update(DBStatements.INSERT_CONTACT, mails) == 0) { // If no row affected, throw Exception
-            throw new DataRetrievalFailureException("Contact cannot be added because some user does not exists.");
+
+        try {
+            jdbcTemplate.queryForMap(DBStatements.GET_CONTACT_COUPLE,
+                    Map.of("userMail", userMail, "contactMail", contactMail));
+        } catch (EmptyResultDataAccessException e) {
+            if (jdbcTemplate.update(DBStatements.INSERT_CONTACT,
+                    Map.of("userMail", userMail, "contactMail", contactMail)) == 0) { // If no row affected, throw Exception
+                throw new DataIntegrityViolationException("Contact cannot be added because some user does not exists.");
+            }
+            return true;
         }
-        return true;
+
+        throw new DataIntegrityViolationException("Contact already exists");
     }
 
     /**

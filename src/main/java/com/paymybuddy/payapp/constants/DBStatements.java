@@ -5,6 +5,10 @@ public final class DBStatements {
     // UserDAO Classic JDBC Statements -------------------------------------------------
 
     // User Table statements
+    private static final String GET_USER_ID =
+            "SELECT u.id FROM User AS u " +
+                    "WHERE u.mail = :userMail";
+
     public static final String GET_USER_BY_MAIL_CLASSIC_JDBC =
             "SELECT id, username, mail, password FROM User WHERE mail = ?";
 
@@ -57,6 +61,10 @@ public final class DBStatements {
     //  Spring NamedParameterJDBCTemplate Statements -------------------------------------------------
 
     // Contact Table statements
+    private static final String GET_CONTACT_ID =
+            "SELECT c.id FROM User AS c " +
+                    "WHERE c.mail = :contactMail";
+
     public static final String GET_CONTACTS_ID =
             "SELECT user_b_id AS contact_id FROM Contact AS c " +        // Get all contacts where user is user_a_id
                     "INNER JOIN User AS u ON c.user_a_id = u.id " +
@@ -69,23 +77,21 @@ public final class DBStatements {
     public static final String GET_CONTACTS =
             "SELECT id, username, mail FROM User WHERE id IN (" + GET_CONTACTS_ID + ")";
 
+    public static final String GET_CONTACT_COUPLE =
+            "SELECT user_a_id, user_b_id FROM Contact as c " +
+                    "WHERE (user_a_id = (" + GET_USER_ID + ") AND user_b_id = (" + GET_CONTACT_ID + ")) OR " +
+                    "(user_b_id = (" + GET_USER_ID + ") AND user_a_id = (" + GET_CONTACT_ID + "))";
+
+
     public static final String INSERT_CONTACT =
             "INSERT INTO Contact (user_a_id, user_b_id) " +
                     "SELECT u.id, c.id FROM User AS u " +
                     "INNER JOIN User AS c ON c.mail <> u.mail " +
                     "WHERE u.mail = :userMail AND c.mail = :contactMail";
 
-    private static final String GET_CONTACT_ID_FOR_DELETE =
-            "SELECT c.id FROM User AS c " +
-                    "WHERE c.mail = :contactMail";
-
-    private static final String GET_USER_ID_FOR_DELETE =
-            "SELECT u.id FROM User AS u " +
-                    "WHERE u.mail = :userMail";
-
     public static final String DELETE_CONTACT =
-            "DELETE FROM Contact WHERE (user_a_id IN (" + GET_USER_ID_FOR_DELETE + ") AND user_b_id IN (" + GET_CONTACT_ID_FOR_DELETE + ")) " +
-                    "OR (user_a_id IN (" + GET_CONTACT_ID_FOR_DELETE + ") AND user_b_id IN (" + GET_USER_ID_FOR_DELETE + "))";
+            "DELETE FROM Contact WHERE (user_a_id IN (" + GET_USER_ID + ") AND user_b_id IN (" + GET_CONTACT_ID + ")) " +
+                    "OR (user_a_id IN (" + GET_CONTACT_ID + ") AND user_b_id IN (" + GET_USER_ID + "))";
 
     // Transaction Table statements
     private static final String GET_TRANSACTIONS_MODEL =

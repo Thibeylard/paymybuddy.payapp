@@ -1,5 +1,6 @@
 package com.paymybuddy.payapp.config;
 
+import com.paymybuddy.payapp.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
@@ -39,6 +40,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/registration").permitAll()
                 .antMatchers("/login").permitAll()
+                .antMatchers("/swagger-ui*").hasAuthority(Role.ADMIN.name())
+                .antMatchers("/api-docs*").hasAuthority(Role.ADMIN.name())
                 .antMatchers(HttpMethod.GET).authenticated()
                 .antMatchers(HttpMethod.PUT).authenticated()
                 .antMatchers(HttpMethod.POST).authenticated()

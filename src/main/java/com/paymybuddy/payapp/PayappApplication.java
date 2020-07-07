@@ -2,9 +2,16 @@ package com.paymybuddy.payapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @SpringBootApplication
-public class PayappApplication {
+public class PayappApplication extends SpringBootServletInitializer {
+
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(PayappApplication.class);
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(PayappApplication.class, args);

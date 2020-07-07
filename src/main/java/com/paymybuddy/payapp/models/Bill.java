@@ -1,6 +1,7 @@
 package com.paymybuddy.payapp.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotNull;
@@ -46,7 +47,12 @@ public class Bill {
     }
 
     @JsonCreator
-    public Bill(int id, int userID, ZonedDateTime creationDate, ZonedDateTime startDate, ZonedDateTime endDate, @NotNull BigDecimal total) {
+    public Bill(@JsonProperty("id") int id,
+                @JsonProperty("userID") int userID,
+                @JsonProperty("creationDate") ZonedDateTime creationDate,
+                @JsonProperty("startDate") ZonedDateTime startDate,
+                @JsonProperty("endDate") ZonedDateTime endDate,
+                @JsonProperty("total") @NotNull BigDecimal total) {
         this.id = id;
         this.userID = userID;
         this.creationDate = creationDate;

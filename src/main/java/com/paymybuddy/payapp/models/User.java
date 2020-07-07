@@ -1,6 +1,7 @@
 package com.paymybuddy.payapp.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.paymybuddy.payapp.enums.Role;
 import org.springframework.lang.Nullable;
 
@@ -49,11 +50,11 @@ public class User {
     }
 
     @JsonCreator
-    public User(int id,
-                @NotNull String username,
-                @NotNull String mail,
-                @NotNull String password,
-                @NotNull Collection<Role> roles) {
+    public User(@JsonProperty("id") int id,
+                @JsonProperty("username") @NotNull String username,
+                @JsonProperty("mail") @NotNull String mail,
+                @JsonProperty("password") @NotNull String password,
+                @JsonProperty("roles") @NotNull Collection<Role> roles) {
         this.id = id;
         this.username = username;
         this.mail = mail;

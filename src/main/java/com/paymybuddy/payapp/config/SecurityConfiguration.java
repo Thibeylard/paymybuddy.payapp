@@ -49,7 +49,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .formLogin()
-                .successForwardUrl("/user")
 
                 .and()
                 .csrf().ignoringAntMatchers("/registration")

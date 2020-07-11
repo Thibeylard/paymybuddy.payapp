@@ -1,69 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<name>PayApp - Project</name>
-	<groupId>com.paymybuddy</groupId>
-	<artifactId>payapp</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>pom</packaging>
+    <name>PayApp - Project</name>
+    <groupId>com.paymybuddy</groupId>
+    <artifactId>payapp</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-	<properties>
-		<java.version>13</java.version>
-		<surefire.version>3.0.0-M4</surefire.version>
+    <properties>
+        <java.version>13</java.version>
+        <surefire.version>3.0.0-M4</surefire.version>
         <maven.compiler.release>${java.version}</maven.compiler.release>
     </properties>
 
-	<developers>
-		<developer>
-			<name>Thibaut BEYLARD</name>
-			<email>thibaut.beylard@paymybuddy.com</email>
-			<organization>Pay My Buddy</organization>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <name>Thibaut BEYLARD</name>
+            <email>thibaut.beylard@paymybuddy.com</email>
+            <organization>Pay My Buddy</organization>
+        </developer>
+    </developers>
 
-	<modules>
-		<module>payapp-client</module>
-		<module>payapp-server</module>
-	</modules>
+    <modules>
+        <module>payapp-client</module>
+        <module>payapp-server</module>
+    </modules>
 
-	<!-- ========================================================================== DEPENDENCIES -->
-	<!-- ======================================================================================= -->
-	<dependencyManagement>
-		<dependencies>
+    <!-- ========================================================================== DEPENDENCIES -->
+    <!-- ======================================================================================= -->
+    <dependencyManagement>
+        <dependencies>
 
-			<!-- =================== Tests related dependencies =================== -->
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.13</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.maven.surefire</groupId>
-				<artifactId>maven-surefire-common</artifactId>
-				<version>${surefire.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+            <!-- =================== Tests related dependencies =================== -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.13</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.surefire</groupId>
+                <artifactId>maven-surefire-common</artifactId>
+                <version>${surefire.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-	<!-- ================================================================================= BUILD -->
-	<!-- ======================================================================================= -->
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.0</version>
-					<configuration>
-						<release>${java.version}</release>
-					</configuration>
-				</plugin>
-			</plugins>
+    <!-- ================================================================================= BUILD -->
+    <!-- ======================================================================================= -->
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.0</version>
+                    <configuration>
+                        <release>${java.version}</release>
+                    </configuration>
+                </plugin>
 
-		</pluginManagement>
-	</build>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${surefire.version}</version>
+                    <configuration>
+                        <excludes>
+                            <exclude>*IT</exclude>
+                        </excludes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>surefire-integration-test</id>
+                            <goals>
+                                <goal>test</goal>
+                            </goals>
+                            <phase>integration-test</phase>
+                            <configuration>
+                                <excludes>
+                                    <exclude>none</exclude>
+                                </excludes>
+                                <includes>
+                                    <include>*IT</include>
+                                </includes>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>

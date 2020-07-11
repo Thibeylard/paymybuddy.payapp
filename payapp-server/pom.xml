@@ -168,6 +168,16 @@
 							<goal>repackage</goal>
 						</goals>
 					</execution>
+					<execution>
+						<phase>post-integration-test</phase>
+						<id>start-app</id>
+						<goals>
+							<goal>start</goal>
+						</goals>
+						<configuration>
+							<profiles>prod</profiles>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 

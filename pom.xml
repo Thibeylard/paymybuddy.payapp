@@ -24,8 +24,8 @@
     </developers>
 
     <modules>
-        <module>payapp-client</module>
         <module>payapp-server</module>
+        <module>payapp-client</module>
     </modules>
 
     <!-- ========================================================================== DEPENDENCIES -->
@@ -68,7 +68,7 @@
                     <version>${surefire.version}</version>
                     <configuration>
                         <excludes>
-                            <exclude>*IT</exclude>
+                            <exclude>*</exclude>
                         </excludes>
                     </configuration>
                     <executions>

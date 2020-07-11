@@ -28,6 +28,13 @@
         <module>payapp-client</module>
     </modules>
 
+    <distributionManagement>
+        <site>
+            <id>site-projet</id>
+            <url>scp://localhost/tmp</url>
+        </site>
+    </distributionManagement>
+
     <!-- ========================================================================== DEPENDENCIES -->
     <!-- ======================================================================================= -->
     <dependencyManagement>
@@ -68,7 +75,7 @@
                     <version>${surefire.version}</version>
                     <configuration>
                         <excludes>
-                            <exclude>*</exclude>
+                            <exclude>*IT</exclude>
                         </excludes>
                     </configuration>
                     <executions>
@@ -88,6 +95,20 @@
                             </configuration>
                         </execution>
                     </executions>
+                </plugin>
+
+                <!-- =================== Site plugin  =================== -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.7.1</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.doxia</groupId>
+                            <artifactId>doxia-site-renderer</artifactId>
+                            <version>1.9.1</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
 
             </plugins>

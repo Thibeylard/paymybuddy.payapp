@@ -58,4 +58,16 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- ============================================================================= REPORTING -->
+    <!-- ======================================================================================= -->
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${surefire.version}</version>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>

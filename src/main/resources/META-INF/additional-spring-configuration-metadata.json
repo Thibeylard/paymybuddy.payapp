@@ -1,9 +1,0 @@
-{
-  "properties": [
-    {
-      "name": "default.zoneID",
-      "type": "java.lang.String",
-      "description": "ZoneID applied by default for date times."
-    }
-  ]
-}

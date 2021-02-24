@@ -1,5 +1,41 @@
-# README
-Documentation for PayMyBuddy 'PayApp' Application .
+[![shields](https://img.shields.io/badge/project%20status-validated-deepgreen)](https://shields.io/)
+[![shields](https://img.shields.io/badge/made%20with-java-orange)](https://shields.io/)
+[![shields](https://img.shields.io/badge/powered%20by-spring-green)](https://shields.io/)
+____________________
+
+> Ce README est basé sur les conclusions évoquées dans la présentation réalisée à la fin du projet.
+
+# Concevez une application web Java de A à Z
+
+## Dans le cadre de la formation OpenClassrooms "Développeur d'application Java"
+
+### Objectif du projet
+En partant de zéro, développer toutes les couches d'une application Java sécurisée et fonctionnelle.
+
+### Progression
+En plus de renforcer mes compétences sur les aspects étudiés au précédent projet, ce projet m'a permis de pratiquer l'intégration d'une base de données dans le circuit de l'application de sa conception jusqu'à la gestion des transactions, et de prendre en main d'autres extensions de Spring, notamment Spring Security.
+
+### Réalisation
+En fin de compte, je suis allé au delà de ce qui était demandé, avec plusieurs initiatives :
+* Utilisation de librairies spécifiques aux bases de données
+  * Flyway pour le versionnage des migrations
+  * FlywayDB pour des migrations spécifiques aux tests
+  * AssertJ-DB pour les assertions sur les tables et leurs données
+* Création d'un module client pour réaliser des tests d'intégration avec RestAssured
+* Configuration d'un site Maven pour présenter les rapports
+* Description de l'API avec Swagger.io
+
+Le projet poursuit les bonnes pratiques de développement, avec l'isolation et l'indépendance des tests, la séparation des interfaces, l'injection des dépendances, ou encore l'utilisation des Java Pattern (DTO, DAO).
+
+### Axes d'améliorations
+* Redéfinition du modèle "Bill" et de sa table associée relativement simpliste
+* Valeurs de retour sur les méthodes HTTP POST, PUT, DELETE avec des DTO plutôt qu'une simple chaîne de caractère
+* Validation des modèles 
+
+____________________________
+
+# PayApp
+## Documentation for PayMyBuddy 'PayApp' Application .
 
 ### Build
 Build application with command `mvn clean package` or `mvn clean verify`
